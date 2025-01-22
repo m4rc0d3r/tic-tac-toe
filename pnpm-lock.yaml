@@ -92,6 +92,18 @@ importers:
         specifier: ^6.0.5
         version: 6.0.11(@types/node@22.10.7)
 
+  packages/eslint-config:
+    devDependencies:
+      '@eslint/js':
+        specifier: ^9.17.0
+        version: 9.18.0
+      eslint:
+        specifier: ^9.17.0
+        version: 9.18.0
+      typescript-eslint:
+        specifier: ^8.18.2
+        version: 8.21.0(eslint@9.18.0)(typescript@5.6.3)
+
 packages:
 
   '@bcoe/v8-coverage@1.0.2':
