@@ -9,11 +9,11 @@
   },
   "license": "ISC",
   "scripts": {
-    "stub-for-husky": "echo \"This is a temporary script to test husky functionality.\"",
     "prepare": "husky"
   },
   "devDependencies": {
     "husky": "^9.1.7",
+    "lint-staged": "^15.4.1",
     "prettier": "^3.4.2"
   }
 }
