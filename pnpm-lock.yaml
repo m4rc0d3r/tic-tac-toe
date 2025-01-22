@@ -33,6 +33,9 @@ importers:
       '@tic-tac-toe/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@tic-tac-toe/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@types/node':
         specifier: ^22.1.0
         version: 22.10.7

@@ -1,12 +1,8 @@
 {
-  "extends": "fastify-tsconfig",
+  "extends": ["fastify-tsconfig", "@tic-tac-toe/typescript-config/base.json"],
   "compilerOptions": {
     "outDir": "dist",
-    "sourceMap": true,
-    "moduleResolution": "NodeNext",
-    "module": "NodeNext",
-    "target": "ES2022",
-    "esModuleInterop": true
+    "sourceMap": true
   },
   "include": ["src/**/*.ts"]
 }
