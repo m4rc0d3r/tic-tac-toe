@@ -1,4 +1,5 @@
 import pluginJs from "@eslint/js";
+import prettierConfig from "eslint-config-prettier";
 import tseslint from "typescript-eslint";
 
 /** @type {import('eslint').Linter.Config[]} */
@@ -11,4 +12,5 @@ export default [
   },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
+  prettierConfig,
 ];
