@@ -1,8 +1,7 @@
 {
   "extends": ["fastify-tsconfig", "@tic-tac-toe/typescript-config/base.json"],
   "compilerOptions": {
-    "outDir": "dist",
-    "sourceMap": true
+    "outDir": "dist"
   },
   "include": ["src/**/*.ts"]
 }
