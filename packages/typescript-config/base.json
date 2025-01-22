@@ -9,6 +9,7 @@
     "declaration": true,
     "declarationMap": true,
     "noEmitOnError": true,
+    "sourceMap": true,
 
     "esModuleInterop": true,
     "isolatedModules": true,
