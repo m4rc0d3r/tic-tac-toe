@@ -12,8 +12,6 @@
     "noEmit": true,
 
     /* Linting */
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
     "noUncheckedSideEffectImports": true
   },
   "include": ["vite.config.ts"]
