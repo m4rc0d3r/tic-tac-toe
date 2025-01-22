@@ -26,6 +26,7 @@
     "fastify-cli": "^7.3.0"
   },
   "devDependencies": {
+    "@tic-tac-toe/eslint-config": "workspace:*",
     "@types/node": "^22.1.0",
     "c8": "^10.1.2",
     "ts-node": "^10.4.0",

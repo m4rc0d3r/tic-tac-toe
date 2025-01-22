@@ -30,6 +30,9 @@ importers:
         specifier: ^5.0.0
         version: 5.0.1
     devDependencies:
+      '@tic-tac-toe/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
       '@types/node':
         specifier: ^22.1.0
         version: 22.10.7
