@@ -8,7 +8,12 @@
     "node": ">=22"
   },
   "license": "ISC",
+  "scripts": {
+    "stub-for-husky": "echo \"This is a temporary script to test husky functionality.\"",
+    "prepare": "husky"
+  },
   "devDependencies": {
+    "husky": "^9.1.7",
     "prettier": "^3.4.2"
   }
 }
