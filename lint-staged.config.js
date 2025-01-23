@@ -5,11 +5,8 @@ import path from "node:path";
  * @type {import('lint-staged').Configuration}
  */
 const config = {
-  "*.{json,md,yaml,yml,html,css}": ["prettier --write"],
-  "*.{js,mjs,cjs,jsx}": [
-    "eslint --fix --flag unstable_config_lookup_from_file",
-    "prettier --write",
-  ],
+  "*.{json,md,yaml,yml,html,css}": [runPrettier()],
+  "*.{js,mjs,cjs,jsx}": [runEslint(), runPrettier()],
   "*.{ts,mts,cts,tsx}": async (absoluteFilePaths) => {
     const SEPARATOR = " ";
     const relativeFilePaths = getRelativePaths(absoluteFilePaths);
@@ -18,11 +15,33 @@ const config = {
     const commands = getRelativePaths(tsConfigs).map((tsConfig) => `tsc --noEmit -p ${tsConfig}`);
     return [
       `concurrently ${commands.map((command) => `"${command}"`).join(SEPARATOR)}`,
-      `eslint --fix --flag unstable_config_lookup_from_file ${listOfFiles}`,
-      `prettier --write ${listOfFiles}`,
+      runEslint(listOfFiles),
+      runPrettier(listOfFiles),
     ];
   },
 };
+
+/**
+ * @param {string} command
+ * @param {string[]} [listOfFiles]
+ */
+function executeCommand(command, listOfFiles) {
+  return listOfFiles ? `${command} ${listOfFiles}` : command;
+}
+
+/**
+ * @param {string[]} [listOfFiles]
+ */
+function runPrettier(listOfFiles) {
+  return executeCommand("prettier --write", listOfFiles);
+}
+
+/**
+ * @param {string[]} [listOfFiles]
+ */
+function runEslint(listOfFiles) {
+  return executeCommand("eslint --fix --flag unstable_config_lookup_from_file", listOfFiles);
+}
 
 const CURRENT_DIRECTORY = import.meta.dirname;
 
