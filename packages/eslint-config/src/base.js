@@ -13,6 +13,30 @@ export default [
   },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
+  {
+    rules: {
+      "@typescript-eslint/consistent-type-exports": "error",
+      "@typescript-eslint/consistent-type-imports": "error",
+      "@typescript-eslint/explicit-member-accessibility": [
+        "error",
+        {
+          accessibility: "no-public",
+        },
+      ],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          args: "all",
+          argsIgnorePattern: "^_",
+          caughtErrors: "all",
+          caughtErrorsIgnorePattern: "^_",
+          destructuredArrayIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          ignoreRestSiblings: true,
+        },
+      ],
+    },
+  },
   importPlugin.flatConfigs.recommended,
   {
     settings: {
