@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "@tic-tac-toe/eslint-config": "workspace:*",
+    "@tic-tac-toe/lint-staged-config": "workspace:*",
     "husky": "^9.1.7",
     "lint-staged": "^15.4.1",
     "prettier": "^3.4.2"
