@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "@tic-tac-toe/eslint-config": "workspace:*",
+    "@tic-tac-toe/lint-staged-config": "workspace:*",
     "@tic-tac-toe/typescript-config": "workspace:*",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
