@@ -1,5 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import process from "node:process";
+
+const CURRENT_DIRECTORY = process.cwd();
+const TSCONFIG_FILE_NAMES = ["tsconfig.json", "tsconfig.app.json", "tsconfig.node.json"];
 
 /**
  * @type {import('lint-staged').Configuration}
@@ -9,10 +13,17 @@ const config = {
   "*.{js,mjs,cjs,jsx}": [runEslint(), runPrettier()],
   "*.{ts,mts,cts,tsx}": async (absoluteFilePaths) => {
     const SEPARATOR = " ";
-    const relativeFilePaths = getRelativePaths(absoluteFilePaths);
+    const relativeFilePaths = absoluteFilePaths.map((filePath) =>
+      path.relative(CURRENT_DIRECTORY, filePath),
+    );
     const listOfFiles = relativeFilePaths.join(SEPARATOR);
-    const tsConfigs = await getPathsToTsconfigs(relativeFilePaths);
-    const commands = getRelativePaths(tsConfigs).map((tsConfig) => `tsc --noEmit -p ${tsConfig}`);
+    const tsConfigs = await getTsConfigs(relativeFilePaths);
+    const commands = tsConfigs.flatMap(([directory, tsConfigs]) =>
+      tsConfigs.map(
+        (tsConfig) =>
+          `tsc --noEmit -p ${path.join(path.relative(CURRENT_DIRECTORY, directory), tsConfig)}`,
+      ),
+    );
     return [
       `concurrently ${commands.map((command) => `"${command}"`).join(SEPARATOR)}`,
       runEslint(listOfFiles),
@@ -43,31 +54,25 @@ function runEslint(listOfFiles) {
   return executeCommand("eslint --fix --flag unstable_config_lookup_from_file", listOfFiles);
 }
 
-const CURRENT_DIRECTORY = import.meta.dirname;
-
 /**
  * @param {string[]} files
  */
-function getRelativePaths(files) {
-  return files.map((directory) => path.relative(CURRENT_DIRECTORY, directory));
-}
-
-/**
- * @param {string[]} files
- */
-async function getPathsToTsconfigs(files) {
-  const TSCONFIG_FILE_NAME = "tsconfig.json";
-
-  /** @type {Set<string>} */
-  const directoriesWithTsconfig = new Set();
+async function getTsConfigs(files) {
+  /** @type {Map<string,string[]>} */
+  const directoriesWithTsConfigs = new Map();
 
   for (const file of files) {
     let directory = path.resolve(path.dirname(file));
+    if (directoriesWithTsConfigs.has(directory)) {
+      continue;
+    }
     while (true) {
       const content = await fs.readdir(directory);
-      const containsTsconfig = content.includes(TSCONFIG_FILE_NAME);
-      if (containsTsconfig) {
-        directoriesWithTsconfig.add(directory);
+      const containedTsConfigs = TSCONFIG_FILE_NAMES.filter((tsConfigFileName) =>
+        content.includes(tsConfigFileName),
+      );
+      if (containedTsConfigs.length > 0) {
+        directoriesWithTsConfigs.set(directory, containedTsConfigs);
         break;
       }
       if (directory === CURRENT_DIRECTORY) {
@@ -77,7 +82,7 @@ async function getPathsToTsconfigs(files) {
     }
   }
 
-  return [...directoriesWithTsconfig];
+  return [...directoriesWithTsConfigs.entries()];
 }
 
 export default config;
