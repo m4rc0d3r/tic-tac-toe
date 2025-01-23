@@ -1,0 +1,14 @@
+{
+  "name": "@tic-tac-toe/lint-staged-config",
+  "version": "0.0.0",
+  "description": "",
+  "type": "module",
+  "exports": {
+    "./base": "./src/base.js",
+    "./commands": "./src/commands.js"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "lint-staged": "^15.4.1"
+  }
+}
