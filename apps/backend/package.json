@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@tic-tac-toe/eslint-config": "workspace:*",
+    "@tic-tac-toe/lint-staged-config": "workspace:*",
     "@tic-tac-toe/typescript-config": "workspace:*",
     "@types/node": "^22.1.0",
     "c8": "^10.1.2",

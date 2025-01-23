@@ -45,6 +45,9 @@ importers:
       '@tic-tac-toe/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@tic-tac-toe/lint-staged-config':
+        specifier: workspace:*
+        version: link:../../packages/lint-staged-config
       '@tic-tac-toe/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
