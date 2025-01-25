@@ -8,9 +8,5 @@ export default {
       glob: "src/**/*.{ts,mts,cts,tsx}",
       pathToConfigFile: "tsconfig.json",
     },
-    {
-      glob: "test/**/*.{ts,mts,cts,tsx}",
-      pathToConfigFile: "test/tsconfig.json",
-    },
   ]),
 };
