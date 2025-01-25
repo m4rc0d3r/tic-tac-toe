@@ -1,4 +1,5 @@
 const PRETTIER_COMMAND = "prettier --write";
+const STYLELINT_COMMAND = "stylelint --fix";
 const ESLINT_COMMAND = "eslint --fix --flag unstable_config_lookup_from_file";
 const TSC_COMMAND = "tsc --noEmit -p";
 
@@ -20,6 +21,13 @@ function runPrettier(listOfFiles) {
 /**
  * @param {string[]} [listOfFiles]
  */
+function runStylelint(listOfFiles) {
+  return executeCommand(STYLELINT_COMMAND, listOfFiles);
+}
+
+/**
+ * @param {string[]} [listOfFiles]
+ */
 function runEslint(listOfFiles) {
   return executeCommand(ESLINT_COMMAND, listOfFiles);
 }
@@ -31,4 +39,4 @@ function runTsc(pathToProject) {
   return executeCommand(TSC_COMMAND, pathToProject);
 }
 
-export { runEslint, runPrettier, runTsc };
+export { runEslint, runPrettier, runStylelint, runTsc };
