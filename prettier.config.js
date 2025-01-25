@@ -1,8 +1,3 @@
-/**
- * @type {import("prettier").Config}
- */
-const config = {
-  printWidth: 100,
-};
+import base from "@tic-tac-toe/prettier-config/base";
 
-export default config;
+export default base;
