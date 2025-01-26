@@ -9,7 +9,11 @@
   },
   "license": "ISC",
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "format:check": "prettier --check . '!apps'; pnpm --filter './apps/**' format:check",
+    "format:fix": "prettier --write . '!apps'; pnpm --filter './apps/**' format:fix",
+    "lint:check": "eslint --flag unstable_config_lookup_from_file --ignore-pattern 'apps' '.'; pnpm --filter './apps/**' lint:check",
+    "lint:fix": "eslint --fix --flag unstable_config_lookup_from_file --ignore-pattern 'apps' '.'; pnpm --filter './apps/**' lint:fix"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.6.1",
