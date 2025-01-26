@@ -3,7 +3,7 @@ import prettierConfig from "eslint-config-prettier";
 import importPlugin from "eslint-plugin-import";
 import tseslint from "typescript-eslint";
 
-/** @type {import('eslint').Linter.Config[]} */
+/** @type {import("eslint").Linter.Config[]} */
 export default [
   {
     files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],

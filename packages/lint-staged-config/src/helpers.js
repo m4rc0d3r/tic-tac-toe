@@ -6,9 +6,7 @@ import { runEslint, runPrettier, runTsc } from "./commands.js";
  * @property {string} pathToConfigFile
  */
 
-/**
- * @param {Option[]} options
- */
+/** @param {Option[]} options */
 function setUpTasksForTypescriptFiles(options) {
   return options.reduce((acc, { glob, pathToConfigFile }) => {
     acc[glob] = (files) => {

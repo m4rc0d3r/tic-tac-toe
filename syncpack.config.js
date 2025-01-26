@@ -1,6 +1,4 @@
-/**
- * @type {import('syncpack').RcFile}
- */
+/** @type {import("syncpack").RcFile} */
 const config = {
   versionGroups: [
     {

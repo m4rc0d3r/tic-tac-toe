@@ -11,30 +11,22 @@ function executeCommand(command, additionalArgs) {
   return additionalArgs ? `${command} ${additionalArgs}` : command;
 }
 
-/**
- * @param {string[]} [listOfFiles]
- */
+/** @param {string[]} [listOfFiles] */
 function runPrettier(listOfFiles) {
   return executeCommand(PRETTIER_COMMAND, listOfFiles);
 }
 
-/**
- * @param {string[]} [listOfFiles]
- */
+/** @param {string[]} [listOfFiles] */
 function runStylelint(listOfFiles) {
   return executeCommand(STYLELINT_COMMAND, listOfFiles);
 }
 
-/**
- * @param {string[]} [listOfFiles]
- */
+/** @param {string[]} [listOfFiles] */
 function runEslint(listOfFiles) {
   return executeCommand(ESLINT_COMMAND, listOfFiles);
 }
 
-/**
- * @param {string} pathToProject
- */
+/** @param {string} pathToProject */
 function runTsc(pathToProject) {
   return executeCommand(TSC_COMMAND, pathToProject);
 }
