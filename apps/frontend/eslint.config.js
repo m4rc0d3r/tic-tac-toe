@@ -1,3 +1,4 @@
+import tanstackQuery from "@tanstack/eslint-plugin-query";
 import base from "@tic-tac-toe/eslint-config/base";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
@@ -26,4 +27,5 @@ export default [
       ],
     },
   },
+  ...tanstackQuery.configs["flat/recommended"],
 ];
