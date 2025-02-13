@@ -1,18 +1,6 @@
 {
   "name": "tic-tac-toe",
   "version": "0.0.0",
-  "type": "module",
-  "packageManager": "pnpm@9.15.1",
-  "engines": {
-    "node": ">=22"
-  },
-  "scripts": {
-    "prepare": "husky",
-    "format:check": "prettier --check . '!apps'; pnpm --filter './apps/**' format:check",
-    "format:fix": "prettier --write . '!apps'; pnpm --filter './apps/**' format:fix",
-    "lint:check": "eslint --flag unstable_config_lookup_from_file --ignore-pattern 'apps' '.'; pnpm --filter './apps/**' lint:check",
-    "lint:fix": "eslint --fix --flag unstable_config_lookup_from_file --ignore-pattern 'apps' '.'; pnpm --filter './apps/**' lint:fix"
-  },
   "devDependencies": {
     "@commitlint/cli": "^19.6.1",
     "@commitlint/config-conventional": "^19.6.0",
@@ -25,5 +13,17 @@
     "prettier": "^3.4.2",
     "syncpack": "^13.0.0",
     "typescript": "^5.7.3"
-  }
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@9.15.1",
+  "scripts": {
+    "format:check": "prettier --check . '!apps'; pnpm --filter './apps/**' format:check",
+    "format:fix": "prettier --write . '!apps'; pnpm --filter './apps/**' format:fix",
+    "lint:check": "eslint --flag unstable_config_lookup_from_file --ignore-pattern 'apps' '.'; pnpm --filter './apps/**' lint:check",
+    "lint:fix": "eslint --fix --flag unstable_config_lookup_from_file --ignore-pattern 'apps' '.'; pnpm --filter './apps/**' lint:fix",
+    "prepare": "husky"
+  },
+  "type": "module"
 }

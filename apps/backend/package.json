@@ -1,26 +1,13 @@
 {
   "name": "@tic-tac-toe/backend",
-  "version": "0.0.0",
   "description": "This project was bootstrapped with Fastify-CLI.",
-  "type": "module",
-  "main": "app.ts",
-  "scripts": {
-    "start": "pnpm build:ts && fastify start -l info dist/app.js",
-    "build:ts": "tsc",
-    "watch:ts": "tsc -w",
-    "dev": "pnpm build:ts && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"pnpm watch:ts\" \"pnpm dev:start\"",
-    "dev:start": "fastify start --ignore-watch=.ts$ -w -l info -P dist/app.js",
-    "format:check": "prettier --check .",
-    "format:fix": "prettier --write .",
-    "lint:check": "eslint .",
-    "lint:fix": "eslint --fix ."
-  },
+  "version": "0.0.0",
   "dependencies": {
-    "fastify": "^5.0.0",
-    "fastify-plugin": "^5.0.0",
     "@fastify/autoload": "^6.0.0",
     "@fastify/sensible": "^6.0.0",
-    "fastify-cli": "^7.3.0"
+    "fastify": "^5.0.0",
+    "fastify-cli": "^7.3.0",
+    "fastify-plugin": "^5.0.0"
   },
   "devDependencies": {
     "@tic-tac-toe/eslint-config": "workspace:*",
@@ -28,9 +15,22 @@
     "@tic-tac-toe/typescript-config": "workspace:*",
     "@types/node": "^22.1.0",
     "c8": "^10.1.2",
-    "ts-node": "^10.4.0",
     "concurrently": "^9.0.0",
     "fastify-tsconfig": "^2.0.0",
+    "ts-node": "^10.4.0",
     "typescript": "^5.7.3"
-  }
+  },
+  "main": "app.ts",
+  "scripts": {
+    "build:ts": "tsc",
+    "dev": "pnpm build:ts && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"pnpm watch:ts\" \"pnpm dev:start\"",
+    "dev:start": "fastify start --ignore-watch=.ts$ -w -l info -P dist/app.js",
+    "format:check": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "lint:check": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "start": "pnpm build:ts && fastify start -l info dist/app.js",
+    "watch:ts": "tsc -w"
+  },
+  "type": "module"
 }
