@@ -1,13 +1,11 @@
 {
   "name": "tic-tac-toe",
   "version": "0.0.0",
-  "description": "",
   "type": "module",
   "packageManager": "pnpm@9.15.1",
   "engines": {
     "node": ">=22"
   },
-  "license": "ISC",
   "scripts": {
     "prepare": "husky",
     "format:check": "prettier --check . '!apps'; pnpm --filter './apps/**' format:check",

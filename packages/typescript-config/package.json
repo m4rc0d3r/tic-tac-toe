@@ -1,7 +1,5 @@
 {
   "name": "@tic-tac-toe/typescript-config",
   "version": "0.0.0",
-  "description": "",
-  "type": "module",
-  "license": "ISC"
+  "type": "module"
 }

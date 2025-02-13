@@ -15,9 +15,6 @@
     "lint:check": "eslint .",
     "lint:fix": "eslint --fix ."
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "fastify": "^5.0.0",
     "fastify-plugin": "^5.0.0",
