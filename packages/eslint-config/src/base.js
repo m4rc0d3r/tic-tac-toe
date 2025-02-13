@@ -12,6 +12,11 @@ export default [
     ignores: ["**/dist"],
   },
   pluginJs.configs.recommended,
+  {
+    rules: {
+      eqeqeq: "error",
+    },
+  },
   ...tseslint.configs.recommendedTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
   {
@@ -22,6 +27,7 @@ export default [
       },
     },
     rules: {
+      "@typescript-eslint/consistent-type-definitions": ["error", "type"],
       "@typescript-eslint/consistent-type-exports": "error",
       "@typescript-eslint/consistent-type-imports": "error",
       "@typescript-eslint/explicit-member-accessibility": [
@@ -55,13 +61,21 @@ export default [
         typescript: {
           alwaysTryTypes: true,
         },
+        node: {
+          extensions: [".js", ".jsx", ".ts", ".tsx"],
+        },
       },
     },
     rules: {
       "import/no-empty-named-blocks": "error",
       "import/no-absolute-path": "error",
       "import/no-self-import": "error",
-      "import/no-useless-path-segments": "error",
+      "import/no-useless-path-segments": [
+        "error",
+        {
+          noUselessIndex: true,
+        },
+      ],
       "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
       "import/exports-last": "error",
       "import/first": "error",
