@@ -10,6 +10,8 @@
     "fastify-plugin": "^5.0.0"
   },
   "devDependencies": {
+    "@swc/cli": "^0.6.0",
+    "@swc/core": "^1.10.16",
     "@tic-tac-toe/eslint-config": "workspace:*",
     "@tic-tac-toe/lint-staged-config": "workspace:*",
     "@tic-tac-toe/typescript-config": "workspace:*",
@@ -22,15 +24,19 @@
   },
   "main": "app.ts",
   "scripts": {
+    "build": "concurrently --kill-others-on-fail -p \"[{name}]\" -n \"TSC,SWC\" -c \"blue.bold,yellow.bold\" \"pnpm build:ts\" \"pnpm build:swc\"",
+    "build:swc": "swc src -d dist --strip-leading-paths",
     "build:ts": "tsc",
-    "dev": "pnpm build:ts && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"pnpm watch:ts\" \"pnpm dev:start\"",
+    "dev": "concurrently -k -p \"[{name}]\" -n \"TSC,SWC,App\" -c \"blue.bold,yellow.bold,red.bold\" \"pnpm watch:ts\" \"pnpm watch:swc\" \"pnpm dev:start\"",
     "dev:start": "fastify start --ignore-watch=.ts$ -w -l info -P dist/app.js",
     "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
     "lint:check": "eslint .",
     "lint:fix": "eslint --fix .",
-    "start": "pnpm build:ts && fastify start -l info dist/app.js",
-    "watch:ts": "tsc -w"
+    "start": "pnpm build && fastify start -l info dist/app.js",
+    "watch": "concurrently -k -p \"[{name}]\" -n \"TSC,SWC\" -c \"blue.bold,yellow.bold\" \"pnpm watch:ts\" \"pnpm watch:swc\"",
+    "watch:swc": "pnpm build:swc -w",
+    "watch:ts": "pnpm build:ts -w --preserveWatchOutput"
   },
   "type": "module"
 }
