@@ -4,9 +4,9 @@ import type { ReactNode } from "react";
 
 const queryClient = new QueryClient();
 
-interface TanstackQueryProviderProps {
+type TanstackQueryProviderProps = {
   children: ReactNode;
-}
+};
 
 function TanstackQueryProvider({ children }: TanstackQueryProviderProps) {
   return (
