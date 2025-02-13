@@ -1,6 +1,21 @@
+import type { FastifyTRPCPluginOptions } from "@trpc/server/adapters/fastify";
+import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import type { FastifyPluginAsync } from "fastify";
 
-const app: FastifyPluginAsync = async (_fastify, _opts): Promise<void> => {
+import { createTrpcContext, trpcRouter } from "./infra";
+
+const appRouter = trpcRouter({});
+type AppRouter = typeof appRouter;
+
+const app: FastifyPluginAsync = async (fastify, _opts): Promise<void> => {
+  fastify.register(fastifyTRPCPlugin, {
+    prefix: "trpc",
+    trpcOptions: {
+      router: appRouter,
+      createContext: createTrpcContext,
+    } satisfies FastifyTRPCPluginOptions<AppRouter>["trpcOptions"],
+  });
+
   await Promise.resolve();
 };
 
