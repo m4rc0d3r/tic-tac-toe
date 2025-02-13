@@ -1,12 +1,22 @@
 import { either as e } from "fp-ts";
 import { z } from "zod";
 
+import { zAuthenticationConfig } from "./authentication";
 import { zBcryptConfig } from "./bcrypt";
 import { ConfigVarsError } from "./config-vars.error";
+import { zCookieConfig } from "./cookie";
+import type { CorsConfig } from "./cors";
+import { zCorsConfig } from "./cors";
+import { zFrontendAppConfig } from "./frontend-app";
 import { zTrpcConfig } from "./trpc";
 
 const zConfig = z.object({
+  authentication: zAuthenticationConfig,
   bcrypt: zBcryptConfig,
+  cookie: zCookieConfig,
+  frontendApp: zFrontendAppConfig,
+  cors: zCorsConfig,
+
   trpc: zTrpcConfig,
 });
 type Config = z.infer<typeof zConfig>;
@@ -14,8 +24,16 @@ type Config = z.infer<typeof zConfig>;
 function createConfig(variables: Record<string, unknown>): e.Either<ConfigVarsError, Config> {
   return e.tryCatch(
     () => {
+      const frontendApp = zFrontendAppConfig.parse(variables);
       return {
+        authentication: zAuthenticationConfig.parse(variables),
         bcrypt: zBcryptConfig.parse(variables),
+        cookie: zCookieConfig.parse(variables),
+        cors: zCorsConfig.parse({
+          origin: frontendApp.url(),
+          credentials: true,
+        } satisfies CorsConfig),
+        frontendApp,
         trpc: zTrpcConfig.parse(variables),
       };
     },
