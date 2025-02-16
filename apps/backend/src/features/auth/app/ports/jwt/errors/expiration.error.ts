@@ -1,5 +1,5 @@
-import type { OperationalErrorOptions } from "~/shared";
-import { OperationalError } from "~/shared";
+import type { OperationalErrorOptions } from "@tic-tac-toe/core";
+import { OperationalError } from "@tic-tac-toe/core";
 
 class JwtExpirationError extends OperationalError {
   constructor(

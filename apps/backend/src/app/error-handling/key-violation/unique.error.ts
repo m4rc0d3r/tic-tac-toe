@@ -1,7 +1,7 @@
+import type { OperationalErrorOptions } from "@tic-tac-toe/core";
+
 import type { KeyType, Paths } from "./base.error";
 import { KeyViolationError } from "./base.error";
-
-import type { OperationalErrorOptions } from "~/shared";
 
 const KEY_TYPE = "unique";
 

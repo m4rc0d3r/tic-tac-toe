@@ -1,9 +1,9 @@
+import { ConfigVarsError } from "@tic-tac-toe/core";
 import { either as e } from "fp-ts";
 import { z } from "zod";
 
 import { zAuthenticationConfig } from "./authentication";
 import { zBcryptConfig } from "./bcrypt";
-import { ConfigVarsError } from "./config-vars.error";
 import { zCookieConfig } from "./cookie";
 import type { CorsConfig } from "./cors";
 import { zCorsConfig } from "./cors";

@@ -1,5 +1,5 @@
-import type { OperationalErrorOptions } from "~/shared";
-import { capitalize, OperationalError } from "~/shared";
+import type { OperationalErrorOptions } from "@tic-tac-toe/core";
+import { OperationalError, capitalize } from "@tic-tac-toe/core";
 
 type KeyType = "foreign" | "unique";
 type Paths<T extends string = string> = [T, ...T[]];
