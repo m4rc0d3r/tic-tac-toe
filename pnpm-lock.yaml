@@ -153,9 +153,21 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.64.2
         version: 5.64.2(react@18.3.1)
+      '@tic-tac-toe/backend':
+        specifier: workspace:*
+        version: link:../backend
       '@tic-tac-toe/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@trpc/client':
+        specifier: 11.0.0-rc.764
+        version: 11.0.0-rc.764(@trpc/server@11.0.0-rc.764(typescript@5.7.3))(typescript@5.7.3)
+      '@trpc/react-query':
+        specifier: 11.0.0-rc.764
+        version: 11.0.0-rc.764(@tanstack/react-query@5.64.2(react@18.3.1))(@trpc/client@11.0.0-rc.764(@trpc/server@11.0.0-rc.764(typescript@5.7.3))(typescript@5.7.3))(@trpc/server@11.0.0-rc.764(typescript@5.7.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3)
+      '@trpc/server':
+        specifier: 11.0.0-rc.764
+        version: 11.0.0-rc.764(typescript@5.7.3)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -1628,6 +1640,22 @@ packages:
 
   '@tokenizer/token@0.3.0':
     resolution: {integrity: sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A==}
+
+  '@trpc/client@11.0.0-rc.764':
+    resolution: {integrity: sha512-6NXnOm5c4U3CYqaIzZ9YHqwyEpGj8aMVpY7jvUwvpJjX11n1j52YbwqoeuUpz1JJzYw6g23PFORD4JQanqQntQ==}
+    peerDependencies:
+      '@trpc/server': 11.0.0-rc.764+71c7ccc49
+      typescript: '>=5.7.2'
+
+  '@trpc/react-query@11.0.0-rc.764':
+    resolution: {integrity: sha512-tl84JuhHqo+EvJ7uzJTCemIBH9qv7VUbBIJwKSGpj0zRwoQdkh3l8EIn5Kb16N2/+Hkilfc34MPSmB91VrfPNg==}
+    peerDependencies:
+      '@tanstack/react-query': ^5.62.8
+      '@trpc/client': 11.0.0-rc.764+71c7ccc49
+      '@trpc/server': 11.0.0-rc.764+71c7ccc49
+      react: '>=18.2.0'
+      react-dom: '>=18.2.0'
+      typescript: '>=5.7.2'
 
   '@trpc/server@11.0.0-rc.764':
     resolution: {integrity: sha512-fwU5Oowk0d7qD4nB29Fv54FGDp2JlxJcRLJUSBmXIYCK66BlwHUcaB6lzrwy6Weqlc9nt+U5j/WsooWcFDam7A==}
@@ -6242,6 +6270,20 @@ snapshots:
       react: 18.3.1
 
   '@tokenizer/token@0.3.0': {}
+
+  '@trpc/client@11.0.0-rc.764(@trpc/server@11.0.0-rc.764(typescript@5.7.3))(typescript@5.7.3)':
+    dependencies:
+      '@trpc/server': 11.0.0-rc.764(typescript@5.7.3)
+      typescript: 5.7.3
+
+  '@trpc/react-query@11.0.0-rc.764(@tanstack/react-query@5.64.2(react@18.3.1))(@trpc/client@11.0.0-rc.764(@trpc/server@11.0.0-rc.764(typescript@5.7.3))(typescript@5.7.3))(@trpc/server@11.0.0-rc.764(typescript@5.7.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3)':
+    dependencies:
+      '@tanstack/react-query': 5.64.2(react@18.3.1)
+      '@trpc/client': 11.0.0-rc.764(@trpc/server@11.0.0-rc.764(typescript@5.7.3))(typescript@5.7.3)
+      '@trpc/server': 11.0.0-rc.764(typescript@5.7.3)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      typescript: 5.7.3
 
   '@trpc/server@11.0.0-rc.764(typescript@5.7.3)':
     dependencies:
