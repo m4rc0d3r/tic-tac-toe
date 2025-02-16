@@ -39,6 +39,10 @@
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"
   },
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "default": "./dist/index.js"
+  },
   "main": "dist/main.js",
   "scripts": {
     "build": "concurrently --kill-others-on-fail -p \"[{name}]\" -n \"TSC,SWC\" -c \"blue.bold,yellow.bold\" \"pnpm build:ts\" \"pnpm build:swc\"",
