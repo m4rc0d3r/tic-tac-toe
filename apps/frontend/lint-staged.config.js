@@ -20,7 +20,9 @@ export default {
       additionalTasks: {
         [STEIGER]: STEIGER_COMMAND,
       },
-      sequenceOfExecution: [STEIGER],
+      launchOptions: {
+        [STEIGER]: true,
+      },
     },
     {
       glob: "vite.config.ts",

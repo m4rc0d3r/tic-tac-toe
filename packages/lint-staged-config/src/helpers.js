@@ -6,12 +6,14 @@ import { runEslint, runPrettier, runTsc } from "./commands.js";
  * @property {string} glob
  * @property {string} pathToConfigFile
  * @property {Record<TaskName,string | (files: string[]) => string>} [additionalTasks]
- * @property {SequenceOfExecution<TaskName>} [sequenceOfExecution]
+ * @property {Partial<LaunchOptions<TaskName>>} [launchOptions]
  */
+
+/** @typedef {"prettier" | "eslint" | "tsc"} DefaultTaskName */
 
 /**
  * @template {string} TaskName
- * @typedef {("prettier" | "eslint" | "tsc" | TaskName)[]} SequenceOfExecution
+ * @typedef {Record<DefaultTaskName | TaskName, boolean>} LaunchOptions
  */
 
 /**
@@ -19,49 +21,48 @@ import { runEslint, runPrettier, runTsc } from "./commands.js";
  * @param {Option<TaskName>[]} options
  */
 function setUpTasksForTypescriptFiles(options) {
-  return options.reduce((acc, { glob, pathToConfigFile, additionalTasks, sequenceOfExecution }) => {
+  return options.reduce((acc, { glob, pathToConfigFile, additionalTasks, launchOptions }) => {
     acc[glob] = (files) => {
       const listOfFiles = files.join(" ");
 
-      const normalizedDefaultTasks = Object.entries({
-        prettier: runPrettier(listOfFiles),
-        eslint: runEslint(listOfFiles),
+      const defaultTasks = Object.entries({
         tsc: runTsc(pathToConfigFile),
+        eslint: runEslint(listOfFiles),
+        prettier: runPrettier(listOfFiles),
       });
 
-      const normalizedAdditionalTasks = Object.entries(additionalTasks ?? {}).map(
-        ([name, command]) => [name, typeof command === "string" ? command : command(listOfFiles)],
-      );
+      /** @type {[string, string][]} */
+      const additionalTasks2 = Object.entries(additionalTasks ?? {}).map(([name, command]) => [
+        name,
+        typeof command === "string" ? command : command(listOfFiles),
+      ]);
 
-      const sequence = normalizeSequence(
-        normalizedAdditionalTasks.map(([name]) => name),
-        sequenceOfExecution,
-      );
-
-      const tasks = [...normalizedDefaultTasks, ...normalizedAdditionalTasks].sort(
-        ([aName], [bName]) => sequence.indexOf(aName) - sequence.indexOf(bName),
-      );
-
-      return tasks.map(([, command]) => command);
+      return getTasksToRun(
+        [...defaultTasks, ...additionalTasks2],
+        Object.entries(launchOptions ?? {}),
+      ).map(([, command]) => command);
     };
     return acc;
   }, {});
 }
 
-const DEFAULT_EXECUTION_SEQUENCE = ["tsc", "eslint", "prettier"];
-
 /**
- * @param {string[]} additionalTasks
- * @param {SequenceOfExecution[]} [sequence]
+ * @template {string} [TaskName=string] Default is `string`
+ * @param {[DefaultTaskName | TaskName, string][]} tasks
+ * @param {[DefaultTaskName | TaskName, boolean][]} launchOptions
+ * @returns {[DefaultTaskName | TaskName, string][]}
  */
-function normalizeSequence(additionalTasks, sequence) {
-  const normalized = new Set(sequence ?? DEFAULT_EXECUTION_SEQUENCE);
+function getTasksToRun(tasks, launchOptions) {
+  const unspecifiedTasks = tasks.filter(([name]) =>
+    launchOptions.every(([name2]) => name !== name2),
+  );
 
-  for (const task of [...additionalTasks, ...DEFAULT_EXECUTION_SEQUENCE]) {
-    normalized.add(task);
-  }
-
-  return [...normalized];
+  return [
+    ...launchOptions
+      .filter(([, execute]) => execute)
+      .map(([name]) => [name, tasks.find((task) => task.at(0) === name).at(1)]),
+    ...unspecifiedTasks,
+  ];
 }
 
 export { setUpTasksForTypescriptFiles };
