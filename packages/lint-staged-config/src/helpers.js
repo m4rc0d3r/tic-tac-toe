@@ -1,16 +1,23 @@
 import { runEslint, runPrettier, runTsc } from "./commands.js";
 
 /**
+ * @template {string} TaskName
  * @typedef {object} Option
  * @property {string} glob
  * @property {string} pathToConfigFile
- * @property {Record<string,string | (files: string[]) => string>} [additionalTasks]
- * @property {SequenceOfExecution} [sequenceOfExecution]
+ * @property {Record<TaskName,string | (files: string[]) => string>} [additionalTasks]
+ * @property {SequenceOfExecution<TaskName>} [sequenceOfExecution]
  */
 
-/** @typedef {("prettier" | "eslint" | "tsc" | (string & Record<never, never>))[]} SequenceOfExecution */
+/**
+ * @template {string} TaskName
+ * @typedef {("prettier" | "eslint" | "tsc" | TaskName)[]} SequenceOfExecution
+ */
 
-/** @param {Option[]} options */
+/**
+ * @template {string} [TaskName=string] Default is `string`
+ * @param {Option<TaskName>[]} options
+ */
 function setUpTasksForTypescriptFiles(options) {
   return options.reduce((acc, { glob, pathToConfigFile, additionalTasks, sequenceOfExecution }) => {
     acc[glob] = (files) => {
