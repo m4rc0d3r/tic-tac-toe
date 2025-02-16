@@ -1,3 +1,5 @@
+import path from "node:path";
+
 import svgrJsx from "@svgr/plugin-jsx";
 import svgrSvgo from "@svgr/plugin-svgo";
 import tailwindcss from "@tailwindcss/vite";
@@ -16,4 +18,9 @@ export default defineConfig({
       },
     }),
   ],
+  resolve: {
+    alias: {
+      "~": path.resolve(__dirname, "./src"),
+    },
+  },
 });
