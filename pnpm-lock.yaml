@@ -236,6 +236,27 @@ importers:
         specifier: ^4.3.0
         version: 4.3.0(rollup@4.31.0)(typescript@5.7.3)(vite@6.0.11(@types/node@22.10.7)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(sass@1.83.4)(stylus@0.62.0)(tsx@4.19.2)(yaml@2.6.1))
 
+  packages/core:
+    devDependencies:
+      '@swc/cli':
+        specifier: ^0.6.0
+        version: 0.6.0(@swc/core@1.10.16)(chokidar@4.0.3)
+      '@swc/core':
+        specifier: ^1.10.16
+        version: 1.10.16
+      '@tic-tac-toe/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@tic-tac-toe/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      concurrently:
+        specifier: ^9.0.0
+        version: 9.1.2
+      typescript:
+        specifier: ^5.7.3
+        version: 5.7.3
+
   packages/eslint-config:
     devDependencies:
       '@eslint/js':
