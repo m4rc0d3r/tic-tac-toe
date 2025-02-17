@@ -6,6 +6,7 @@ import { httpBatchLink } from "@trpc/client";
 import type { ReactNode } from "react";
 import { useState } from "react";
 
+import { useAuthStore } from "~/entities/auth";
 import { trpc } from "~/shared/api";
 import { useConfigStore } from "~/shared/config";
 
@@ -25,6 +26,15 @@ function QueryClientProvider({ children }: QueryClientProviderProps) {
       links: [
         httpBatchLink({
           url: [backendApp.url(), prefix].join("/"),
+          fetch: (input, options) =>
+            fetch(input, {
+              ...options,
+              credentials: "include",
+              signal: options?.signal ?? null,
+            }),
+          headers: () => ({
+            authorization: ["Bearer", useAuthStore.getState().token].join(" "),
+          }),
         }),
       ],
     }),
