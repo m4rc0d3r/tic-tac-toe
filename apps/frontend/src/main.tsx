@@ -1,18 +1,11 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import App from "./App.tsx";
-import { Configurator } from "./app/configurator.tsx";
-import { QueryClientProvider } from "./app/react-query.tsx";
+import { App } from "./app";
 import "./index.css";
-import { Toaster } from "./shared/ui/sonner.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Configurator />
-    <Toaster />
-    <QueryClientProvider>
-      <App />
-    </QueryClientProvider>
+    <App />
   </StrictMode>,
 );
