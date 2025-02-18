@@ -15,10 +15,9 @@ type Props = {
 };
 
 function QueryClientProvider({ children }: Props) {
-  const {
-    backendApp,
-    trpc: { prefix },
-  } = useConfigStore();
+  const backendApp = useConfigStore.use.backendApp();
+  const { prefix } = useConfigStore.use.trpc();
+  const token = useAuthStore.use.token();
 
   const [queryClient] = useState(() => new QueryClient());
   const [trpcClient] = useState(() =>
@@ -33,7 +32,7 @@ function QueryClientProvider({ children }: Props) {
               signal: options?.signal ?? null,
             }),
           headers: () => ({
-            authorization: ["Bearer", useAuthStore.getState().token].join(" "),
+            authorization: ["Bearer", token].join(" "),
           }),
         }),
       ],
