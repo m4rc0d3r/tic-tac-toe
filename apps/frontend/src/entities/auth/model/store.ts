@@ -4,6 +4,8 @@ import { devtools } from "zustand/middleware";
 
 import type { Me } from "./me";
 
+import { createSelectors } from "~/shared/lib/zustand";
+
 type State = {
   login: (token: NonNullable<State["token"]>, me: NonNullable<State["me"]>) => void;
   logout: () => void;
@@ -27,23 +29,25 @@ const initialState: WithoutMethods<State> = {
   me: null,
 };
 
-const useAuthStore = create<State>()(
-  devtools(
-    (set) =>
-      ({
-        ...initialState,
-        login: (token, me) =>
-          set({
-            isAuthenticated: true,
-            token,
-            me,
-          }),
-        logout: () => set(initialState),
-        reset: () => set(initialState),
-      }) satisfies State,
-    {
-      store: "AuthStore",
-    },
+const useAuthStore = createSelectors(
+  create<State>()(
+    devtools(
+      (set) =>
+        ({
+          ...initialState,
+          login: (token, me) =>
+            set({
+              isAuthenticated: true,
+              token,
+              me,
+            }),
+          logout: () => set(initialState),
+          reset: () => set(initialState),
+        }) satisfies State,
+      {
+        store: "AuthStore",
+      },
+    ),
   ),
 );
 

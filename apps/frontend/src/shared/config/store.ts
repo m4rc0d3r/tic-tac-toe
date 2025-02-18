@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
+import { createSelectors } from "../lib/zustand";
+
 import type { Config } from "./config";
 
 const initialState: Config = {
@@ -17,10 +19,12 @@ const initialState: Config = {
   },
 };
 
-const useConfigStore = create<Config>()(
-  devtools(() => initialState, {
-    store: "ConfigStore",
-  }),
+const useConfigStore = createSelectors(
+  create<Config>()(
+    devtools(() => initialState, {
+      store: "ConfigStore",
+    }),
+  ),
 );
 
 export { useConfigStore };
