@@ -3,7 +3,7 @@ import * as React from "react";
 
 import { cn } from "./utils";
 
-type SeparatorProps = React.ComponentProps<typeof SeparatorPrimitive.Root> & {
+type Props = React.ComponentProps<typeof SeparatorPrimitive.Root> & {
   thickness?: string | undefined;
 };
 
@@ -13,7 +13,7 @@ function Separator({
   decorative = true,
   thickness = "2px",
   ...props
-}: SeparatorProps) {
+}: Props) {
   return (
     <SeparatorPrimitive.Root
       data-slot="separator-root"

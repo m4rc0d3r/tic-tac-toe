@@ -10,11 +10,11 @@ import { useAuthStore } from "~/entities/auth";
 import { trpc } from "~/shared/api";
 import { useConfigStore } from "~/shared/config";
 
-type QueryClientProviderProps = {
+type Props = {
   children: ReactNode;
 };
 
-function QueryClientProvider({ children }: QueryClientProviderProps) {
+function QueryClientProvider({ children }: Props) {
   const {
     backendApp,
     trpc: { prefix },
