@@ -6,7 +6,9 @@ import { toast } from "sonner";
 import type { z } from "zod";
 
 import { useAuthStore } from "~/entities/auth";
+import type { TrpcErrorCause } from "~/shared/api";
 import { trpc } from "~/shared/api";
+import { listWithConjunction } from "~/shared/lib/text";
 import { Button } from "~/shared/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/shared/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/shared/ui/form";
@@ -14,6 +16,18 @@ import { H1 } from "~/shared/ui/h1";
 import { Input } from "~/shared/ui/input";
 import { P } from "~/shared/ui/p";
 import { Separator } from "~/shared/ui/separator";
+
+function composeErrorMessage(
+  cause: TrpcErrorCause = {
+    area: "UNKNOWN",
+  },
+) {
+  const { area, paths } = cause;
+
+  return area === "UNIQUE_KEY_VIOLATION"
+    ? `The ${listWithConjunction(paths)} ${paths.length === 1 ? "is" : "are"} already taken by another user.`
+    : "An unexpected error occurred.";
+}
 
 function RegistrationPage() {
   const navigate = useNavigate();
@@ -38,8 +52,10 @@ function RegistrationPage() {
         loginLocally(accessToken, me);
         void navigate("/");
       },
-      onError: () => {
-        toast.error("Failed to register.");
+      onError: (error) => {
+        toast.error("Failed to register.", {
+          description: composeErrorMessage(error.shape?.cause),
+        });
       },
     });
   };
