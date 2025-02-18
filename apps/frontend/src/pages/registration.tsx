@@ -45,8 +45,8 @@ function RegistrationPage() {
   };
 
   return (
-    <div className="flex h-full items-center justify-center">
-      <Card className="border-none shadow-none">
+    <div className="flex h-full">
+      <Card className="m-auto border-none shadow-none">
         <CardHeader className="items-center">
           <CardTitle>
             <H1>Signing up</H1>
