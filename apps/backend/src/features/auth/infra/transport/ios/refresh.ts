@@ -7,7 +7,7 @@ const zRefreshIn = z.object({
 });
 type RefreshIn = z.infer<typeof zRefreshIn>;
 
-const zRefreshOut = zRegisterOut.pick({ accessToken: true });
+const zRefreshOut = zRegisterOut;
 type RefreshOut = z.infer<typeof zRefreshOut>;
 
 export { zRefreshIn, zRefreshOut };

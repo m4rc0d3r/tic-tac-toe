@@ -97,6 +97,7 @@ const authRouter = trpcRouter({
           authentication: { refreshTokenCookieName },
           frontendApp,
         },
+        usersService,
         authService,
       },
       input: { extendSession },
@@ -127,6 +128,18 @@ const authRouter = trpcRouter({
       );
     }
 
+    const { userId: id } = checkResult.right;
+
+    const searchResult = await usersService.findOneBy({
+      id,
+    });
+
+    if (searchResult._tag === "Left") {
+      throw toTrpcError(searchResult.left);
+    }
+
+    const { passwordHash, ...me } = searchResult.right;
+
     const accessToken = extendSession
       ? await setUpAuthentication(res, authService, checkResult.right.userId, {
           name: refreshTokenCookieName,
@@ -140,6 +153,7 @@ const authRouter = trpcRouter({
 
     return {
       accessToken,
+      me,
     };
   }),
 });
