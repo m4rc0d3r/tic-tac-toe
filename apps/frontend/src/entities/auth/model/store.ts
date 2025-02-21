@@ -6,25 +6,27 @@ import type { Me } from "./me";
 
 import { createSelectors } from "~/shared/lib/zustand";
 
+type AuthenticationStatus = "UNCERTAIN" | "UNAUTHENTICATED" | "AUTHENTICATED";
+
 type State = {
   login: (token: NonNullable<State["token"]>, me: NonNullable<State["me"]>) => void;
   logout: () => void;
   reset: () => void;
 } & (
   | {
-      isAuthenticated: false;
+      status: Extract<AuthenticationStatus, "UNCERTAIN" | "UNAUTHENTICATED">;
       token: null;
       me: null;
     }
   | {
-      isAuthenticated: true;
+      status: Extract<AuthenticationStatus, "AUTHENTICATED">;
       token: string;
       me: Me;
     }
 );
 
 const initialState: WithoutMethods<State> = {
-  isAuthenticated: false,
+  status: "UNCERTAIN",
   token: null,
   me: null,
 };
@@ -37,11 +39,15 @@ const useAuthStore = createSelectors(
           ...initialState,
           login: (token, me) =>
             set({
-              isAuthenticated: true,
+              status: "AUTHENTICATED",
               token,
               me,
             }),
-          logout: () => set(initialState),
+          logout: () =>
+            set({
+              ...initialState,
+              status: "UNAUTHENTICATED",
+            }),
           reset: () => set(initialState),
         }) satisfies State,
       {
