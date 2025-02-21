@@ -9,6 +9,7 @@ import { useAuthStore } from "~/entities/auth";
 import type { TrpcErrorCause } from "~/shared/api";
 import { trpc } from "~/shared/api";
 import { listWithConjunction } from "~/shared/lib/text";
+import { ROUTES } from "~/shared/routing";
 import { Button } from "~/shared/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/shared/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/shared/ui/form";
@@ -50,7 +51,7 @@ function RegistrationPage() {
       onSuccess: ({ accessToken, me }) => {
         toast.success("Registration completed successfully.");
         loginLocally(accessToken, me);
-        void navigate("/");
+        void navigate(ROUTES.home);
       },
       onError: (error) => {
         toast.error("Failed to register.", {

@@ -4,6 +4,7 @@ import { AboutPage } from "~/pages/about";
 import { HomePage } from "~/pages/home";
 import { LoginPage } from "~/pages/login";
 import { RegistrationPage } from "~/pages/registration";
+import { ROUTES } from "~/shared/routing";
 
 const router = createBrowserRouter([
   {
@@ -14,15 +15,15 @@ const router = createBrowserRouter([
         Component: HomePage,
       },
       {
-        path: "about",
+        path: ROUTES.about,
         Component: AboutPage,
       },
       {
-        path: "register",
+        path: ROUTES.registration,
         Component: RegistrationPage,
       },
       {
-        path: "login",
+        path: ROUTES.login,
         Component: LoginPage,
       },
     ],
