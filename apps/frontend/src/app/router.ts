@@ -1,5 +1,6 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, Outlet } from "react-router";
 
+import { withConditionalAccess } from "~/features/routing2";
 import { AboutPage } from "~/pages/about";
 import { HomePage } from "~/pages/home";
 import { LoginPage } from "~/pages/login";
@@ -19,12 +20,20 @@ const router = createBrowserRouter([
         Component: AboutPage,
       },
       {
-        path: ROUTES.registration,
-        Component: RegistrationPage,
-      },
-      {
-        path: ROUTES.login,
-        Component: LoginPage,
+        Component: withConditionalAccess({
+          component: Outlet,
+          allowFor: "UNAUTHENTICATED",
+        }),
+        children: [
+          {
+            path: ROUTES.registration,
+            Component: RegistrationPage,
+          },
+          {
+            path: ROUTES.login,
+            Component: LoginPage,
+          },
+        ],
       },
     ],
   },
