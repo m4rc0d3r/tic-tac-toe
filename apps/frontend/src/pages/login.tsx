@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { zLoginIn } from "@tic-tac-toe/backend";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
 import type { z } from "zod";
 
@@ -10,7 +10,14 @@ import type { TrpcErrorCause } from "~/shared/api";
 import { trpc } from "~/shared/api";
 import { ROUTES } from "~/shared/routing";
 import { Button } from "~/shared/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/shared/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~/shared/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/shared/ui/form";
 import { H1 } from "~/shared/ui/h1";
 import { Input } from "~/shared/ui/input";
@@ -107,6 +114,15 @@ function LoginPage() {
             </form>
           </Form>
         </CardContent>
+        <div className="px-6">
+          <Separator />
+        </div>
+        <CardFooter className="justify-center pt-6">
+          <P>Don't have an account yet?</P>&nbsp;
+          <Link to={ROUTES.registration} className="font-bold text-blue-700">
+            Sign up
+          </Link>
+        </CardFooter>
       </Card>
     </div>
   );
