@@ -7,6 +7,8 @@ import { router } from "./router";
 
 import { Toaster } from "~/shared/ui/sonner";
 
+import "./i18n";
+
 function App() {
   return (
     <>
