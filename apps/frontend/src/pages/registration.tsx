@@ -9,6 +9,7 @@ import { useAuthStore } from "~/entities/auth";
 import type { TrpcErrorCause } from "~/shared/api";
 import { trpc } from "~/shared/api";
 import { listWithConjunction } from "~/shared/lib/text";
+import { errorMapForForms } from "~/shared/lib/zod";
 import { ROUTES } from "~/shared/routing";
 import { Button } from "~/shared/ui/button";
 import {
@@ -43,7 +44,9 @@ function RegistrationPage() {
   const loginLocally = useAuthStore.use.login();
 
   const form = useForm<z.infer<typeof zRegisterIn>>({
-    resolver: zodResolver(zRegisterIn),
+    resolver: zodResolver(zRegisterIn, {
+      errorMap: errorMapForForms,
+    }),
     defaultValues: {
       email: "",
       nickname: "",

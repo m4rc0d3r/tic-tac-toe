@@ -8,6 +8,7 @@ import type { z } from "zod";
 import { useAuthStore } from "~/entities/auth";
 import type { TrpcErrorCause } from "~/shared/api";
 import { trpc } from "~/shared/api";
+import { errorMapForForms } from "~/shared/lib/zod";
 import { ROUTES } from "~/shared/routing";
 import { Button } from "~/shared/ui/button";
 import {
@@ -42,7 +43,9 @@ function LoginPage() {
   const loginLocally = useAuthStore.use.login();
 
   const form = useForm<z.infer<typeof zLoginIn>>({
-    resolver: zodResolver(zLoginIn),
+    resolver: zodResolver(zLoginIn, {
+      errorMap: errorMapForForms,
+    }),
     defaultValues: {
       email: "",
       password: "",
