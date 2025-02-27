@@ -175,10 +175,10 @@ function MeSection({ data, ...props }: MeSectionProps) {
   const handleLogout = () => {
     logout(void 0, {
       onSuccess: () => {
-        toast.success("Logout completed successfully.");
+        toast.success(tc(TRANSLATION_KEYS.LOGOUT_COMPLETED_SUCCESSFULLY));
       },
       onError: () => {
-        toast.error("Errors occurred while logging out.");
+        toast.error(tc(TRANSLATION_KEYS.ERRORS_WHEN_LOGGING_OUT));
       },
       onSettled: () => {
         logoutLocally();
