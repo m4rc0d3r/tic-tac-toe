@@ -35,7 +35,7 @@ function composeErrorMessage(
   const { area, paths } = cause;
 
   return area === "UNIQUE_KEY_VIOLATION"
-    ? `The ${listWithConjunction(paths)} ${paths.length === 1 ? "is" : "are"} already taken by another user.`
+    ? `The ${listWithConjunction(paths, "and")} ${paths.length === 1 ? "is" : "are"} already taken by another user.`
     : "An unexpected error occurred.";
 }
 
