@@ -8,6 +8,7 @@ import type { z } from "zod";
 import { useAuthStore } from "~/entities/auth";
 import type { TrpcErrorCause } from "~/shared/api";
 import { trpc } from "~/shared/api";
+import { TRANSLATION_KEYS, useTranslation2 } from "~/shared/i18n";
 import { listWithConjunction } from "~/shared/lib/text";
 import { errorMapForForms } from "~/shared/lib/zod";
 import { ROUTES } from "~/shared/routing";
@@ -39,6 +40,10 @@ function composeErrorMessage(
 }
 
 function RegistrationPage() {
+  const {
+    postproc: { tc, ts, tsp },
+  } = useTranslation2();
+
   const navigate = useNavigate();
   const { mutate: register, isPending: isRegistrationPending } = trpc.auth.register.useMutation();
   const loginLocally = useAuthStore.use.login();
@@ -76,10 +81,14 @@ function RegistrationPage() {
       <Card className="m-auto border-none shadow-none">
         <CardHeader className="items-center">
           <CardTitle>
-            <H1>Signing up</H1>
+            <H1>{tc(TRANSLATION_KEYS.SIGNING_UP)}</H1>
           </CardTitle>
           <CardDescription>
-            <P>Create an account to get the ability to store your game history and more.</P>
+            <P>
+              {tsp(
+                TRANSLATION_KEYS.CREATE_ACCOUNT_TO_GET_THE_ABILITY_TO_STORE_YOUR_GAME_HISTORY_AND_MORE,
+              )}
+            </P>
           </CardDescription>
         </CardHeader>
         <div className="px-6">
@@ -95,7 +104,7 @@ function RegistrationPage() {
                 name="nickname"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nickname</FormLabel>
+                    <FormLabel>{tc(TRANSLATION_KEYS.NICKNAME)}</FormLabel>
                     <FormControl>
                       <Input disabled={isRegistrationPending} {...field} />
                     </FormControl>
@@ -107,7 +116,7 @@ function RegistrationPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{tc(TRANSLATION_KEYS.EMAIL)}</FormLabel>
                     <FormControl>
                       <Input disabled={isRegistrationPending} {...field} />
                     </FormControl>
@@ -119,7 +128,7 @@ function RegistrationPage() {
                 name="firstName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>First name</FormLabel>
+                    <FormLabel>{tc(TRANSLATION_KEYS.FIRST_NAME)}</FormLabel>
                     <FormControl>
                       <Input disabled={isRegistrationPending} {...field} />
                     </FormControl>
@@ -131,7 +140,7 @@ function RegistrationPage() {
                 name="lastName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Last name</FormLabel>
+                    <FormLabel>{tc(TRANSLATION_KEYS.LAST_NAME)}</FormLabel>
                     <FormControl>
                       <Input disabled={isRegistrationPending} {...field} />
                     </FormControl>
@@ -143,7 +152,7 @@ function RegistrationPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>{tc(TRANSLATION_KEYS.PASSWORD)}</FormLabel>
                     <FormControl>
                       <Input type="password" disabled={isRegistrationPending} {...field} />
                     </FormControl>
@@ -152,7 +161,7 @@ function RegistrationPage() {
                 )}
               />
               <Button disabled={isRegistrationPending} className="w-full">
-                Sign up
+                {tc(TRANSLATION_KEYS.SIGN_UP)}
               </Button>
             </form>
           </Form>
@@ -161,9 +170,9 @@ function RegistrationPage() {
           <Separator />
         </div>
         <CardFooter className="justify-center pt-6">
-          <P>Do you already have an account?</P>&nbsp;
+          <P>{ts("?")(TRANSLATION_KEYS.DO_YOU_ALREADY_HAVE_ACCOUNT)}</P>&nbsp;
           <Link to={ROUTES.login} className="font-bold text-blue-700">
-            Sign in
+            {tc(TRANSLATION_KEYS.SIGN_IN)}
           </Link>
         </CardFooter>
       </Card>

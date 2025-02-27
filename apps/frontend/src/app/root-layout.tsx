@@ -9,7 +9,7 @@ import { trpc } from "~/shared/api";
 import AboutIcon from "~/shared/assets/about.svg?react";
 import LogoIcon from "~/shared/assets/logo.svg?react";
 import type { LanguageCode } from "~/shared/i18n";
-import { SUPPORTED_LANGUAGES, useTranslation2 } from "~/shared/i18n";
+import { SUPPORTED_LANGUAGES, TRANSLATION_KEYS, useTranslation2 } from "~/shared/i18n";
 import { ROUTES } from "~/shared/routing";
 import { Button } from "~/shared/ui/button";
 import {
@@ -23,6 +23,10 @@ import {
 import { cn } from "~/shared/ui/utils";
 
 function RootLayout() {
+  const {
+    postproc: { tc },
+  } = useTranslation2();
+
   type State = ReturnType<(typeof useAuthStore)["getState"]>;
   const { status, me } = {
     status: useAuthStore.use.status(),
@@ -33,7 +37,7 @@ function RootLayout() {
 
   const menuItems = [
     {
-      name: "About",
+      name: tc(TRANSLATION_KEYS.ABOUT_US),
       path: ROUTES.about,
       Icon: AboutIcon,
     },
@@ -41,12 +45,12 @@ function RootLayout() {
 
   const authMenuItems = [
     {
-      name: "Sign in",
+      name: tc(TRANSLATION_KEYS.SIGN_IN),
       path: ROUTES.login,
       variant: "ghost" satisfies ComponentProps<typeof Button>["variant"],
     },
     {
-      name: "Sign up",
+      name: tc(TRANSLATION_KEYS.SIGN_UP),
       path: ROUTES.registration,
       variant: "outline" satisfies ComponentProps<typeof Button>["variant"],
     },
@@ -159,6 +163,9 @@ type MeSectionProps = ComponentProps<typeof DropdownMenu> & {
 };
 
 function MeSection({ data, ...props }: MeSectionProps) {
+  const {
+    postproc: { tc },
+  } = useTranslation2();
   const navigate = useNavigate();
 
   const { mutate: logout, isPending: isLogoutPending } = trpc.auth.logout.useMutation();
@@ -186,11 +193,11 @@ function MeSection({ data, ...props }: MeSectionProps) {
     <DropdownMenu {...props}>
       <DropdownMenuTrigger className="hover:bg-muted flex cursor-pointer items-center rounded-md px-2">
         <UserIcon className="size-10" />
-        {fullName || "Name not specified"}
+        {fullName || tc(TRANSLATION_KEYS.NAME_NOT_SPECIFIED)}
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={handleLogout} disabled={isLogoutPending}>
-          Sign out
+          {tc(TRANSLATION_KEYS.SIGN_OUT)}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

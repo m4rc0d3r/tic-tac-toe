@@ -5,19 +5,81 @@ import type { FallbackNs, UseTranslationOptions, UseTranslationResponse } from "
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
-const TRANSLATION_KEYS = z.enum(["ENGLISH", "UKRAINIAN"]).Values;
+const TRANSLATION_KEYS = z.enum([
+  "ENGLISH",
+  "UKRAINIAN",
+  "WELCOME_TO_HOME_PAGE",
+  "WELCOME_TO_ABOUT_US_PAGE",
+  "ABOUT_US",
+  "SIGN_IN",
+  "SIGN_UP",
+  "SIGN_OUT",
+  "NAME_NOT_SPECIFIED",
+  "SIGNING_UP",
+  "CREATE_ACCOUNT_TO_GET_THE_ABILITY_TO_STORE_YOUR_GAME_HISTORY_AND_MORE",
+  "NICKNAME",
+  "EMAIL",
+  "FIRST_NAME",
+  "LAST_NAME",
+  "PASSWORD",
+  "DO_YOU_ALREADY_HAVE_ACCOUNT",
+  "SIGNING_IN",
+  "SIGN_IN_TO_YOUR_ACCOUNT_TO_ACCESS_YOUR_GAME_HISTORY_AND_MORE",
+  "DONT_HAVE_AN_ACCOUNT_YET",
+]).Values;
 
 const RESOURCES = {
   en: {
     translation: {
       [TRANSLATION_KEYS.ENGLISH]: "english",
       [TRANSLATION_KEYS.UKRAINIAN]: "ukrainian",
+      [TRANSLATION_KEYS.WELCOME_TO_HOME_PAGE]: "welcome to the home page",
+      [TRANSLATION_KEYS.WELCOME_TO_ABOUT_US_PAGE]: "welcome to the page that tells about us",
+      [TRANSLATION_KEYS.ABOUT_US]: "about us",
+      [TRANSLATION_KEYS.SIGN_IN]: "sign in",
+      [TRANSLATION_KEYS.SIGN_UP]: "sign up",
+      [TRANSLATION_KEYS.SIGN_OUT]: "sign out",
+      [TRANSLATION_KEYS.NAME_NOT_SPECIFIED]: "name not specified",
+      [TRANSLATION_KEYS.SIGNING_UP]: "signing up",
+      [TRANSLATION_KEYS.CREATE_ACCOUNT_TO_GET_THE_ABILITY_TO_STORE_YOUR_GAME_HISTORY_AND_MORE]:
+        "create an account to get the ability to store your game history and more",
+      [TRANSLATION_KEYS.NICKNAME]: "nickname",
+      [TRANSLATION_KEYS.EMAIL]: "email",
+      [TRANSLATION_KEYS.FIRST_NAME]: "first name",
+      [TRANSLATION_KEYS.LAST_NAME]: "last name",
+      [TRANSLATION_KEYS.PASSWORD]: "password",
+      [TRANSLATION_KEYS.DO_YOU_ALREADY_HAVE_ACCOUNT]: "do you already have an account",
+      [TRANSLATION_KEYS.SIGNING_IN]: "signing in",
+      [TRANSLATION_KEYS.SIGN_IN_TO_YOUR_ACCOUNT_TO_ACCESS_YOUR_GAME_HISTORY_AND_MORE]:
+        "sign in to your account to access your game history and more",
+      [TRANSLATION_KEYS.DONT_HAVE_AN_ACCOUNT_YET]: "Don't have an account yet",
     },
   },
   uk: {
     translation: {
       [TRANSLATION_KEYS.ENGLISH]: "англійська",
       [TRANSLATION_KEYS.UKRAINIAN]: "українська",
+      [TRANSLATION_KEYS.WELCOME_TO_HOME_PAGE]: "ласкаво просимо на головну сторінку",
+      [TRANSLATION_KEYS.WELCOME_TO_ABOUT_US_PAGE]:
+        "ласкаво просимо на сторінку, яка розповідає про нас",
+      [TRANSLATION_KEYS.ABOUT_US]: "про нас",
+      [TRANSLATION_KEYS.SIGN_IN]: "увійти",
+      [TRANSLATION_KEYS.SIGN_UP]: "зареєструватися",
+      [TRANSLATION_KEYS.SIGN_OUT]: "вийти",
+      [TRANSLATION_KEYS.NAME_NOT_SPECIFIED]: "ім'я не вказано",
+      [TRANSLATION_KEYS.SIGNING_UP]: "реєстрація",
+      [TRANSLATION_KEYS.CREATE_ACCOUNT_TO_GET_THE_ABILITY_TO_STORE_YOUR_GAME_HISTORY_AND_MORE]:
+        "створіть обліковий запис, щоб зберігати історію ігор і не тільки",
+      [TRANSLATION_KEYS.NICKNAME]: "псевдонім",
+      [TRANSLATION_KEYS.EMAIL]: "електронна адреса",
+      [TRANSLATION_KEYS.FIRST_NAME]: "ім'я",
+      [TRANSLATION_KEYS.LAST_NAME]: "прізвище",
+      [TRANSLATION_KEYS.PASSWORD]: "пароль",
+      [TRANSLATION_KEYS.DO_YOU_ALREADY_HAVE_ACCOUNT]: "ви вже маєте акаунт",
+      [TRANSLATION_KEYS.SIGNING_IN]: "вхід",
+      [TRANSLATION_KEYS.SIGN_IN_TO_YOUR_ACCOUNT_TO_ACCESS_YOUR_GAME_HISTORY_AND_MORE]:
+        "увійдіть у свій обліковий запис, щоб отримати доступ до історії ігор і не тільки",
+      [TRANSLATION_KEYS.DONT_HAVE_AN_ACCOUNT_YET]: "у вас ще немає облікового запису",
     },
   },
 };

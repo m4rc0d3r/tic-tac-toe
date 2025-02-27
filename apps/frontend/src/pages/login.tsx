@@ -8,6 +8,7 @@ import type { z } from "zod";
 import { useAuthStore } from "~/entities/auth";
 import type { TrpcErrorCause } from "~/shared/api";
 import { trpc } from "~/shared/api";
+import { TRANSLATION_KEYS, useTranslation2 } from "~/shared/i18n";
 import { errorMapForForms } from "~/shared/lib/zod";
 import { ROUTES } from "~/shared/routing";
 import { Button } from "~/shared/ui/button";
@@ -38,6 +39,10 @@ function composeErrorMessage(
 }
 
 function LoginPage() {
+  const {
+    postproc: { tc, ts, tsp },
+  } = useTranslation2();
+
   const navigate = useNavigate();
   const { mutate: login, isPending: isLoginPending } = trpc.auth.login.useMutation();
   const loginLocally = useAuthStore.use.login();
@@ -72,10 +77,12 @@ function LoginPage() {
       <Card className="m-auto border-none shadow-none">
         <CardHeader className="items-center">
           <CardTitle>
-            <H1>Signing in</H1>
+            <H1>{tc(TRANSLATION_KEYS.SIGNING_IN)}</H1>
           </CardTitle>
           <CardDescription>
-            <P>Sign in to your account to access your game history and more.</P>
+            <P>
+              {tsp(TRANSLATION_KEYS.SIGN_IN_TO_YOUR_ACCOUNT_TO_ACCESS_YOUR_GAME_HISTORY_AND_MORE)}
+            </P>
           </CardDescription>
         </CardHeader>
         <div className="px-6">
@@ -91,7 +98,7 @@ function LoginPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{tc(TRANSLATION_KEYS.EMAIL)}</FormLabel>
                     <FormControl>
                       <Input disabled={isLoginPending} {...field} />
                     </FormControl>
@@ -103,7 +110,7 @@ function LoginPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>{tc(TRANSLATION_KEYS.PASSWORD)}</FormLabel>
                     <FormControl>
                       <Input type="password" disabled={isLoginPending} {...field} />
                     </FormControl>
@@ -112,7 +119,7 @@ function LoginPage() {
                 )}
               />
               <Button disabled={isLoginPending} className="w-full">
-                Sign in
+                {tc(TRANSLATION_KEYS.SIGN_IN)}
               </Button>
             </form>
           </Form>
@@ -121,9 +128,9 @@ function LoginPage() {
           <Separator />
         </div>
         <CardFooter className="justify-center pt-6">
-          <P>Don't have an account yet?</P>&nbsp;
+          <P>{ts("?")(TRANSLATION_KEYS.DONT_HAVE_AN_ACCOUNT_YET)}</P>&nbsp;
           <Link to={ROUTES.registration} className="font-bold text-blue-700">
-            Sign up
+            {tc(TRANSLATION_KEYS.SIGN_UP)}
           </Link>
         </CardFooter>
       </Card>
