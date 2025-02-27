@@ -2,6 +2,7 @@ import {
   QueryClient,
   QueryClientProvider as ReactQueryClientProvider,
 } from "@tanstack/react-query";
+import { SPACE } from "@tic-tac-toe/core";
 import { httpBatchLink } from "@trpc/client";
 import type { ReactNode } from "react";
 import { useState } from "react";
@@ -32,7 +33,7 @@ function QueryClientProvider({ children }: Props) {
               signal: options?.signal ?? null,
             }),
           headers: () => ({
-            authorization: ["Bearer", token].join(" "),
+            authorization: ["Bearer", token].join(SPACE),
           }),
         }),
       ],

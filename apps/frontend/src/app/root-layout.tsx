@@ -1,3 +1,4 @@
+import { SPACE } from "@tic-tac-toe/core";
 import { MenuIcon, UserIcon } from "lucide-react";
 import type { ComponentProps } from "react";
 import { Link, Outlet, useNavigate } from "react-router";
@@ -187,7 +188,7 @@ function MeSection({ data, ...props }: MeSectionProps) {
   };
 
   const { firstName, lastName } = data;
-  const fullName = [firstName, lastName].join(" ").trim();
+  const fullName = [firstName, lastName].join(SPACE).trim();
 
   return (
     <DropdownMenu {...props}>

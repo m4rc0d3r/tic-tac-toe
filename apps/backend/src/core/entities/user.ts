@@ -1,3 +1,4 @@
+import { EMPTY_STRING } from "@tic-tac-toe/core";
 import { z } from "zod";
 
 import {
@@ -14,8 +15,8 @@ const zUser = z.object({
   id: zId,
   email: zEmail,
   nickname: zUserNickname,
-  firstName: zUserFirstName.default(""),
-  lastName: zUserLastName.default(""),
+  firstName: zUserFirstName.default(EMPTY_STRING),
+  lastName: zUserLastName.default(EMPTY_STRING),
   password: zUserPassword,
   passwordHash: zUserPasswordHash,
 });

@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { zRegisterIn } from "@tic-tac-toe/backend";
+import { EMPTY_STRING, QUESTION_MARK } from "@tic-tac-toe/core";
 import type { Namespace, TFunction } from "i18next";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
@@ -77,11 +78,11 @@ function RegistrationPage() {
       errorMap: errorMapForForms(t),
     }),
     defaultValues: {
-      email: "",
-      nickname: "",
-      firstName: "",
-      lastName: "",
-      password: "",
+      email: EMPTY_STRING,
+      nickname: EMPTY_STRING,
+      firstName: EMPTY_STRING,
+      lastName: EMPTY_STRING,
+      password: EMPTY_STRING,
     },
   });
 
@@ -194,7 +195,7 @@ function RegistrationPage() {
           <Separator />
         </div>
         <CardFooter className="justify-center pt-6">
-          <P>{ts("?")(TRANSLATION_KEYS.DO_YOU_ALREADY_HAVE_ACCOUNT)}</P>&nbsp;
+          <P>{ts(QUESTION_MARK)(TRANSLATION_KEYS.DO_YOU_ALREADY_HAVE_ACCOUNT)}</P>&nbsp;
           <Link to={ROUTES.login} className="font-bold text-blue-700">
             {tc(TRANSLATION_KEYS.SIGN_IN)}
           </Link>

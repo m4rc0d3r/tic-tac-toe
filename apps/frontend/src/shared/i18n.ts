@@ -1,4 +1,4 @@
-import { capitalize } from "@tic-tac-toe/core";
+import { capitalize, EMPTY_STRING, UNDERSCORE } from "@tic-tac-toe/core";
 import type { FlatNamespace, KeyPrefix, Namespace, TFunction } from "i18next";
 import type { $Tuple } from "node_modules/react-i18next/helpers";
 import type { FallbackNs, UseTranslationOptions, UseTranslationResponse } from "react-i18next";
@@ -25,8 +25,8 @@ function tk<C extends Case, G extends Gender, P extends Plural>(
     plural: P;
   }>,
 ) {
-  const { case_ = "", gender = "", plural = "" } = opts ?? {};
-  return [name, case_, gender, plural].filter((value) => value).join("_");
+  const { case_ = EMPTY_STRING, gender = EMPTY_STRING, plural = EMPTY_STRING } = opts ?? {};
+  return [name, case_, gender, plural].filter((value) => value).join(UNDERSCORE);
 }
 
 const TRANSLATION_KEYS = z.enum([
@@ -223,7 +223,7 @@ function createTc<Ns extends Namespace, KPrefix>(t: TFunction<Ns, KPrefix>) {
 function createTs<Ns extends Namespace, KPrefix>(t: TFunction<Ns, KPrefix>) {
   return (punctuationMark: string) =>
     (...args: Parameters<typeof t>) =>
-      [createTc(t)(...args), punctuationMark].join("");
+      [createTc(t)(...args), punctuationMark].join(EMPTY_STRING);
 }
 
 function createTsp<Ns extends Namespace, KPrefix>(t: TFunction<Ns, KPrefix>) {

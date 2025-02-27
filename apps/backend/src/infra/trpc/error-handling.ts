@@ -1,3 +1,4 @@
+import { EMPTY_STRING } from "@tic-tac-toe/core";
 import { TRPCError } from "@trpc/server";
 import type { DefaultErrorShape } from "@trpc/server/unstable-core-do-not-import";
 import { TRPC_ERROR_CODES_BY_KEY } from "@trpc/server/unstable-core-do-not-import";
@@ -44,7 +45,7 @@ function formatTrpcError(error: TRPCError, path?: string, stack?: string) {
   const code = HTTP_STATUS_PHRASES_BY_ERROR_AREA[cause.area];
 
   const defaultShape = {
-    message: "",
+    message: EMPTY_STRING,
     code: TRPC_ERROR_CODES_BY_KEY[code],
     data: {
       code,

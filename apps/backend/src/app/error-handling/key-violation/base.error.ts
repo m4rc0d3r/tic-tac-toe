@@ -1,5 +1,5 @@
 import type { OperationalErrorOptions } from "@tic-tac-toe/core";
-import { OperationalError, capitalize } from "@tic-tac-toe/core";
+import { COMMA_WITH_SPACE, OperationalError, capitalize } from "@tic-tac-toe/core";
 
 type KeyType = "foreign" | "unique";
 type Paths<T extends string = string> = [T, ...T[]];
@@ -15,7 +15,7 @@ abstract class KeyViolationError<
   ) {
     super(options);
     const capitalizedType = capitalize(this.type);
-    this.message = `${capitalizedType} key constraint consisting of attributes in the paths ${this.paths.map((p) => `'${p}'`).join(", ")} was violated.`;
+    this.message = `${capitalizedType} key constraint consisting of attributes in the paths ${this.paths.map((p) => `'${p}'`).join(COMMA_WITH_SPACE)} was violated.`;
   }
 }
 

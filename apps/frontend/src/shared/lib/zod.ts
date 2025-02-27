@@ -1,3 +1,4 @@
+import { EMPTY_STRING } from "@tic-tac-toe/core";
 import type { Namespace, TFunction } from "i18next";
 import { z } from "zod";
 
@@ -38,7 +39,7 @@ function errorMapForForms<Ns extends Namespace, KPrefix>(t: TFunction<Ns, KPrefi
           );
         }
         return {
-          message: parts.join(""),
+          message: parts.join(EMPTY_STRING),
         };
       }
       if ("startsWith" in validation) {

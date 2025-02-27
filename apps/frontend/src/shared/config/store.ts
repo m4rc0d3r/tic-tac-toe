@@ -1,3 +1,4 @@
+import { EMPTY_STRING } from "@tic-tac-toe/core";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
@@ -7,15 +8,15 @@ import type { Config } from "./config";
 
 const initialState: Config = {
   backendApp: {
-    protocol: "",
-    address: "",
+    protocol: EMPTY_STRING,
+    address: EMPTY_STRING,
     port: 0,
     url: function (): string {
       throw new Error("Function not implemented.");
     },
   },
   trpc: {
-    prefix: "",
+    prefix: EMPTY_STRING,
   },
 };
 
