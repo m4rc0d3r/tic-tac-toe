@@ -8,12 +8,16 @@ import { useAuthStore } from "~/entities/auth";
 import { trpc } from "~/shared/api";
 import AboutIcon from "~/shared/assets/about.svg?react";
 import LogoIcon from "~/shared/assets/logo.svg?react";
+import type { LanguageCode } from "~/shared/i18n";
+import { SUPPORTED_LANGUAGES, useTranslation2 } from "~/shared/i18n";
 import { ROUTES } from "~/shared/routing";
 import { Button } from "~/shared/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "~/shared/ui/dropdown-menu";
 import { cn } from "~/shared/ui/utils";
@@ -89,6 +93,7 @@ function RootLayout() {
               </ul>
             </li>
             <li className="flex items-center">
+              <LanguageSwitcher />
               {status === "AUTHENTICATED" ? (
                 <MeSection data={me} />
               ) : status === "UNAUTHENTICATED" ? (
@@ -118,6 +123,37 @@ function RootLayout() {
   );
 }
 
+function LanguageSwitcher(props: ComponentProps<typeof DropdownMenu>) {
+  const {
+    translation: { i18n },
+    postproc: { tc },
+  } = useTranslation2();
+
+  const getLanguageName = (code: string) =>
+    tc(SUPPORTED_LANGUAGES[code as LanguageCode].toLocaleUpperCase(), {
+      lng: code,
+    });
+
+  return (
+    <DropdownMenu {...props}>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">{getLanguageName(i18n.language)}</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuRadioGroup
+          value={i18n.language}
+          onValueChange={(value) => void i18n.changeLanguage(value)}
+        >
+          {Object.keys(SUPPORTED_LANGUAGES).map((value) => (
+            <DropdownMenuRadioItem key={value} value={value}>
+              {getLanguageName(value)}
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 type MeSectionProps = ComponentProps<typeof DropdownMenu> & {
   data: Me;
 };

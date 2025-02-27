@@ -3,13 +3,22 @@ import type { FlatNamespace, KeyPrefix, Namespace, TFunction } from "i18next";
 import type { $Tuple } from "node_modules/react-i18next/helpers";
 import type { FallbackNs, UseTranslationOptions, UseTranslationResponse } from "react-i18next";
 import { useTranslation } from "react-i18next";
+import { z } from "zod";
+
+const TRANSLATION_KEYS = z.enum(["ENGLISH", "UKRAINIAN"]).Values;
 
 const RESOURCES = {
   en: {
-    translation: {},
+    translation: {
+      [TRANSLATION_KEYS.ENGLISH]: "english",
+      [TRANSLATION_KEYS.UKRAINIAN]: "ukrainian",
+    },
   },
   uk: {
-    translation: {},
+    translation: {
+      [TRANSLATION_KEYS.ENGLISH]: "англійська",
+      [TRANSLATION_KEYS.UKRAINIAN]: "українська",
+    },
   },
 };
 
@@ -70,5 +79,13 @@ function createTsp<Ns extends Namespace, KPrefix>(t: TFunction<Ns, KPrefix>) {
   return (...args: Parameters<typeof t>) => createTs(t)(".")(...args);
 }
 
-export { createTc, createTs, createTsp, RESOURCES, SUPPORTED_LANGUAGES, useTranslation2 };
+export {
+  createTc,
+  createTs,
+  createTsp,
+  RESOURCES,
+  SUPPORTED_LANGUAGES,
+  TRANSLATION_KEYS,
+  useTranslation2,
+};
 export type { LanguageCode };
