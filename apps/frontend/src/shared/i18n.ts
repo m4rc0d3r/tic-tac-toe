@@ -35,6 +35,11 @@ const TRANSLATION_KEYS = z.enum([
   "MUST_END_WITH_STRING",
   "INCORRECT_NUMBER_OF_CHARACTERS_MUST_BE_EXACTLY_N",
   "NOT_ENOUGH_CHARACTERS_AT_LEAST_N_REQUIRED",
+  "UNEXPECTED_ERROR_OCCURRED",
+  "DATA_ALREADY_USED_BY_ANOTHER_USER",
+  "CONJUNCTION",
+  "REGISTRATION_SUCCESSFULLY_COMPLETED",
+  "FAILED_TO_REGISTER",
 ]).Values;
 
 const RESOURCES = {
@@ -73,6 +78,14 @@ const RESOURCES = {
         "not enough characters, at least {{n}} is required",
       [`${TRANSLATION_KEYS.NOT_ENOUGH_CHARACTERS_AT_LEAST_N_REQUIRED}_other`]:
         "not enough characters, at least {{n}} are required",
+      [TRANSLATION_KEYS.UNEXPECTED_ERROR_OCCURRED]: "an unexpected error occurred",
+      [`${TRANSLATION_KEYS.DATA_ALREADY_USED_BY_ANOTHER_USER}_one`]:
+        "the {{data}} is already taken by another user",
+      [`${TRANSLATION_KEYS.DATA_ALREADY_USED_BY_ANOTHER_USER}_other`]:
+        "the {{data}} are already taken by another user",
+      [TRANSLATION_KEYS.CONJUNCTION]: "and",
+      [TRANSLATION_KEYS.REGISTRATION_SUCCESSFULLY_COMPLETED]: "registration successfully completed",
+      [TRANSLATION_KEYS.FAILED_TO_REGISTER]: "failed to register",
     },
   },
   uk: {
@@ -112,6 +125,16 @@ const RESOURCES = {
         "недостатньо символів, потрібно принаймні {{n}}",
       [`${TRANSLATION_KEYS.NOT_ENOUGH_CHARACTERS_AT_LEAST_N_REQUIRED}_one`]:
         "недостатньо символів, потрібен принаймні {{n}}",
+      [TRANSLATION_KEYS.UNEXPECTED_ERROR_OCCURRED]: "сталася неочікувана помилка",
+      [TRANSLATION_KEYS.DATA_ALREADY_USED_BY_ANOTHER_USER]:
+        "{{data}} вже зайняті іншим користувачем",
+      [`${TRANSLATION_KEYS.DATA_ALREADY_USED_BY_ANOTHER_USER}_male_one`]:
+        "{{data}} вже зайнятий іншим користувачем",
+      [`${TRANSLATION_KEYS.DATA_ALREADY_USED_BY_ANOTHER_USER}_female_one`]:
+        "{{data}} вже зайнята іншим користувачем",
+      [TRANSLATION_KEYS.CONJUNCTION]: "і",
+      [TRANSLATION_KEYS.REGISTRATION_SUCCESSFULLY_COMPLETED]: "реєстрацію успішно завершено",
+      [TRANSLATION_KEYS.FAILED_TO_REGISTER]: "не вдалося зареєструватися",
     },
   },
 };

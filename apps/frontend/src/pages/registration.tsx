@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { zRegisterIn } from "@tic-tac-toe/backend";
+import type { Namespace, TFunction } from "i18next";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
@@ -8,7 +9,7 @@ import type { z } from "zod";
 import { useAuthStore } from "~/entities/auth";
 import type { TrpcErrorCause } from "~/shared/api";
 import { trpc } from "~/shared/api";
-import { TRANSLATION_KEYS, useTranslation2 } from "~/shared/i18n";
+import { createTsp, TRANSLATION_KEYS, useTranslation2 } from "~/shared/i18n";
 import { listWithConjunction } from "~/shared/lib/text";
 import { errorMapForForms } from "~/shared/lib/zod";
 import { ROUTES } from "~/shared/routing";
@@ -27,16 +28,38 @@ import { Input } from "~/shared/ui/input";
 import { P } from "~/shared/ui/p";
 import { Separator } from "~/shared/ui/separator";
 
-function composeErrorMessage(
+function composeErrorMessage<Ns extends Namespace, KPrefix>(
+  t: TFunction<Ns, KPrefix>,
   cause: TrpcErrorCause = {
     area: "UNKNOWN",
   },
 ) {
+  const tsp = createTsp(t);
   const { area, paths } = cause;
 
-  return area === "UNIQUE_KEY_VIOLATION"
-    ? `The ${listWithConjunction(paths, "and")} ${paths.length === 1 ? "is" : "are"} already taken by another user.`
-    : "An unexpected error occurred.";
+  if (area === "UNIQUE_KEY_VIOLATION") {
+    const CONTEXT_BY_FIELD_NAME: Record<string, string> = {
+      email: "female",
+      nickname: "male",
+    };
+    const translatedPaths = paths.map((path) => t(path.toLocaleUpperCase()));
+    const data = listWithConjunction(translatedPaths, t(TRANSLATION_KEYS.CONJUNCTION));
+    const count = paths.length;
+
+    if (count > 1) {
+      return tsp(TRANSLATION_KEYS.DATA_ALREADY_USED_BY_ANOTHER_USER, {
+        data,
+        count,
+      });
+    }
+    return tsp(TRANSLATION_KEYS.DATA_ALREADY_USED_BY_ANOTHER_USER, {
+      data,
+      context: CONTEXT_BY_FIELD_NAME[paths[0]],
+      count,
+    });
+  }
+
+  return tsp(TRANSLATION_KEYS.UNEXPECTED_ERROR_OCCURRED);
 }
 
 function RegistrationPage() {
@@ -65,13 +88,13 @@ function RegistrationPage() {
   const onSubmit: Parameters<(typeof form)["handleSubmit"]>[0] = (data) => {
     register(data, {
       onSuccess: ({ accessToken, me }) => {
-        toast.success("Registration completed successfully.");
+        toast.success(tc(TRANSLATION_KEYS.REGISTRATION_SUCCESSFULLY_COMPLETED));
         loginLocally(accessToken, me);
         void navigate(ROUTES.home);
       },
       onError: (error) => {
-        toast.error("Failed to register.", {
-          description: composeErrorMessage(error.shape?.cause),
+        toast.error(tc(TRANSLATION_KEYS.FAILED_TO_REGISTER), {
+          description: composeErrorMessage(t, error.shape?.cause),
         });
       },
     });
