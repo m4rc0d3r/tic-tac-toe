@@ -5,7 +5,29 @@ import type { FallbackNs, UseTranslationOptions, UseTranslationResponse } from "
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
-const CASES = z.enum(["genitive"]).Values;
+const zCase = z.enum(["genitive"]);
+const CASES = zCase.Values;
+type Case = z.infer<typeof zCase>;
+
+const zPlural = z.enum(["one", "other"]);
+const PLURALS = zPlural.Values;
+type Plural = z.infer<typeof zPlural>;
+
+const zGender = z.enum(["male", "female"]);
+const GENDERS = zGender.Values;
+type Gender = z.infer<typeof zGender>;
+
+function tk<C extends Case, G extends Gender, P extends Plural>(
+  name: string,
+  opts?: Partial<{
+    case_: C;
+    gender: G;
+    plural: P;
+  }>,
+) {
+  const { case_ = "", gender = "", plural = "" } = opts ?? {};
+  return [name, case_, gender, plural].filter((value) => value).join("_");
+}
 
 const TRANSLATION_KEYS = z.enum([
   "ENGLISH",
@@ -77,14 +99,14 @@ const RESOURCES = {
       [TRANSLATION_KEYS.MUST_END_WITH_STRING]: 'must end with "{{string}}"',
       [TRANSLATION_KEYS.INCORRECT_NUMBER_OF_CHARACTERS_MUST_BE_EXACTLY_N]:
         "incorrect number of characters, must be exactly {{n}}",
-      [`${TRANSLATION_KEYS.NOT_ENOUGH_CHARACTERS_AT_LEAST_N_REQUIRED}_one`]:
+      [tk(TRANSLATION_KEYS.NOT_ENOUGH_CHARACTERS_AT_LEAST_N_REQUIRED, { plural: "one" })]:
         "not enough characters, at least {{n}} is required",
-      [`${TRANSLATION_KEYS.NOT_ENOUGH_CHARACTERS_AT_LEAST_N_REQUIRED}_other`]:
+      [tk(TRANSLATION_KEYS.NOT_ENOUGH_CHARACTERS_AT_LEAST_N_REQUIRED, { plural: "other" })]:
         "not enough characters, at least {{n}} are required",
       [TRANSLATION_KEYS.UNEXPECTED_ERROR_OCCURRED]: "an unexpected error occurred",
-      [`${TRANSLATION_KEYS.DATA_ALREADY_USED_BY_ANOTHER_USER}_one`]:
+      [tk(TRANSLATION_KEYS.DATA_ALREADY_USED_BY_ANOTHER_USER, { plural: "one" })]:
         "the {{data}} is already taken by another user",
-      [`${TRANSLATION_KEYS.DATA_ALREADY_USED_BY_ANOTHER_USER}_other`]:
+      [tk(TRANSLATION_KEYS.DATA_ALREADY_USED_BY_ANOTHER_USER, { plural: "other" })]:
         "the {{data}} are already taken by another user",
       [TRANSLATION_KEYS.CONJUNCTION]: "and",
       [TRANSLATION_KEYS.REGISTRATION_SUCCESSFULLY_COMPLETED]: "registration successfully completed",
@@ -112,7 +134,7 @@ const RESOURCES = {
         "створіть обліковий запис, щоб зберігати історію ігор і не тільки",
       [TRANSLATION_KEYS.NICKNAME]: "псевдонім",
       [TRANSLATION_KEYS.EMAIL]: "електронна адреса",
-      [`${TRANSLATION_KEYS.EMAIL}_${CASES.genitive}`]: "електронної адреси",
+      [tk(TRANSLATION_KEYS.EMAIL, { case_: "genitive" })]: "електронної адреси",
       [TRANSLATION_KEYS.FIRST_NAME]: "ім'я",
       [TRANSLATION_KEYS.LAST_NAME]: "прізвище",
       [TRANSLATION_KEYS.PASSWORD]: "пароль",
@@ -130,14 +152,14 @@ const RESOURCES = {
         "неправильна кількість символів, має бути рівно {{n}}",
       [TRANSLATION_KEYS.NOT_ENOUGH_CHARACTERS_AT_LEAST_N_REQUIRED]:
         "недостатньо символів, потрібно принаймні {{n}}",
-      [`${TRANSLATION_KEYS.NOT_ENOUGH_CHARACTERS_AT_LEAST_N_REQUIRED}_one`]:
+      [tk(TRANSLATION_KEYS.NOT_ENOUGH_CHARACTERS_AT_LEAST_N_REQUIRED, { plural: "one" })]:
         "недостатньо символів, потрібен принаймні {{n}}",
       [TRANSLATION_KEYS.UNEXPECTED_ERROR_OCCURRED]: "сталася неочікувана помилка",
       [TRANSLATION_KEYS.DATA_ALREADY_USED_BY_ANOTHER_USER]:
         "{{data}} вже зайняті іншим користувачем",
-      [`${TRANSLATION_KEYS.DATA_ALREADY_USED_BY_ANOTHER_USER}_male_one`]:
+      [tk(TRANSLATION_KEYS.DATA_ALREADY_USED_BY_ANOTHER_USER, { gender: "male", plural: "one" })]:
         "{{data}} вже зайнятий іншим користувачем",
-      [`${TRANSLATION_KEYS.DATA_ALREADY_USED_BY_ANOTHER_USER}_female_one`]:
+      [tk(TRANSLATION_KEYS.DATA_ALREADY_USED_BY_ANOTHER_USER, { gender: "female", plural: "one" })]:
         "{{data}} вже зайнята іншим користувачем",
       [TRANSLATION_KEYS.CONJUNCTION]: "і",
       [TRANSLATION_KEYS.REGISTRATION_SUCCESSFULLY_COMPLETED]: "реєстрацію успішно завершено",
@@ -213,9 +235,11 @@ export {
   createTc,
   createTs,
   createTsp,
+  GENDERS,
+  PLURALS,
   RESOURCES,
   SUPPORTED_LANGUAGES,
   TRANSLATION_KEYS,
   useTranslation2,
 };
-export type { LanguageCode };
+export type { Case, Gender, LanguageCode, Plural };

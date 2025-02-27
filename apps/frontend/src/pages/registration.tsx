@@ -9,7 +9,7 @@ import type { z } from "zod";
 import { useAuthStore } from "~/entities/auth";
 import type { TrpcErrorCause } from "~/shared/api";
 import { trpc } from "~/shared/api";
-import { createTsp, TRANSLATION_KEYS, useTranslation2 } from "~/shared/i18n";
+import { createTsp, GENDERS, TRANSLATION_KEYS, useTranslation2 } from "~/shared/i18n";
 import { listWithConjunction } from "~/shared/lib/text";
 import { errorMapForForms } from "~/shared/lib/zod";
 import { ROUTES } from "~/shared/routing";
@@ -39,8 +39,8 @@ function composeErrorMessage<Ns extends Namespace, KPrefix>(
 
   if (area === "UNIQUE_KEY_VIOLATION") {
     const CONTEXT_BY_FIELD_NAME: Record<string, string> = {
-      email: "female",
-      nickname: "male",
+      email: GENDERS.female,
+      nickname: GENDERS.male,
     };
     const translatedPaths = paths.map((path) => t(path.toLocaleUpperCase()));
     const data = listWithConjunction(translatedPaths, t(TRANSLATION_KEYS.CONJUNCTION));
