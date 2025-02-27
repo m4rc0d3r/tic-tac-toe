@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { zLoginIn } from "@tic-tac-toe/backend";
+import type { Namespace, TFunction } from "i18next";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
@@ -8,7 +9,7 @@ import type { z } from "zod";
 import { useAuthStore } from "~/entities/auth";
 import type { TrpcErrorCause } from "~/shared/api";
 import { trpc } from "~/shared/api";
-import { TRANSLATION_KEYS, useTranslation2 } from "~/shared/i18n";
+import { createTsp, TRANSLATION_KEYS, useTranslation2 } from "~/shared/i18n";
 import { errorMapForForms } from "~/shared/lib/zod";
 import { ROUTES } from "~/shared/routing";
 import { Button } from "~/shared/ui/button";
@@ -26,16 +27,18 @@ import { Input } from "~/shared/ui/input";
 import { P } from "~/shared/ui/p";
 import { Separator } from "~/shared/ui/separator";
 
-function composeErrorMessage(
+function composeErrorMessage<Ns extends Namespace, KPrefix>(
+  t: TFunction<Ns, KPrefix>,
   cause: TrpcErrorCause = {
     area: "UNKNOWN",
   },
 ) {
+  const tsp = createTsp(t);
   const { area } = cause;
 
   return area === "NOT_FOUND"
-    ? `Incorrect email address and/or password.`
-    : "An unexpected error occurred.";
+    ? tsp(TRANSLATION_KEYS.INCORRECT_EMAIL_ADDRESS_AND_OR_PASSWORD)
+    : tsp(TRANSLATION_KEYS.UNEXPECTED_ERROR_OCCURRED);
 }
 
 function LoginPage() {
@@ -61,13 +64,13 @@ function LoginPage() {
   const onSubmit: Parameters<(typeof form)["handleSubmit"]>[0] = (data) => {
     login(data, {
       onSuccess: ({ accessToken, me }) => {
-        toast.success("Login completed successfully.");
+        toast.success(tc(TRANSLATION_KEYS.LOGIN_COMPLETED_SUCCESSFULLY));
         loginLocally(accessToken, me);
         void navigate(ROUTES.home);
       },
       onError: (error) => {
-        toast.error("Failed to login.", {
-          description: composeErrorMessage(error.shape?.cause),
+        toast.error(tc(TRANSLATION_KEYS.FAILED_TO_LOGIN), {
+          description: composeErrorMessage(t, error.shape?.cause),
         });
       },
     });

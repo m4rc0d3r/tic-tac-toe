@@ -40,6 +40,9 @@ const TRANSLATION_KEYS = z.enum([
   "CONJUNCTION",
   "REGISTRATION_SUCCESSFULLY_COMPLETED",
   "FAILED_TO_REGISTER",
+  "INCORRECT_EMAIL_ADDRESS_AND_OR_PASSWORD",
+  "LOGIN_COMPLETED_SUCCESSFULLY",
+  "FAILED_TO_LOGIN",
 ]).Values;
 
 const RESOURCES = {
@@ -86,6 +89,10 @@ const RESOURCES = {
       [TRANSLATION_KEYS.CONJUNCTION]: "and",
       [TRANSLATION_KEYS.REGISTRATION_SUCCESSFULLY_COMPLETED]: "registration successfully completed",
       [TRANSLATION_KEYS.FAILED_TO_REGISTER]: "failed to register",
+      [TRANSLATION_KEYS.INCORRECT_EMAIL_ADDRESS_AND_OR_PASSWORD]:
+        "incorrect email address and/or password",
+      [TRANSLATION_KEYS.LOGIN_COMPLETED_SUCCESSFULLY]: "login completed successfully",
+      [TRANSLATION_KEYS.FAILED_TO_LOGIN]: "failed to login",
     },
   },
   uk: {
@@ -135,6 +142,11 @@ const RESOURCES = {
       [TRANSLATION_KEYS.CONJUNCTION]: "і",
       [TRANSLATION_KEYS.REGISTRATION_SUCCESSFULLY_COMPLETED]: "реєстрацію успішно завершено",
       [TRANSLATION_KEYS.FAILED_TO_REGISTER]: "не вдалося зареєструватися",
+      [TRANSLATION_KEYS.INCORRECT_EMAIL_ADDRESS_AND_OR_PASSWORD]:
+        "неправильна адреса електронної пошти та/або пароль",
+
+      [TRANSLATION_KEYS.LOGIN_COMPLETED_SUCCESSFULLY]: "вхід успішно завершено",
+      [TRANSLATION_KEYS.FAILED_TO_LOGIN]: "не вдалося увійти",
     },
   },
 };
