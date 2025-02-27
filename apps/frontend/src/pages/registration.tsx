@@ -41,6 +41,7 @@ function composeErrorMessage(
 
 function RegistrationPage() {
   const {
+    translation: { t },
     postproc: { tc, ts, tsp },
   } = useTranslation2();
 
@@ -50,7 +51,7 @@ function RegistrationPage() {
 
   const form = useForm<z.infer<typeof zRegisterIn>>({
     resolver: zodResolver(zRegisterIn, {
-      errorMap: errorMapForForms,
+      errorMap: errorMapForForms(t),
     }),
     defaultValues: {
       email: "",

@@ -5,6 +5,8 @@ import type { FallbackNs, UseTranslationOptions, UseTranslationResponse } from "
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
+const CASES = z.enum(["genitive"]).Values;
+
 const TRANSLATION_KEYS = z.enum([
   "ENGLISH",
   "UKRAINIAN",
@@ -26,6 +28,13 @@ const TRANSLATION_KEYS = z.enum([
   "SIGNING_IN",
   "SIGN_IN_TO_YOUR_ACCOUNT_TO_ACCESS_YOUR_GAME_HISTORY_AND_MORE",
   "DONT_HAVE_AN_ACCOUNT_YET",
+  "DOES_NOT_MATCH_FORMAT",
+  "MUST_CONTAIN_STRING",
+  "STARTING_AT_POSITION_N",
+  "MUST_START_WITH_STRING",
+  "MUST_END_WITH_STRING",
+  "INCORRECT_NUMBER_OF_CHARACTERS_MUST_BE_EXACTLY_N",
+  "NOT_ENOUGH_CHARACTERS_AT_LEAST_N_REQUIRED",
 ]).Values;
 
 const RESOURCES = {
@@ -53,6 +62,17 @@ const RESOURCES = {
       [TRANSLATION_KEYS.SIGN_IN_TO_YOUR_ACCOUNT_TO_ACCESS_YOUR_GAME_HISTORY_AND_MORE]:
         "sign in to your account to access your game history and more",
       [TRANSLATION_KEYS.DONT_HAVE_AN_ACCOUNT_YET]: "Don't have an account yet",
+      [TRANSLATION_KEYS.DOES_NOT_MATCH_FORMAT]: "does not match {{format}} format",
+      [TRANSLATION_KEYS.MUST_CONTAIN_STRING]: 'must contain "{{string}}"',
+      [TRANSLATION_KEYS.STARTING_AT_POSITION_N]: ", starting at position {{n}}",
+      [TRANSLATION_KEYS.MUST_START_WITH_STRING]: 'must start with "{{string}}"',
+      [TRANSLATION_KEYS.MUST_END_WITH_STRING]: 'must end with "{{string}}"',
+      [TRANSLATION_KEYS.INCORRECT_NUMBER_OF_CHARACTERS_MUST_BE_EXACTLY_N]:
+        "incorrect number of characters, must be exactly {{n}}",
+      [`${TRANSLATION_KEYS.NOT_ENOUGH_CHARACTERS_AT_LEAST_N_REQUIRED}_one`]:
+        "not enough characters, at least {{n}} is required",
+      [`${TRANSLATION_KEYS.NOT_ENOUGH_CHARACTERS_AT_LEAST_N_REQUIRED}_other`]:
+        "not enough characters, at least {{n}} are required",
     },
   },
   uk: {
@@ -72,6 +92,7 @@ const RESOURCES = {
         "створіть обліковий запис, щоб зберігати історію ігор і не тільки",
       [TRANSLATION_KEYS.NICKNAME]: "псевдонім",
       [TRANSLATION_KEYS.EMAIL]: "електронна адреса",
+      [`${TRANSLATION_KEYS.EMAIL}_${CASES.genitive}`]: "електронної адреси",
       [TRANSLATION_KEYS.FIRST_NAME]: "ім'я",
       [TRANSLATION_KEYS.LAST_NAME]: "прізвище",
       [TRANSLATION_KEYS.PASSWORD]: "пароль",
@@ -80,6 +101,17 @@ const RESOURCES = {
       [TRANSLATION_KEYS.SIGN_IN_TO_YOUR_ACCOUNT_TO_ACCESS_YOUR_GAME_HISTORY_AND_MORE]:
         "увійдіть у свій обліковий запис, щоб отримати доступ до історії ігор і не тільки",
       [TRANSLATION_KEYS.DONT_HAVE_AN_ACCOUNT_YET]: "у вас ще немає облікового запису",
+      [TRANSLATION_KEYS.DOES_NOT_MATCH_FORMAT]: "не відповідає формату {{format}}",
+      [TRANSLATION_KEYS.MUST_CONTAIN_STRING]: 'має містити "{{string}}"',
+      [TRANSLATION_KEYS.STARTING_AT_POSITION_N]: ", починаючи з позиції {{n}}",
+      [TRANSLATION_KEYS.MUST_START_WITH_STRING]: 'має починатися на "{{string}}"',
+      [TRANSLATION_KEYS.MUST_END_WITH_STRING]: 'має закінчуватися на "{{string}}"',
+      [TRANSLATION_KEYS.INCORRECT_NUMBER_OF_CHARACTERS_MUST_BE_EXACTLY_N]:
+        "неправильна кількість символів, має бути рівно {{n}}",
+      [TRANSLATION_KEYS.NOT_ENOUGH_CHARACTERS_AT_LEAST_N_REQUIRED]:
+        "недостатньо символів, потрібно принаймні {{n}}",
+      [`${TRANSLATION_KEYS.NOT_ENOUGH_CHARACTERS_AT_LEAST_N_REQUIRED}_one`]:
+        "недостатньо символів, потрібен принаймні {{n}}",
     },
   },
 };
@@ -142,6 +174,7 @@ function createTsp<Ns extends Namespace, KPrefix>(t: TFunction<Ns, KPrefix>) {
 }
 
 export {
+  CASES,
   createTc,
   createTs,
   createTsp,

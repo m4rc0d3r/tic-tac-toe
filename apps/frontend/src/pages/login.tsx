@@ -40,6 +40,7 @@ function composeErrorMessage(
 
 function LoginPage() {
   const {
+    translation: { t },
     postproc: { tc, ts, tsp },
   } = useTranslation2();
 
@@ -49,7 +50,7 @@ function LoginPage() {
 
   const form = useForm<z.infer<typeof zLoginIn>>({
     resolver: zodResolver(zLoginIn, {
-      errorMap: errorMapForForms,
+      errorMap: errorMapForForms(t),
     }),
     defaultValues: {
       email: "",
