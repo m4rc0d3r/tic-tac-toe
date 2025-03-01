@@ -4,6 +4,7 @@ import { AuthResolver } from "./auth-resolver";
 import { Configurator } from "./configurator";
 import { QueryClientProvider } from "./react-query";
 import { router } from "./router";
+import { ThemeProvider } from "./theming";
 
 import { Toaster } from "~/shared/ui/sonner";
 
@@ -16,7 +17,9 @@ function App() {
       <Toaster />
       <QueryClientProvider>
         <AuthResolver />
-        <RouterProvider router={router} />
+        <ThemeProvider>
+          <RouterProvider router={router} />
+        </ThemeProvider>
       </QueryClientProvider>
     </>
   );

@@ -1,8 +1,11 @@
 import { SPACE } from "@tic-tac-toe/core";
-import { MenuIcon, UserIcon } from "lucide-react";
+import { MenuIcon, Moon, Sun, UserIcon } from "lucide-react";
 import type { ComponentProps } from "react";
 import { Link, Outlet, useNavigate } from "react-router";
 import { toast } from "sonner";
+
+import type { Theme } from "./theming";
+import { THEMES, useTheme } from "./theming";
 
 import type { Me } from "~/entities/auth";
 import { useAuthStore } from "~/entities/auth";
@@ -98,6 +101,7 @@ function RootLayout() {
               </ul>
             </li>
             <li className="flex items-center">
+              <ThemeSwitcher />
               <LanguageSwitcher />
               {status === "AUTHENTICATED" ? (
                 <MeSection data={me} />
@@ -125,6 +129,36 @@ function RootLayout() {
         <Outlet />
       </main>
     </div>
+  );
+}
+
+function ThemeSwitcher(props: ComponentProps<typeof DropdownMenu>) {
+  const {
+    postproc: { tc },
+  } = useTranslation2();
+  const { theme, setTheme } = useTheme();
+
+  const getThemeName = (value: string) => tc(value.toLocaleUpperCase());
+
+  return (
+    <DropdownMenu {...props}>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="icon">
+          <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+          <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+          <span className="sr-only">Switch theme</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as Theme)}>
+          {THEMES.map((value) => (
+            <DropdownMenuRadioItem key={value} value={value}>
+              {getThemeName(value)}
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 

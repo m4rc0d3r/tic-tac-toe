@@ -67,6 +67,9 @@ const TRANSLATION_KEYS = z.enum([
   "INCORRECT_EMAIL_ADDRESS_AND_OR_PASSWORD",
   "LOGIN_COMPLETED_SUCCESSFULLY",
   "FAILED_TO_LOGIN",
+  "LIGHT",
+  "DARK",
+  "SYSTEM",
 ]).Values;
 
 const RESOURCES = {
@@ -119,6 +122,9 @@ const RESOURCES = {
         "incorrect email address and/or password",
       [TRANSLATION_KEYS.LOGIN_COMPLETED_SUCCESSFULLY]: "login completed successfully",
       [TRANSLATION_KEYS.FAILED_TO_LOGIN]: "failed to login",
+      [TRANSLATION_KEYS.LIGHT]: "light",
+      [TRANSLATION_KEYS.DARK]: "dark",
+      [TRANSLATION_KEYS.SYSTEM]: "system",
     },
   },
   uk: {
@@ -175,6 +181,9 @@ const RESOURCES = {
 
       [TRANSLATION_KEYS.LOGIN_COMPLETED_SUCCESSFULLY]: "вхід успішно завершено",
       [TRANSLATION_KEYS.FAILED_TO_LOGIN]: "не вдалося увійти",
+      [TRANSLATION_KEYS.LIGHT]: "світла",
+      [TRANSLATION_KEYS.DARK]: "темна",
+      [TRANSLATION_KEYS.SYSTEM]: "системна",
     },
   },
 };
