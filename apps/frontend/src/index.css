@@ -30,6 +30,7 @@
   --chart-4: hsl(43deg 74% 66%);
   --chart-5: hsl(27deg 87% 67%);
   --radius: 0.6rem;
+  --link-foreground: hsl(221deg 97% 54%);
 }
 
 .dark {
@@ -57,6 +58,7 @@
   --chart-3: hsl(30deg 80% 55%);
   --chart-4: hsl(280deg 65% 60%);
   --chart-5: hsl(340deg 75% 55%);
+  --link-foreground: hsl(211deg 100% 66%);
 }
 
 @theme inline {
@@ -88,6 +90,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --color-link-foreground: var(--link-foreground);
 }
 
 @layer base {
