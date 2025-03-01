@@ -251,9 +251,11 @@ function MeSection({ data, ...props }: MeSectionProps) {
 
   return (
     <DropdownMenu {...props}>
-      <DropdownMenuTrigger className="hover:bg-muted flex cursor-pointer items-center rounded-md px-2">
-        <UserIcon className="size-10" />
-        {fullName || tc(TRANSLATION_KEYS.NAME_NOT_SPECIFIED)}
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost">
+          <UserIcon className="size-8" />
+          {fullName || tc(TRANSLATION_KEYS.NAME_NOT_SPECIFIED)}
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={handleLogout} disabled={isLogoutPending}>
