@@ -64,7 +64,7 @@ function RootLayout() {
     <div className="flex h-full flex-col">
       <header>
         <nav>
-          <ul className="flex justify-between p-2 shadow-sm">
+          <ul className="flex justify-between gap-2 p-2 shadow-sm">
             <li className="flex items-center md:hidden">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -101,26 +101,40 @@ function RootLayout() {
               </ul>
             </li>
             <li className="flex items-center">
-              <ThemeSwitcher />
-              <LanguageSwitcher />
-              {status === "AUTHENTICATED" ? (
-                <MeSection data={me} />
-              ) : status === "UNAUTHENTICATED" ? (
-                <ul className="flex gap-1">
-                  {authMenuItems.map(({ name, path, variant }, index) => (
-                    <li
-                      key={path}
-                      className={cn(index === authMenuItems.length - 1 && "hidden sm:list-item")}
-                    >
-                      <Button asChild variant={variant}>
-                        <Link to={path}>{name}</Link>
-                      </Button>
+              <ul className="flex gap-2">
+                <li className="flex items-center">
+                  <ul className="flex gap-1">
+                    <li className="flex items-center">
+                      <ThemeSwitcher />
                     </li>
-                  ))}
-                </ul>
-              ) : (
-                <></>
-              )}
+                    <li className="flex items-center">
+                      <LanguageSwitcher />
+                    </li>
+                  </ul>
+                </li>
+                <li className="flex items-center">
+                  {status === "AUTHENTICATED" ? (
+                    <MeSection data={me} />
+                  ) : status === "UNAUTHENTICATED" ? (
+                    <ul className="flex gap-1">
+                      {authMenuItems.map(({ name, path, variant }, index) => (
+                        <li
+                          key={path}
+                          className={cn(
+                            index === authMenuItems.length - 1 && "hidden sm:list-item",
+                          )}
+                        >
+                          <Button asChild variant={variant}>
+                            <Link to={path}>{name}</Link>
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <></>
+                  )}
+                </li>
+              </ul>
             </li>
           </ul>
         </nav>
