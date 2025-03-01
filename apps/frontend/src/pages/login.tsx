@@ -3,7 +3,7 @@ import { zLoginIn } from "@tic-tac-toe/backend";
 import { EMPTY_STRING, QUESTION_MARK } from "@tic-tac-toe/core";
 import type { Namespace, TFunction } from "i18next";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import type { z } from "zod";
 
@@ -25,6 +25,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/shared/ui/form";
 import { H1 } from "~/shared/ui/h1";
 import { Input } from "~/shared/ui/input";
+import { Link2 } from "~/shared/ui/link2";
 import { P } from "~/shared/ui/p";
 import { Separator } from "~/shared/ui/separator";
 
@@ -85,15 +86,15 @@ function LoginPage() {
             <H1>{tc(TRANSLATION_KEYS.SIGNING_IN)}</H1>
           </CardTitle>
           <CardDescription>
-            <P>
+            <P className="text-center">
               {tsp(TRANSLATION_KEYS.SIGN_IN_TO_YOUR_ACCOUNT_TO_ACCESS_YOUR_GAME_HISTORY_AND_MORE)}
             </P>
           </CardDescription>
         </CardHeader>
-        <div className="px-6">
+        <div className="px-6 pb-6">
           <Separator />
         </div>
-        <CardContent className="pt-6">
+        <CardContent>
           <Form {...form}>
             <form
               onSubmit={(event) => void form.handleSubmit(onSubmit)(event)}
@@ -129,14 +130,14 @@ function LoginPage() {
             </form>
           </Form>
         </CardContent>
-        <div className="px-6">
+        <div className="px-6 pb-6">
           <Separator />
         </div>
-        <CardFooter className="justify-center pt-6">
-          <P>{ts(QUESTION_MARK)(TRANSLATION_KEYS.DONT_HAVE_AN_ACCOUNT_YET)}</P>&nbsp;
-          <Link to={ROUTES.registration} className="font-bold text-blue-700">
-            {tc(TRANSLATION_KEYS.SIGN_UP)}
-          </Link>
+        <CardFooter className="justify-center">
+          <P>
+            {ts(QUESTION_MARK)(TRANSLATION_KEYS.DONT_HAVE_AN_ACCOUNT_YET)}&nbsp;
+            <Link2 to={ROUTES.registration}>{tc(TRANSLATION_KEYS.SIGN_UP)}</Link2>
+          </P>
         </CardFooter>
       </Card>
     </div>
