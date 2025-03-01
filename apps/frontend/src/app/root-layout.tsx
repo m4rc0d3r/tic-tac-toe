@@ -11,7 +11,9 @@ import type { Me } from "~/entities/auth";
 import { useAuthStore } from "~/entities/auth";
 import { trpc } from "~/shared/api";
 import AboutIcon from "~/shared/assets/about.svg?react";
+import EnglishFlagIcon from "~/shared/assets/english-flag.svg?react";
 import LogoIcon from "~/shared/assets/logo.svg?react";
+import UkrainianFlagIcon from "~/shared/assets/ukrainian-flag.svg?react";
 import type { LanguageCode } from "~/shared/i18n";
 import { SUPPORTED_LANGUAGES, TRANSLATION_KEYS, useTranslation2 } from "~/shared/i18n";
 import { ROUTES } from "~/shared/routing";
@@ -157,7 +159,7 @@ function ThemeSwitcher(props: ComponentProps<typeof DropdownMenu>) {
   return (
     <DropdownMenu {...props}>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
+        <Button variant="ghost" size="icon">
           <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
           <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
           <span className="sr-only">Switch theme</span>
@@ -182,15 +184,24 @@ function LanguageSwitcher(props: ComponentProps<typeof DropdownMenu>) {
     postproc: { tc },
   } = useTranslation2();
 
+  const FLAGS_BY_CODE: Record<LanguageCode, typeof EnglishFlagIcon> = {
+    en: EnglishFlagIcon,
+    uk: UkrainianFlagIcon,
+  };
+
   const getLanguageName = (code: string) =>
     tc(SUPPORTED_LANGUAGES[code as LanguageCode].toLocaleUpperCase(), {
       lng: code,
     });
 
+  const FlagIcon = FLAGS_BY_CODE[i18n.language as LanguageCode];
+
   return (
     <DropdownMenu {...props}>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">{getLanguageName(i18n.language)}</Button>
+        <Button variant="ghost" size="icon">
+          <FlagIcon />
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuRadioGroup
