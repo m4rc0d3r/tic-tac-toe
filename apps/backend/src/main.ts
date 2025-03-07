@@ -22,7 +22,6 @@ if (eitherConfig._tag === "Left") {
   throw eitherConfig.left;
 }
 const config = eitherConfig.right;
-const dependencies = createDependencies(config);
 
 const {
   app: { logLevel: level, prettyLogs },
@@ -37,6 +36,8 @@ const app = fastify({
     }),
   },
 });
+
+const dependencies = createDependencies(config, app.log);
 
 app.register(fastifyCors, config.cors);
 
