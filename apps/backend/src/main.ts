@@ -8,7 +8,7 @@ import { expand } from "dotenv-expand";
 import fastify from "fastify";
 
 import { authRouter } from "./features/auth";
-import { createDependencies, createTrpcContext, trpcRouter } from "./infra";
+import { createConfig, createDependencies, createTrpcContext, trpcRouter } from "./infra";
 
 const appRouter = trpcRouter({
   auth: authRouter,
@@ -16,13 +16,13 @@ const appRouter = trpcRouter({
 type AppRouter = typeof appRouter;
 
 expand(dotenvConfig());
-const eitherDependencies = createDependencies(process.env);
-if (eitherDependencies._tag === "Left") {
+const eitherConfig = createConfig(process.env);
+if (eitherConfig._tag === "Left") {
   // eslint-disable-next-line @typescript-eslint/only-throw-error
-  throw eitherDependencies.left;
+  throw eitherConfig.left;
 }
-const dependencies = eitherDependencies.right;
-const { config } = dependencies;
+const config = eitherConfig.right;
+const dependencies = createDependencies(config);
 
 const {
   app: { logLevel: level, prettyLogs },

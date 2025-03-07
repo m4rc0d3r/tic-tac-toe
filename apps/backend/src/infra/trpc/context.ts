@@ -2,10 +2,7 @@ import type { CreateFastifyContextOptions } from "@trpc/server/adapters/fastify"
 
 import type { createDependencies } from "../dependencies";
 
-type CreateTrpcInternalContextOptions = Extract<
-  ReturnType<typeof createDependencies>,
-  { _tag: "Right" }
->["right"];
+type CreateTrpcInternalContextOptions = ReturnType<typeof createDependencies>;
 
 function createTrpcInternalContext(opts: CreateTrpcInternalContextOptions) {
   return opts;
