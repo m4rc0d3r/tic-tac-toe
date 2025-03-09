@@ -10,6 +10,7 @@ import type { CorsConfig } from "./cors";
 import { zCorsConfig } from "./cors";
 import { zFrontendAppConfig } from "./frontend-app";
 import { zTrpcConfig } from "./trpc";
+import { zVercelConfig } from "./vercel";
 
 const zConfig = z.object({
   app: zAppConfig,
@@ -20,6 +21,7 @@ const zConfig = z.object({
   cors: zCorsConfig,
 
   trpc: zTrpcConfig,
+  vercel: zVercelConfig,
 });
 type Config = z.infer<typeof zConfig>;
 
@@ -38,6 +40,7 @@ function createConfig(variables: Record<string, unknown>): e.Either<ConfigVarsEr
         } satisfies CorsConfig),
         frontendApp,
         trpc: zTrpcConfig.parse(variables),
+        vercel: zVercelConfig.parse(variables),
       };
     },
     (error) => {
