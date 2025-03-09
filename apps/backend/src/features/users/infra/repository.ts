@@ -1,8 +1,13 @@
 import type { PrismaClient } from "@prisma/client";
 import { either as e, taskEither as te } from "fp-ts";
 
-import type { FindOneByIn, FindOneByOut, ListOut } from "../app";
-import type { CreateIn, CreateOut } from "../app/ports/repository";
+import type {
+  CreateIn,
+  CreateOut,
+  FindOneByIn,
+  FindOneByOut,
+  ListOut,
+} from "../app/ports/repository";
 import { UsersRepository } from "../app/ports/repository";
 
 import { NotFoundError, UniqueKeyViolationError } from "~/app";

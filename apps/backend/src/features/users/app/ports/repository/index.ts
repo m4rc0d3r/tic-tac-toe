@@ -1,2 +1,2 @@
-export type * from "./ios";
+export * from "./ios";
 export * from "./repository";

@@ -1,8 +1,9 @@
 import { either as e } from "fp-ts";
 
 import type { HashingService, UsersRepository } from "../ports";
+import type { FindOneByOut, ListOut } from "../ports/repository";
 
-import type { CreateIn, CreateOut, FindOneByIn, FindOneByOut, ListOut } from "./ios";
+import type { CreateIn, CreateOut, FindOneByIn } from "./ios";
 
 import type { UniqueKeyViolationError } from "~/app";
 import { NotFoundError } from "~/app";
