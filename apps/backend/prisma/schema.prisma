@@ -19,6 +19,7 @@ model User {
   nickname     String @unique
   firstName    String @default("") @map("first_name")
   lastName     String @default("") @map("last_name")
+  avatar     String @default("")
   passwordHash String @map("password_hash")
 
   @@map("users")

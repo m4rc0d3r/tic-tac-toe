@@ -1,3 +1,5 @@
+export { zAvatar as zUserAvatar } from "./avatar";
+export type { Avatar as UserAvatar } from "./avatar";
 export { zFirstName as zUserFirstName } from "./first-name";
 export type { FirstName as UserFirstName } from "./first-name";
 export { zLastName as zUserLastName } from "./last-name";

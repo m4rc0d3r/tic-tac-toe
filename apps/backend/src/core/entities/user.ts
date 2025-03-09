@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   zEmail,
   zId,
+  zUserAvatar,
   zUserFirstName,
   zUserLastName,
   zUserNickname,
@@ -17,6 +18,7 @@ const zUser = z.object({
   nickname: zUserNickname,
   firstName: zUserFirstName.default(EMPTY_STRING),
   lastName: zUserLastName.default(EMPTY_STRING),
+  avatar: zUserAvatar.default(EMPTY_STRING),
   password: zUserPassword,
   passwordHash: zUserPasswordHash,
 });
