@@ -2,8 +2,9 @@ import {
   QueryClient,
   QueryClientProvider as ReactQueryClientProvider,
 } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { SPACE } from "@tic-tac-toe/core";
-import { httpBatchLink } from "@trpc/client";
+import { httpLink } from "@trpc/client";
 import type { ReactNode } from "react";
 import { useState } from "react";
 
@@ -18,13 +19,12 @@ type Props = {
 function QueryClientProvider({ children }: Props) {
   const backendApp = useConfigStore.use.backendApp();
   const { prefix } = useConfigStore.use.trpc();
-  const token = useAuthStore.use.token();
 
   const [queryClient] = useState(() => new QueryClient());
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [
-        httpBatchLink({
+        httpLink({
           url: [backendApp.url(), prefix].join("/"),
           fetch: (input, options) =>
             fetch(input, {
@@ -33,7 +33,7 @@ function QueryClientProvider({ children }: Props) {
               signal: options?.signal ?? null,
             }),
           headers: () => ({
-            authorization: ["Bearer", token].join(SPACE),
+            authorization: ["Bearer", useAuthStore.getState().token].join(SPACE),
           }),
         }),
       ],
@@ -41,7 +41,10 @@ function QueryClientProvider({ children }: Props) {
   );
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <ReactQueryClientProvider client={queryClient}>{children}</ReactQueryClientProvider>
+      <ReactQueryClientProvider client={queryClient}>
+        {children}
+        <ReactQueryDevtools />
+      </ReactQueryClientProvider>
     </trpc.Provider>
   );
 }
