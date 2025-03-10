@@ -201,6 +201,9 @@ importers:
       '@trpc/server':
         specifier: 11.0.0-rc.764
         version: 11.0.0-rc.764(typescript@5.7.3)
+      '@web-std/file':
+        specifier: ^3.0.3
+        version: 3.0.3
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -246,6 +249,9 @@ importers:
       zod:
         specifier: ^3.24.2
         version: 3.24.2
+      zod-form-data:
+        specifier: ^2.0.5
+        version: 2.0.5(zod@3.24.2)
       zustand:
         specifier: ^5.0.3
         version: 5.0.3(@types/react@19.0.10)(immer@10.1.1)(react@19.0.0)

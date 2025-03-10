@@ -11,6 +11,7 @@ type AuthenticationStatus = "UNCERTAIN" | "UNAUTHENTICATED" | "AUTHENTICATED";
 type State = {
   login: (token: NonNullable<State["token"]>, me: NonNullable<State["me"]>) => void;
   logout: () => void;
+  updateMe: (data: Partial<Me>) => void;
   reset: () => void;
 } & (
   | {
@@ -48,6 +49,7 @@ const useAuthStore = createSelectors(
               ...initialState,
               status: "UNAUTHENTICATED",
             }),
+          updateMe: (data) => set(({ me }) => (me ? { me: { ...me, ...data } } : { me })),
           reset: () => set(initialState),
         }) satisfies State,
       {

@@ -71,6 +71,18 @@ const TRANSLATION_KEYS = z.enum([
   "DARK",
   "SYSTEM",
   "USER_AVATAR",
+  "SETTINGS",
+  "CHANGES_SAVED_SUCCESSFULLY",
+  "FAILED_TO_SAVE_CHANGES",
+  "PERSONAL_INFORMATION",
+  "LOGIN_DETAILS",
+  "SAVE",
+  "CURRENT",
+  "YOU_MUST_ENTER_YOUR_CURRENT_PASSWORD_TO_MAKE_CHANGES",
+  "INCORRECT_CURRENT_PASSWORD",
+  "ACCEPTABLE_IMAGE_FORMATS",
+  "RESET",
+  "INVALID_IMAGE_FORMAT_ONLY_FORMATS_ARE_ACCEPTED",
 ]).Values;
 
 const RESOURCES = {
@@ -127,6 +139,20 @@ const RESOURCES = {
       [TRANSLATION_KEYS.DARK]: "dark",
       [TRANSLATION_KEYS.SYSTEM]: "system",
       [TRANSLATION_KEYS.USER_AVATAR]: "user avatar",
+      [TRANSLATION_KEYS.SETTINGS]: "settings",
+      [TRANSLATION_KEYS.CHANGES_SAVED_SUCCESSFULLY]: "changes saved successfully",
+      [TRANSLATION_KEYS.FAILED_TO_SAVE_CHANGES]: "failed to save changes",
+      [TRANSLATION_KEYS.PERSONAL_INFORMATION]: "personal information",
+      [TRANSLATION_KEYS.LOGIN_DETAILS]: "login details",
+      [TRANSLATION_KEYS.SAVE]: "save",
+      [TRANSLATION_KEYS.CURRENT]: "current",
+      [TRANSLATION_KEYS.YOU_MUST_ENTER_YOUR_CURRENT_PASSWORD_TO_MAKE_CHANGES]:
+        "you must enter your current password to make changes",
+      [TRANSLATION_KEYS.INCORRECT_CURRENT_PASSWORD]: "incorrect current password",
+      [TRANSLATION_KEYS.ACCEPTABLE_IMAGE_FORMATS]: "acceptable image formats",
+      [TRANSLATION_KEYS.RESET]: "reset",
+      [TRANSLATION_KEYS.INVALID_IMAGE_FORMAT_ONLY_FORMATS_ARE_ACCEPTED]:
+        "invalid image format, only {{formats}} are accepted",
     },
   },
   uk: {
@@ -187,6 +213,20 @@ const RESOURCES = {
       [TRANSLATION_KEYS.DARK]: "темна",
       [TRANSLATION_KEYS.SYSTEM]: "системна",
       [TRANSLATION_KEYS.USER_AVATAR]: "аватар користувача",
+      [TRANSLATION_KEYS.SETTINGS]: "налаштування",
+      [TRANSLATION_KEYS.CHANGES_SAVED_SUCCESSFULLY]: "зміни успішно збережено",
+      [TRANSLATION_KEYS.FAILED_TO_SAVE_CHANGES]: "не вдалося зберегти зміни",
+      [TRANSLATION_KEYS.PERSONAL_INFORMATION]: "особиста інформація",
+      [TRANSLATION_KEYS.LOGIN_DETAILS]: "дані для входу",
+      [TRANSLATION_KEYS.SAVE]: "зберегти",
+      [TRANSLATION_KEYS.CURRENT]: "поточний",
+      [TRANSLATION_KEYS.YOU_MUST_ENTER_YOUR_CURRENT_PASSWORD_TO_MAKE_CHANGES]:
+        "ви повинні ввести свій поточний пароль, щоб внести зміни",
+      [TRANSLATION_KEYS.INCORRECT_CURRENT_PASSWORD]: "неправильний поточний пароль",
+      [TRANSLATION_KEYS.ACCEPTABLE_IMAGE_FORMATS]: "прийнятні формати зображень",
+      [TRANSLATION_KEYS.RESET]: "скинути",
+      [TRANSLATION_KEYS.INVALID_IMAGE_FORMAT_ONLY_FORMATS_ARE_ACCEPTED]:
+        "недійсний формат зображення, приймаються лише {{formats}}",
     },
   },
 };

@@ -27,10 +27,18 @@ const MIME_TYPES = {
 } as const;
 type MimeType = (typeof MIME_TYPES)[keyof typeof MIME_TYPES];
 
+const EXTENSIONS_BY_MIME_TYPE = {
+  [MIME_TYPES.gif]: ".gif",
+  [MIME_TYPES.jpeg]: ".jpeg",
+  [MIME_TYPES.png]: ".png",
+  [MIME_TYPES.svg]: ".svg",
+} as const;
+
 export {
   COMMA,
   COMMA_WITH_SPACE,
   EMPTY_STRING,
+  EXTENSIONS_BY_MIME_TYPE,
   MIME_TYPES,
   PERIOD,
   QUESTION_MARK,

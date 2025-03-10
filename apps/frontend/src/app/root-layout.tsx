@@ -259,6 +259,9 @@ function MeSection({ data, ...props }: MeSectionProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
+        <DropdownMenuItem asChild>
+          <Link to={ROUTES.settings}>{tc(TRANSLATION_KEYS.SETTINGS)}</Link>
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={handleLogout} disabled={isLogoutPending}>
           {tc(TRANSLATION_KEYS.SIGN_OUT)}
         </DropdownMenuItem>
