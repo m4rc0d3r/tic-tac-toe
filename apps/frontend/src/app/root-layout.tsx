@@ -1,5 +1,5 @@
 import { SPACE } from "@tic-tac-toe/core";
-import { MenuIcon, Moon, Sun, UserIcon } from "lucide-react";
+import { MenuIcon, Moon, Sun } from "lucide-react";
 import type { ComponentProps } from "react";
 import { Link, Outlet, useNavigate } from "react-router";
 import { toast } from "sonner";
@@ -9,6 +9,7 @@ import { THEMES, useTheme } from "./theming";
 
 import type { Me } from "~/entities/auth";
 import { useAuthStore } from "~/entities/auth";
+import { UserAvatar } from "~/entities/user";
 import { trpc } from "~/shared/api";
 import AboutIcon from "~/shared/assets/about.svg?react";
 import EnglishFlagIcon from "~/shared/assets/english-flag.svg?react";
@@ -246,14 +247,14 @@ function MeSection({ data, ...props }: MeSectionProps) {
     });
   };
 
-  const { firstName, lastName } = data;
+  const { firstName, lastName, avatar } = data;
   const fullName = [firstName, lastName].join(SPACE).trim();
 
   return (
     <DropdownMenu {...props}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost">
-          <UserIcon className="size-8" />
+          <UserAvatar firstName={firstName} lastName={lastName} avatar={avatar} />
           {fullName || tc(TRANSLATION_KEYS.NAME_NOT_SPECIFIED)}
         </Button>
       </DropdownMenuTrigger>

@@ -70,6 +70,7 @@ const TRANSLATION_KEYS = z.enum([
   "LIGHT",
   "DARK",
   "SYSTEM",
+  "USER_AVATAR",
 ]).Values;
 
 const RESOURCES = {
@@ -125,6 +126,7 @@ const RESOURCES = {
       [TRANSLATION_KEYS.LIGHT]: "light",
       [TRANSLATION_KEYS.DARK]: "dark",
       [TRANSLATION_KEYS.SYSTEM]: "system",
+      [TRANSLATION_KEYS.USER_AVATAR]: "user avatar",
     },
   },
   uk: {
@@ -184,6 +186,7 @@ const RESOURCES = {
       [TRANSLATION_KEYS.LIGHT]: "світла",
       [TRANSLATION_KEYS.DARK]: "темна",
       [TRANSLATION_KEYS.SYSTEM]: "системна",
+      [TRANSLATION_KEYS.USER_AVATAR]: "аватар користувача",
     },
   },
 };
