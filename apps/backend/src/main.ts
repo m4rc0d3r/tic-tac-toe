@@ -1,5 +1,6 @@
 import fastifyCookie from "@fastify/cookie";
 import fastifyCors from "@fastify/cors";
+import fastifyMultipart from "@fastify/multipart";
 import type { FastifyTRPCPluginOptions } from "@trpc/server/adapters/fastify";
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import closeWithGrace from "close-with-grace";
@@ -8,10 +9,19 @@ import { expand } from "dotenv-expand";
 import fastify from "fastify";
 
 import { authRouter } from "./features/auth";
+import { usersRouter } from "./features/users/infra/transport";
 import { createConfig, createDependencies, createTrpcContext, trpcRouter } from "./infra";
+
+declare module "fastify" {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+  interface FastifyRequest {
+    body2: FastifyRequest["body"];
+  }
+}
 
 const appRouter = trpcRouter({
   auth: authRouter,
+  users: usersRouter,
 });
 type AppRouter = typeof appRouter;
 
@@ -47,6 +57,19 @@ const {
 app.register(fastifyCookie, {
   secret,
   hook: "onRequest",
+});
+
+app.register(fastifyMultipart, {
+  attachFieldsToBody: true,
+});
+
+/** This needs to be done because without this trick tRPC will not be able to work with form data. */
+app.addHook("preHandler", (req, _res, done) => {
+  if (req.isMultipart()) {
+    req.body2 = req.body;
+    req.body = undefined;
+  }
+  done();
 });
 
 const {

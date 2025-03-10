@@ -1,4 +1,5 @@
 import type { PrismaClient } from "@prisma/client";
+import type { ExcludeUndefinedFromOptionalKeys } from "@tic-tac-toe/core";
 import { either as e, taskEither as te } from "fp-ts";
 
 import type {
@@ -7,13 +8,15 @@ import type {
   FindOneByIn,
   FindOneByOut,
   ListOut,
+  UpdateIn,
+  UpdateOut,
 } from "../app/ports/repository";
 import { UsersRepository } from "../app/ports/repository";
 
 import { NotFoundError, UniqueKeyViolationError } from "~/app";
 import type { UserFieldsInUniqueConstraints } from "~/core";
 import { isConstrainedFields, userFieldsInUniqueConstraints } from "~/core";
-import { isUniqueKeyViolation } from "~/infra";
+import { isNotFoundError, isUniqueKeyViolation } from "~/infra";
 
 class PrismaUsersRepository extends UsersRepository {
   constructor(private readonly prisma: PrismaClient) {
@@ -34,6 +37,36 @@ class PrismaUsersRepository extends UsersRepository {
           if (isConstrainedFields(target, userFieldsInUniqueConstraints)) {
             return new UniqueKeyViolationError(target);
           }
+        }
+        throw reason;
+      },
+    )();
+  }
+
+  override async update({
+    id,
+    ...rest
+  }: UpdateIn): Promise<
+    e.Either<UniqueKeyViolationError<UserFieldsInUniqueConstraints> | NotFoundError, UpdateOut>
+  > {
+    return te.tryCatch(
+      () =>
+        this.prisma.user.update({
+          where: {
+            id,
+          },
+          data: rest as ExcludeUndefinedFromOptionalKeys<typeof rest>,
+        }),
+      (reason) => {
+        if (isUniqueKeyViolation(reason)) {
+          const target = reason.meta.target;
+          if (isConstrainedFields(target, userFieldsInUniqueConstraints)) {
+            return new UniqueKeyViolationError(target);
+          }
+        } else if (isNotFoundError(reason)) {
+          return new NotFoundError({
+            id,
+          });
         }
         throw reason;
       },

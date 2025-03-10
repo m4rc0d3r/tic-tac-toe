@@ -1,5 +1,61 @@
+import { SPACE } from "@tic-tac-toe/core";
+
+import { toTrpcError } from "./error-handling";
 import { trpcInstance } from "./instance";
+
+import { AuthenticationError } from "~/features/auth";
 
 const trpcProcedure = trpcInstance.procedure;
 
-export { trpcProcedure };
+const trpcProcedureWithAuth = trpcProcedure.use(async (opts) => {
+  const {
+    ctx: { req, authService },
+    next,
+  } = opts;
+
+  const authorizationHeader = req.headers.authorization;
+
+  if (!authorizationHeader) {
+    throw toTrpcError(
+      new AuthenticationError({
+        inBrief: "INVALID_REQUEST",
+        inDetail: "AUTHORIZATION_HEADER_MISSING",
+      }),
+    );
+  }
+
+  const [scheme, token] = authorizationHeader.split(SPACE);
+
+  if (!(scheme === "Bearer" && token)) {
+    throw toTrpcError(
+      new AuthenticationError({
+        inBrief: "INVALID_REQUEST",
+        inDetail: "AUTHORIZATION_HEADER_MALFORMED",
+      }),
+    );
+  }
+
+  const checkResult = await authService.checkToken({
+    type: "access",
+    token,
+  });
+
+  if (checkResult._tag === "Left") {
+    throw toTrpcError(
+      new AuthenticationError({
+        inBrief: "INVALID_TOKEN",
+        inDetail: checkResult.left,
+      }),
+    );
+  }
+
+  const { userId } = checkResult.right;
+
+  return next({
+    ctx: {
+      userId,
+    },
+  });
+});
+
+export { trpcProcedure, trpcProcedureWithAuth };

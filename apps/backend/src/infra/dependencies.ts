@@ -4,7 +4,12 @@ import type { FastifyBaseLogger } from "fastify";
 import type { Config } from "./config";
 
 import { AuthService, JwtServiceImpl } from "~/features/auth";
-import { BcryptHashingService, PrismaUsersRepository, UsersService } from "~/features/users";
+import {
+  BcryptHashingService,
+  PrismaUsersRepository,
+  UsersService,
+  VercelBlobService,
+} from "~/features/users";
 import { withMethodTracing } from "~/shared";
 
 function createDependencies(config: Config, logger: FastifyBaseLogger) {
@@ -13,8 +18,9 @@ function createDependencies(config: Config, logger: FastifyBaseLogger) {
   const usersRepository = new PrismaUsersRepository(prisma);
   const hashingService = new BcryptHashingService(config);
   const jwtService = new JwtServiceImpl(config);
+  const blobService = new VercelBlobService(config);
 
-  const usersService = new UsersService(usersRepository, hashingService);
+  const usersService = new UsersService(usersRepository, hashingService, blobService);
   const authService = new AuthService(jwtService);
 
   if (config.app.nodeEnv === "dev") {

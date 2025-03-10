@@ -7,8 +7,10 @@ import { z } from "zod";
 import { NotFoundError, UniqueKeyViolationError } from "~/app";
 import { JwtError } from "~/features/auth/app/ports/jwt";
 import { AuthenticationError } from "~/features/auth/infra/transport/errors";
+import { UserUpdateError } from "~/features/users/infra/transport/errors";
 
 const HTTP_STATUS_PHRASES_BY_ERROR_AREA = {
+  BAD_REQUEST: "BAD_REQUEST",
   AUTHENTICATION: "UNAUTHORIZED",
   NOT_FOUND: "NOT_FOUND",
   UNIQUE_KEY_VIOLATION: "CONFLICT",
@@ -103,6 +105,12 @@ function convertErrorCause(cause: Error) {
     return {
       area: "UNIQUE_KEY_VIOLATION" satisfies ErrorArea,
       paths: cause.paths as UniqueKeyViolationError["paths"],
+    } as const;
+  } else if (cause instanceof UserUpdateError) {
+    const { reason } = cause;
+    return {
+      area: "BAD_REQUEST" satisfies ErrorArea,
+      reason,
     } as const;
   }
 

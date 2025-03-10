@@ -1,9 +1,9 @@
 import { either as e } from "fp-ts";
 
-import type { HashingService, UsersRepository } from "../ports";
-import type { FindOneByOut, ListOut } from "../ports/repository";
+import type { BlobService, HashingService, UsersRepository } from "../ports";
+import type { FindOneByOut, ListOut, UpdateOut } from "../ports/repository";
 
-import type { CreateIn, CreateOut, FindOneByIn } from "./ios";
+import type { CreateIn, CreateOut, FindOneByIn, UpdateIn } from "./ios";
 
 import type { UniqueKeyViolationError } from "~/app";
 import { NotFoundError } from "~/app";
@@ -13,6 +13,7 @@ class UsersService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly hashingService: HashingService,
+    private readonly blobService: BlobService,
   ) {}
 
   async create({
@@ -25,6 +26,34 @@ class UsersService {
       ...rest,
       passwordHash: await this.hashingService.hash(password),
     });
+  }
+
+  async update({
+    avatar,
+    password,
+    ...rest
+  }: UpdateIn): Promise<
+    e.Either<UniqueKeyViolationError<UserFieldsInUniqueConstraints> | NotFoundError, UpdateOut>
+  > {
+    const newData: Parameters<typeof this.usersRepository.update>[0] = rest;
+    if (password) {
+      newData.passwordHash = await this.hashingService.hash(password);
+    }
+    if (avatar !== undefined) {
+      const searchResult = await this.usersRepository.findOneBy({
+        id: rest.id,
+      });
+      if (searchResult._tag === "Left") {
+        return searchResult;
+      }
+      const { avatar: currentAvatar } = searchResult.right;
+      if (currentAvatar) {
+        await this.blobService.delete(currentAvatar);
+      }
+      newData.avatar = avatar instanceof File ? await this.blobService.upload(avatar) : avatar;
+    }
+
+    return this.usersRepository.update(newData);
   }
 
   async findOneBy(params: FindOneByIn): Promise<e.Either<NotFoundError, FindOneByOut>> {

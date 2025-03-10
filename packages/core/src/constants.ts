@@ -19,5 +19,31 @@ type QuestionMark = typeof QUESTION_MARK;
 const COMMA_WITH_SPACE = `${COMMA}${SPACE}`;
 type CommaWithSpace = typeof COMMA_WITH_SPACE;
 
-export { COMMA, COMMA_WITH_SPACE, EMPTY_STRING, PERIOD, QUESTION_MARK, SPACE, UNDERSCORE };
-export type { Comma, CommaWithSpace, EmptyString, Period, QuestionMark, Space, Underscore };
+const MIME_TYPES = {
+  gif: "image/gif",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  svg: "image/svg+xml",
+} as const;
+type MimeType = (typeof MIME_TYPES)[keyof typeof MIME_TYPES];
+
+export {
+  COMMA,
+  COMMA_WITH_SPACE,
+  EMPTY_STRING,
+  MIME_TYPES,
+  PERIOD,
+  QUESTION_MARK,
+  SPACE,
+  UNDERSCORE,
+};
+export type {
+  Comma,
+  CommaWithSpace,
+  EmptyString,
+  MimeType,
+  Period,
+  QuestionMark,
+  Space,
+  Underscore,
+};

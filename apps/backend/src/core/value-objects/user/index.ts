@@ -1,4 +1,8 @@
-export { zAvatar as zUserAvatar } from "./avatar";
+export {
+  AVATAR_MIME_TYPES as USER_AVATAR_MIME_TYPES,
+  zAvatar as zUserAvatar,
+  zAvatarAsFile as zUserAvatarAsFile,
+} from "./avatar";
 export type { Avatar as UserAvatar } from "./avatar";
 export { zFirstName as zUserFirstName } from "./first-name";
 export type { FirstName as UserFirstName } from "./first-name";

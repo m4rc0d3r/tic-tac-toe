@@ -11,4 +11,16 @@ function isUniqueKeyViolation(error: unknown): error is PrismaClientKnownRequest
   return error instanceof PrismaClientKnownRequestError && error.code === UNIQUE_CONSTRAINT_CODE;
 }
 
-export { isUniqueKeyViolation };
+const NOT_FOUND_CODE = "P2025";
+
+function isNotFoundError(error: unknown): error is PrismaClientKnownRequestError & {
+  code: typeof NOT_FOUND_CODE;
+  meta: {
+    modelName: string;
+    cause: string;
+  };
+} {
+  return error instanceof PrismaClientKnownRequestError && error.code === NOT_FOUND_CODE;
+}
+
+export { isNotFoundError, isUniqueKeyViolation };
