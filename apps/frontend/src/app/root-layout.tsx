@@ -67,7 +67,7 @@ function RootLayout() {
     <div className="flex h-full flex-col">
       <header>
         <nav>
-          <ul className="flex justify-between gap-2 p-2 shadow-sm">
+          <ul className="flex justify-between gap-2 border-b p-2">
             <li className="flex items-center md:hidden">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -142,7 +142,7 @@ function RootLayout() {
           </ul>
         </nav>
       </header>
-      <main className="h-full">
+      <main className="flex h-full overflow-hidden">
         <Outlet />
       </main>
     </div>

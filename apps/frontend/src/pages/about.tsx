@@ -6,7 +6,7 @@ function AboutPage() {
   } = useTranslation2();
 
   return (
-    <p className="flex h-full items-center justify-center">
+    <p className="flex flex-grow items-center justify-center">
       {tsp(TRANSLATION_KEYS.WELCOME_TO_ABOUT_US_PAGE)}
     </p>
   );
