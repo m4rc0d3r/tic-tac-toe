@@ -91,6 +91,9 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --color-link-foreground: var(--link-foreground);
+  --breakpoint-xs: 30rem;
+  --breakpoint-2xs: 22.5rem;
+  --breakpoint-3xs: 20rem;
 }
 
 @layer base {
