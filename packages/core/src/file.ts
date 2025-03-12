@@ -45,5 +45,26 @@ const zMimeTypeRefinement = <T extends z.ZodSchema>(schema: T) => {
   }) as Parameters<ReturnType<typeof z.instanceof<typeof File>>["superRefine"]>[0];
 };
 
-export { isZMimeTypeIssue, Z_INVALID_MIME_TYPE, zMimeTypeRefinement };
-export type { ZMimeTypeIssue };
+const MIME_TYPES = {
+  gif: "image/gif",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  svg: "image/svg+xml",
+} as const;
+type MimeType = (typeof MIME_TYPES)[keyof typeof MIME_TYPES];
+
+const EXTENSIONS_BY_MIME_TYPE = {
+  [MIME_TYPES.gif]: ".gif",
+  [MIME_TYPES.jpeg]: ".jpeg",
+  [MIME_TYPES.png]: ".png",
+  [MIME_TYPES.svg]: ".svg",
+} as const;
+
+export {
+  EXTENSIONS_BY_MIME_TYPE,
+  isZMimeTypeIssue,
+  MIME_TYPES,
+  Z_INVALID_MIME_TYPE,
+  zMimeTypeRefinement,
+};
+export type { MimeType, ZMimeTypeIssue };

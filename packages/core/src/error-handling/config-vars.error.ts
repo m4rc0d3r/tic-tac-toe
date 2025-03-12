@@ -1,8 +1,9 @@
 import type { z } from "zod";
 
-import { stringify2 } from "~/converters";
-import type { NonOperationalErrorOptions } from "~/error-handling";
-import { NonOperationalError } from "~/error-handling";
+import type { NonOperationalErrorOptions } from "./non-operational.error";
+import { NonOperationalError } from "./non-operational.error";
+
+import { stringify2 } from "~/json";
 
 type ConfigVarProblem = {
   name: string;

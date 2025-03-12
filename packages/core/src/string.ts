@@ -19,39 +19,18 @@ type QuestionMark = typeof QUESTION_MARK;
 const COMMA_WITH_SPACE = `${COMMA}${SPACE}`;
 type CommaWithSpace = typeof COMMA_WITH_SPACE;
 
-const MIME_TYPES = {
-  gif: "image/gif",
-  jpeg: "image/jpeg",
-  png: "image/png",
-  svg: "image/svg+xml",
-} as const;
-type MimeType = (typeof MIME_TYPES)[keyof typeof MIME_TYPES];
-
-const EXTENSIONS_BY_MIME_TYPE = {
-  [MIME_TYPES.gif]: ".gif",
-  [MIME_TYPES.jpeg]: ".jpeg",
-  [MIME_TYPES.png]: ".png",
-  [MIME_TYPES.svg]: ".svg",
-} as const;
+function capitalize<T extends string>(value: T): Capitalize<T> {
+  return [value.at(0)?.toLocaleUpperCase(), value.slice(1)].join(EMPTY_STRING) as Capitalize<T>;
+}
 
 export {
+  capitalize,
   COMMA,
   COMMA_WITH_SPACE,
   EMPTY_STRING,
-  EXTENSIONS_BY_MIME_TYPE,
-  MIME_TYPES,
   PERIOD,
   QUESTION_MARK,
   SPACE,
   UNDERSCORE,
 };
-export type {
-  Comma,
-  CommaWithSpace,
-  EmptyString,
-  MimeType,
-  Period,
-  QuestionMark,
-  Space,
-  Underscore,
-};
+export type { Comma, CommaWithSpace, EmptyString, Period, QuestionMark, Space, Underscore };
