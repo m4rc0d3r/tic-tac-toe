@@ -2,6 +2,7 @@ export * from "./array";
 export * from "./error-handling";
 export * from "./file";
 export * from "./game";
+export * from "./geometry";
 export * from "./json";
 export * from "./primitive";
 export type * from "./record";
