@@ -1,3 +1,4 @@
+export * from "./array";
 export * from "./error-handling";
 export * from "./file";
 export * from "./json";
