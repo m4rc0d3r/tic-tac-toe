@@ -4,6 +4,7 @@ const ROUTES = {
   registration: "/register",
   login: "/login",
   settings: "/settings",
+  classicGame: "/classic-game",
 };
 
 export { ROUTES };

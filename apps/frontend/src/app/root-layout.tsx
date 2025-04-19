@@ -1,5 +1,5 @@
 import { SPACE } from "@tic-tac-toe/core";
-import { MenuIcon, Moon, Sun } from "lucide-react";
+import { GamepadIcon, MenuIcon, Moon, Sun } from "lucide-react";
 import type { ComponentProps } from "react";
 import { Link, Outlet, useNavigate } from "react-router";
 import { toast } from "sonner";
@@ -47,6 +47,11 @@ function RootLayout() {
       name: tc(TRANSLATION_KEYS.ABOUT_US),
       path: ROUTES.about,
       Icon: AboutIcon,
+    },
+    {
+      name: tc(TRANSLATION_KEYS.PLAY),
+      path: ROUTES.classicGame,
+      Icon: GamepadIcon,
     },
   ];
 

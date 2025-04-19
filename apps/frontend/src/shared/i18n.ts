@@ -83,6 +83,7 @@ const TRANSLATION_KEYS = z.enum([
   "ACCEPTABLE_IMAGE_FORMATS",
   "RESET",
   "INVALID_IMAGE_FORMAT_ONLY_FORMATS_ARE_ACCEPTED",
+  "PLAY",
 ]).Values;
 
 const RESOURCES = {
@@ -153,6 +154,7 @@ const RESOURCES = {
       [TRANSLATION_KEYS.RESET]: "reset",
       [TRANSLATION_KEYS.INVALID_IMAGE_FORMAT_ONLY_FORMATS_ARE_ACCEPTED]:
         "invalid image format, only {{formats}} are accepted",
+      [TRANSLATION_KEYS.PLAY]: "play",
     },
   },
   uk: {
@@ -227,6 +229,7 @@ const RESOURCES = {
       [TRANSLATION_KEYS.RESET]: "скинути",
       [TRANSLATION_KEYS.INVALID_IMAGE_FORMAT_ONLY_FORMATS_ARE_ACCEPTED]:
         "недійсний формат зображення, приймаються лише {{formats}}",
+      [TRANSLATION_KEYS.PLAY]: "грати",
     },
   },
 };

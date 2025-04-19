@@ -4,6 +4,7 @@ import { RootLayout } from "./root-layout";
 
 import { withConditionalAccess } from "~/features/routing2";
 import { AboutPage } from "~/pages/about";
+import { ClassicGamePage } from "~/pages/classic-game";
 import { HomePage } from "~/pages/home";
 import { LoginPage } from "~/pages/login";
 import { RegistrationPage } from "~/pages/registration";
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
               component: SettingsPage,
               allowFor: "AUTHENTICATED",
             }),
+          },
+          {
+            path: ROUTES.classicGame,
+            Component: ClassicGamePage,
           },
         ],
       },
