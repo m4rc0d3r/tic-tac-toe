@@ -4,6 +4,7 @@ export * from "./file";
 export * from "./game";
 export * from "./geometry";
 export * from "./json";
+export * from "./number";
 export * from "./primitive";
 export type * from "./record";
 export * from "./string";
