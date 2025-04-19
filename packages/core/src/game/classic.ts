@@ -31,6 +31,43 @@ type Move = {
   position: Vec2;
 };
 
+type GameState =
+  | {
+      status: "IN_PROGRESS";
+    }
+  | {
+      status: "OVER";
+      result: "DRAW";
+    }
+  | {
+      status: "OVER";
+      result: "VICTORY";
+      winner: Player;
+    };
+
+function getGameState(board: Board): GameState;
+function getGameState(moves: Move[]): GameState;
+function getGameState(boardOrMoves: Board | Move[]): GameState {
+  const board = (() =>
+    Array.isArray(boardOrMoves[0])
+      ? (boardOrMoves as Board)
+      : buildBoard(boardOrMoves as Move[]))();
+
+  const player = X;
+  const evaluation = evaluate(board, player);
+  if (evaluation === WINNING_POSITION) {
+    return { status: "OVER", result: "VICTORY", winner: player };
+  } else if (evaluation === LOSING_POSITION) {
+    return { status: "OVER", result: "VICTORY", winner: getOpponent(player) };
+  } else {
+    if (getNumberOfCells(board, EMPTY) === 0) {
+      return { status: "OVER", result: "DRAW" };
+    } else {
+      return { status: "IN_PROGRESS" };
+    }
+  }
+}
+
 function positionToIndex({ x, y }: Vec2) {
   return y * BOARD_SIZE + x;
 }
@@ -86,6 +123,67 @@ function getNumberOfCells(boardOrMoves: Board | Move[], content: CellContent) {
 
 function getOpponent(player: Player) {
   return player === X ? O : X;
+}
+
+function getWinningPositions(board: Board) {
+  const indices = range(BOARD_SIZE);
+
+  for (const positions of [
+    indices.map((i) => ({ x: i, y: i })),
+    indices.map((i) => ({ x: indices.length - 1 - i, y: i })),
+    ...indices.map((i) => indices.map((j) => ({ x: i, y: j }))),
+    ...indices.map((i) => indices.map((j) => ({ x: j, y: i }))),
+  ]) {
+    const [a, b, c] = positions.map((position) => getCellContent(board, position));
+    if (a && a !== EMPTY && a === b && b === c) {
+      return positions;
+    }
+  }
+
+  return [];
+}
+
+type Direction = "VERTICAL" | "HORIZONTAL" | "DIAGONAL";
+type WinningLineParams = {
+  direction: Direction;
+  index: number;
+};
+function getWinningLineParams(board: Board) {
+  const indices = range(BOARD_SIZE);
+
+  type Item = { params: WinningLineParams; positions: Vec2[] };
+  for (const item of [
+    {
+      params: { direction: "DIAGONAL", index: 0 },
+      positions: indices.map((i) => ({ x: i, y: i })),
+    },
+    {
+      params: { direction: "DIAGONAL", index: 1 },
+      positions: indices.map((i) => ({ x: indices.length - 1 - i, y: i })),
+    },
+    ...indices.map(
+      (i) =>
+        ({
+          params: { direction: "HORIZONTAL", index: i },
+          positions: indices.map((j) => ({ x: j, y: i })),
+        }) as Item,
+    ),
+    ...indices.map(
+      (i) =>
+        ({
+          params: { direction: "VERTICAL", index: i },
+          positions: indices.map((j) => ({ x: i, y: j })),
+        }) as Item,
+    ),
+  ] satisfies Item[]) {
+    const { params, positions } = item;
+    const [a, b, c] = positions.map((position) => getCellContent(board, position));
+    if (a && a !== EMPTY && a === b && b === c) {
+      return params;
+    }
+  }
+
+  return null;
 }
 
 function evaluate(board: Board, player: Player) {
@@ -192,8 +290,11 @@ export {
   fillCellWith,
   findBestMove,
   getCellContent,
+  getGameState,
   getNumberOfCells,
   getOpponent,
+  getWinningLineParams,
+  getWinningPositions,
   isMoveAllowed,
   LOSING_POSITION,
   minimax,
@@ -208,4 +309,14 @@ export {
   WORST_MINIMIZER_POSITION,
   X,
 };
-export type { Board, CellContent, Move, OffBoard, Player, Vec2 };
+export type {
+  Board,
+  CellContent,
+  Direction,
+  GameState,
+  Move,
+  OffBoard,
+  Player,
+  Vec2,
+  WinningLineParams,
+};

@@ -1,3 +1,4 @@
+import type { Direction } from "@tic-tac-toe/core";
 import { BOARD_SIZE, distanceBetweenPoints } from "@tic-tac-toe/core";
 import type { ComponentProps, Ref } from "react";
 import { useImperativeHandle, useRef } from "react";
@@ -74,7 +75,6 @@ type WinningLineInstanceRef = {
     startAnimation: () => Animation | undefined;
   };
 };
-type Direction = "VERTICAL" | "HORIZONTAL" | "DIAGONAL";
 type Props = Omit<ComponentProps<typeof Svg>, "ref"> & {
   ref?: Ref<WinningLineInstanceRef> | undefined;
 
@@ -101,9 +101,10 @@ function WinningLine({ ref, direction, index, ...props }: Props) {
 
   return (
     <Svg {...props}>
-      <line ref={lineRef} x1={0} y1={0} x2={0} y2={0} />
+      <line ref={lineRef} x1={x1} y1={y1} x2={x2} y2={y2} strokeDasharray={length} />
     </Svg>
   );
 }
 
 export { WinningLine };
+export type { WinningLineInstanceRef };
