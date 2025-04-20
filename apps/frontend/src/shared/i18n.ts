@@ -84,6 +84,14 @@ const TRANSLATION_KEYS = z.enum([
   "RESET",
   "INVALID_IMAGE_FORMAT_ONLY_FORMATS_ARE_ACCEPTED",
   "PLAY",
+  "YOU_WON",
+  "YOU_LOST",
+  "THE_GAME_ENDED_IN_A_DRAW",
+  "VICTORY",
+  "DRAW",
+  "DEFEAT",
+  "PLAY_AGAIN",
+  "GO_TO_THE_MAIN_PAGE",
 ]).Values;
 
 const RESOURCES = {
@@ -155,6 +163,14 @@ const RESOURCES = {
       [TRANSLATION_KEYS.INVALID_IMAGE_FORMAT_ONLY_FORMATS_ARE_ACCEPTED]:
         "invalid image format, only {{formats}} are accepted",
       [TRANSLATION_KEYS.PLAY]: "play",
+      [TRANSLATION_KEYS.YOU_WON]: "you won",
+      [TRANSLATION_KEYS.YOU_LOST]: "you lost",
+      [TRANSLATION_KEYS.THE_GAME_ENDED_IN_A_DRAW]: "the game ended in a draw",
+      [TRANSLATION_KEYS.VICTORY]: "victory",
+      [TRANSLATION_KEYS.DRAW]: "draw",
+      [TRANSLATION_KEYS.DEFEAT]: "defeat",
+      [TRANSLATION_KEYS.PLAY_AGAIN]: "play again",
+      [TRANSLATION_KEYS.GO_TO_THE_MAIN_PAGE]: "go to the main page",
     },
   },
   uk: {
@@ -230,6 +246,14 @@ const RESOURCES = {
       [TRANSLATION_KEYS.INVALID_IMAGE_FORMAT_ONLY_FORMATS_ARE_ACCEPTED]:
         "недійсний формат зображення, приймаються лише {{formats}}",
       [TRANSLATION_KEYS.PLAY]: "грати",
+      [TRANSLATION_KEYS.YOU_WON]: "ви виграли",
+      [TRANSLATION_KEYS.YOU_LOST]: "ви програли",
+      [TRANSLATION_KEYS.THE_GAME_ENDED_IN_A_DRAW]: "гра завершилася нічиєю",
+      [TRANSLATION_KEYS.VICTORY]: "перемога",
+      [TRANSLATION_KEYS.DRAW]: "нічия",
+      [TRANSLATION_KEYS.DEFEAT]: "поразка",
+      [TRANSLATION_KEYS.PLAY_AGAIN]: "зіграти знову",
+      [TRANSLATION_KEYS.GO_TO_THE_MAIN_PAGE]: "перейти на головну сторінку",
     },
   },
 };

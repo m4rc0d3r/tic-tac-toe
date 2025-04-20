@@ -8,7 +8,6 @@ import {
   getWinningLineParams,
   isEven,
   isMoveAllowed,
-  O,
   positionFromIndex,
   positionToIndex,
   X,
@@ -16,24 +15,22 @@ import {
 import type { ComponentProps } from "react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
+import { ICONS_BY_PLAYER } from "./shared";
 import type { WinningLineInstanceRef } from "./winning-line";
 import { WinningLine } from "./winning-line";
 
-import type { PlayerIcon, PlayerIconInstanceRef } from "~/shared/ui/player-icons";
-import { CrossIcon, NoughtIcon } from "~/shared/ui/player-icons";
+import type { PlayerIconInstanceRef } from "~/shared/ui/player-icons";
 import { cn } from "~/shared/ui/utils";
 
-const ICONS_BY_PLAYER: Record<string, PlayerIcon> = {
-  [X]: CrossIcon,
-  [O]: NoughtIcon,
-};
-
 type WhoseMoveIsFirst = "I" | "OPPONENT";
+type GameOverState = Extract<GameState, { status: "OVER" }>;
 type Props = ComponentProps<"div"> & {
   myPlayer?: Player | undefined;
   whoseMoveIsFirst?: WhoseMoveIsFirst | undefined;
   initialMoves?: Move[] | undefined;
   delayBeforeBotMove?: number | undefined;
+  onGameOver?: ((gameState: GameOverState) => void) | undefined;
+  onGameOverDelay?: number | undefined;
 };
 
 function ClassicGame({
@@ -50,6 +47,8 @@ function ClassicGame({
   ],
   delayBeforeBotMove = 1000,
   className,
+  onGameOver,
+  onGameOverDelay = 100,
   ...props
 }: Props) {
   const opponent = getOpponent(myPlayer);
@@ -126,20 +125,29 @@ function ClassicGame({
     };
   }, [initialMoves.length, moves]);
 
+  const handleGameOver = useCallback(
+    (gameState: GameOverState) => {
+      setTimeout(() => {
+        onGameOver?.(gameState);
+      }, onGameOverDelay);
+    },
+    [onGameOver, onGameOverDelay],
+  );
+
   useLayoutEffect(() => {
-    const winningLine = winningLineRef.current;
+    if (gameState.status === "IN_PROGRESS") return;
 
-    if (
-      !(
-        gameState.status === "OVER" &&
-        gameState.result === "VICTORY" &&
-        winningLineParams &&
-        winningLine
-      )
-    )
+    if (gameState.result === "DRAW") {
+      void (async () => {
+        await playerIconAnimation.current?.finished;
+        handleGameOver(gameState);
+      })();
       return;
+    }
 
-    const animation = winningLine.api.startAnimation();
+    if (!winningLineParams) return;
+
+    const animation = winningLineRef.current?.api.startAnimation();
     if (!animation) return;
 
     animation.pause();
@@ -147,11 +155,14 @@ function ClassicGame({
     void (async () => {
       await playerIconAnimation.current?.finished;
       animation.play();
+      await animation.finished;
+      handleGameOver(gameState);
     })();
 
     return () => {
       animation.cancel();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState, winningLineParams]);
 
   const handleCellClick = (index: number) => {
@@ -198,3 +209,4 @@ function ClassicGame({
 }
 
 export { ClassicGame };
+export type { GameOverState };
