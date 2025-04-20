@@ -1,5 +1,6 @@
+import type { Vec2 } from "../geometry";
+
 import { range } from "~/array";
-import type { Vec2 } from "~/geometry";
 import { isNullish } from "~/type-guards";
 
 const BOARD_SIZE = 3;
