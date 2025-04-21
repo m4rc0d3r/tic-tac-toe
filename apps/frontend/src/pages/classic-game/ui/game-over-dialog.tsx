@@ -19,6 +19,8 @@ import {
   DialogTitle,
 } from "~/shared/ui/dialog";
 import type { PlayerIcon } from "~/shared/ui/player-icons";
+import { CrossIcon, NoughtIcon } from "~/shared/ui/player-icons";
+import { cn } from "~/shared/ui/utils";
 
 type Props = ComponentProps<typeof Dialog> & {
   myPlayer: Player;
@@ -30,16 +32,6 @@ function ClassicGameOverDialog({ myPlayer, gameOverState, onPlayAgain, ...props 
   const {
     postproc: { tc, tsp },
   } = useTranslation2();
-
-  const winner = gameOverState.result === "VICTORY" ? gameOverState.winner : "";
-
-  const playerIcons: {
-    icon: PlayerIcon | undefined;
-    medalMetal: MedalMetal;
-  }[] = [
-    { icon: ICONS_BY_PLAYER[winner], medalMetal: "GOLD" },
-    { icon: winner ? ICONS_BY_PLAYER[getOpponent(winner)] : undefined, medalMetal: "SILVER" },
-  ];
 
   const [titleTranslationKey, descriptionTranslationKey] =
     gameOverState.result === "DRAW"
@@ -55,16 +47,7 @@ function ClassicGameOverDialog({ myPlayer, gameOverState, onPlayAgain, ...props 
           <DialogTitle>{tc(titleTranslationKey)}</DialogTitle>
           <DialogDescription>{tsp(descriptionTranslationKey)}</DialogDescription>
         </DialogHeader>
-        {gameOverState.result === "VICTORY" && (
-          <div className="flex justify-evenly">
-            {playerIcons.map(
-              ({ icon, medalMetal }, index) =>
-                icon && (
-                  <PlayerIconWithMedal key={index} playerIcon={icon} medalMetal={medalMetal} />
-                ),
-            )}
-          </div>
-        )}
+        <PlayerIconsWithMedals gameOverState={gameOverState} />
         <DialogFooter>
           <div className="xs:flex-row flex flex-col justify-end gap-2">
             <Button asChild type="button" variant="secondary">
@@ -79,18 +62,46 @@ function ClassicGameOverDialog({ myPlayer, gameOverState, onPlayAgain, ...props 
 }
 
 type MedalMetal = ComponentProps<typeof MedalIcon>["metal"];
-type PlayerIconWithMedalProps = ComponentProps<"div"> & {
-  playerIcon: PlayerIcon;
-  medalMetal: MedalMetal;
+
+type PlayerIconsWithMedalsProps = ComponentProps<"div"> & {
+  gameOverState: GameOverState;
 };
 
-function PlayerIconWithMedal({ playerIcon, medalMetal, ...props }: PlayerIconWithMedalProps) {
-  const PlayerIcon = playerIcon;
+function PlayerIconsWithMedals({ gameOverState, className, ...props }: PlayerIconsWithMedalsProps) {
+  if (gameOverState.result === "DRAW") {
+    return (
+      <div className={cn("flex items-center justify-evenly", className)} {...props}>
+        <CrossIcon className="size-16" />
+        <div>
+          <MedalIcon metal="GOLD" className="size-16" />
+          <MedalIcon metal="SILVER" className="size-16" />
+        </div>
+        <NoughtIcon className="size-16" />
+      </div>
+    );
+  }
+
+  const winner = gameOverState.result === "VICTORY" ? gameOverState.winner : "";
+
+  const playerIcons: {
+    icon: PlayerIcon | undefined;
+    medalMetal: MedalMetal;
+  }[] = [
+    { icon: ICONS_BY_PLAYER[winner], medalMetal: "GOLD" },
+    { icon: winner ? ICONS_BY_PLAYER[getOpponent(winner)] : undefined, medalMetal: "SILVER" },
+  ];
 
   return (
-    <div className="relative h-24 w-16" {...props}>
-      <PlayerIcon className="absolute h-2/3 w-full" />
-      <MedalIcon metal={medalMetal} className="absolute top-1/3 h-2/3 w-full" />
+    <div className={cn("flex justify-evenly", className)} {...props}>
+      {playerIcons.map(
+        ({ icon: PlayerIcon, medalMetal }, index) =>
+          PlayerIcon && (
+            <div key={index} className="relative h-24 w-16">
+              <PlayerIcon className="absolute h-2/3 w-full" />
+              <MedalIcon metal={medalMetal} className="absolute top-1/3 h-2/3 w-full" />
+            </div>
+          ),
+      )}
     </div>
   );
 }
