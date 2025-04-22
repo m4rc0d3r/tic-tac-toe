@@ -94,6 +94,7 @@ const TRANSLATION_KEYS = z.enum([
   "GO_TO_THE_MAIN_PAGE",
   "GAME_CREATION",
   "CHANGING_GAME_SETTINGS",
+  "APPLY",
   "SPECIFY_THE_DESIRED_GAME_PARAMETERS",
   "MY_PLAYER_ICON",
   "WHO_MAKES_THE_FIRST_MOVE",
@@ -102,6 +103,8 @@ const TRANSLATION_KEYS = z.enum([
   "SHOULD_BE_ONE_OF_OPTIONS",
   "OR",
   "CREATE",
+  "GAME_PARAMETERS",
+  "CHANGE",
 ]).Values;
 
 const RESOURCES = {
@@ -183,6 +186,7 @@ const RESOURCES = {
       [TRANSLATION_KEYS.GO_TO_THE_MAIN_PAGE]: "go to the main page",
       [TRANSLATION_KEYS.GAME_CREATION]: "game creation",
       [TRANSLATION_KEYS.CHANGING_GAME_SETTINGS]: "changing game settings",
+      [TRANSLATION_KEYS.APPLY]: "apply",
       [TRANSLATION_KEYS.SPECIFY_THE_DESIRED_GAME_PARAMETERS]: "specify the desired game parameters",
       [TRANSLATION_KEYS.MY_PLAYER_ICON]: "my player icon",
       [TRANSLATION_KEYS.WHO_MAKES_THE_FIRST_MOVE]: "who makes the first move",
@@ -191,6 +195,8 @@ const RESOURCES = {
       [TRANSLATION_KEYS.SHOULD_BE_ONE_OF_OPTIONS]: "must be {{options}}",
       [TRANSLATION_KEYS.OR]: "or",
       [TRANSLATION_KEYS.CREATE]: "create",
+      [TRANSLATION_KEYS.GAME_PARAMETERS]: "game parameters",
+      [TRANSLATION_KEYS.CHANGE]: "change",
     },
   },
   uk: {
@@ -276,6 +282,7 @@ const RESOURCES = {
       [TRANSLATION_KEYS.GO_TO_THE_MAIN_PAGE]: "перейти на головну сторінку",
       [TRANSLATION_KEYS.GAME_CREATION]: "створення гри",
       [TRANSLATION_KEYS.CHANGING_GAME_SETTINGS]: "зміна налаштувань гри",
+      [TRANSLATION_KEYS.APPLY]: "застосовувати",
       [TRANSLATION_KEYS.SPECIFY_THE_DESIRED_GAME_PARAMETERS]: "вкажіть бажані параметри гри",
       [TRANSLATION_KEYS.MY_PLAYER_ICON]: "значок мого гравця",
       [TRANSLATION_KEYS.WHO_MAKES_THE_FIRST_MOVE]: "хто робить перший крок",
@@ -284,6 +291,8 @@ const RESOURCES = {
       [TRANSLATION_KEYS.SHOULD_BE_ONE_OF_OPTIONS]: "має бути {{options}}",
       [TRANSLATION_KEYS.OR]: "або",
       [TRANSLATION_KEYS.CREATE]: "створити",
+      [TRANSLATION_KEYS.GAME_PARAMETERS]: "параметри гри",
+      [TRANSLATION_KEYS.CHANGE]: "змінити",
     },
   },
 };

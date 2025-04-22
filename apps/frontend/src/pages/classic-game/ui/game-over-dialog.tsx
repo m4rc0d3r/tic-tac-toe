@@ -1,10 +1,13 @@
 import type { Player } from "@tic-tac-toe/core";
 import { getOpponent } from "@tic-tac-toe/core";
 import type { ComponentProps } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
 
 import type { GameOverState } from "./game";
+import { ClassicGameOptionsDialog } from "./game-options-dialog";
 import { MedalIcon } from "./icons";
+import type { GameOptions } from "./shared";
 import { ICONS_BY_PLAYER } from "./shared";
 
 import { TRANSLATION_KEYS, useTranslation2 } from "~/shared/i18n";
@@ -25,13 +28,24 @@ import { cn } from "~/shared/ui/utils";
 type Props = ComponentProps<typeof Dialog> & {
   myPlayer: Player;
   gameOverState: GameOverState;
+  gameOptions: GameOptions;
+  onGameOptionsChange?: ((gameOptions: GameOptions) => void) | undefined;
   onPlayAgain?: (() => void) | undefined;
 };
 
-function ClassicGameOverDialog({ myPlayer, gameOverState, onPlayAgain, ...props }: Props) {
+function ClassicGameOverDialog({
+  myPlayer,
+  gameOverState,
+  gameOptions,
+  onGameOptionsChange,
+  onPlayAgain,
+  ...props
+}: Props) {
   const {
     postproc: { tc, tsp },
   } = useTranslation2();
+
+  const [isClassicGameOptionsDialogOpen, setIsClassicGameOptionsDialogOpen] = useState(false);
 
   const [titleTranslationKey, descriptionTranslationKey] =
     gameOverState.result === "DRAW"
@@ -39,6 +53,8 @@ function ClassicGameOverDialog({ myPlayer, gameOverState, onPlayAgain, ...props 
       : gameOverState.winner === myPlayer
         ? [TRANSLATION_KEYS.VICTORY, TRANSLATION_KEYS.YOU_WON]
         : [TRANSLATION_KEYS.DEFEAT, TRANSLATION_KEYS.YOU_LOST];
+
+  const MyPlayerIcon = ICONS_BY_PLAYER[gameOptions.myPlayerIcon];
 
   return (
     <Dialog {...props}>
@@ -48,6 +64,33 @@ function ClassicGameOverDialog({ myPlayer, gameOverState, onPlayAgain, ...props 
           <DialogDescription>{tsp(descriptionTranslationKey)}</DialogDescription>
         </DialogHeader>
         <PlayerIconsWithMedals gameOverState={gameOverState} />
+        <div className="flex flex-col">
+          <h3 className="text-center font-bold">{tc(TRANSLATION_KEYS.GAME_PARAMETERS)}</h3>
+          <p className="flex items-center">
+            {tc(TRANSLATION_KEYS.MY_PLAYER_ICON)}:&nbsp;
+            {MyPlayerIcon && <MyPlayerIcon strokeWidth={16} className="size-6" />}
+          </p>
+          <p>
+            {tc(TRANSLATION_KEYS.WHO_MAKES_THE_FIRST_MOVE)}:&nbsp;
+            {tc(TRANSLATION_KEYS[gameOptions.whoMakesFirstMove])}
+          </p>
+          <ClassicGameOptionsDialog
+            open={isClassicGameOptionsDialogOpen}
+            onOpenChange={setIsClassicGameOptionsDialogOpen}
+            title={tc(TRANSLATION_KEYS.CHANGING_GAME_SETTINGS)}
+            okButtonTitle={tc(TRANSLATION_KEYS.APPLY)}
+            trigger={
+              <Button variant="outline" className="self-end">
+                {tc(TRANSLATION_KEYS.CHANGE)}
+              </Button>
+            }
+            initialValues={gameOptions}
+            onSubmit={(options) => {
+              onGameOptionsChange?.(options);
+              setIsClassicGameOptionsDialogOpen(false);
+            }}
+          />
+        </div>
         <DialogFooter>
           <div className="xs:flex-row flex flex-col justify-end gap-2">
             <Button asChild type="button" variant="secondary">

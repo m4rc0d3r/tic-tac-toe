@@ -84,6 +84,8 @@ function ClassicGamePage({ className, ...props }: Props) {
           open={isGameOverDialogOpen}
           myPlayer={gameOptions.myPlayerIcon}
           gameOverState={gameOverState}
+          gameOptions={gameOptions}
+          onGameOptionsChange={setGameOptions}
           onPlayAgain={handlePlayAgain}
         />
       )}
