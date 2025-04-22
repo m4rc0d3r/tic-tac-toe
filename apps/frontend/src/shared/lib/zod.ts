@@ -4,10 +4,27 @@ import { z } from "zod";
 
 import { CASES, createTc, TRANSLATION_KEYS } from "../i18n";
 
+import { listWithConjunction, putInQuotes } from "./text";
+
 function errorMapForForms<Ns extends Namespace, KPrefix>(t: TFunction<Ns, KPrefix>) {
   const tc = createTc(t);
   const map: z.ZodErrorMap = (issue, ctx) => {
     const { code } = issue;
+
+    if (code === z.ZodIssueCode.invalid_enum_value) {
+      const onlyTranslatedOptions = issue.options
+        .map((option) => (TRANSLATION_KEYS as Record<string, string>)[option])
+        .filter((value) => value !== undefined)
+        .map((option) => tc(option));
+      return {
+        message: tc(TRANSLATION_KEYS.SHOULD_BE_ONE_OF_OPTIONS, {
+          options: listWithConjunction(
+            onlyTranslatedOptions.map(putInQuotes),
+            t(TRANSLATION_KEYS.OR),
+          ),
+        }),
+      };
+    }
 
     if (code === z.ZodIssueCode.invalid_string) {
       const { validation } = issue;

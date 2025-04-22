@@ -8,4 +8,8 @@ function listWithConjunction(items: string[], conjunction: string) {
       : [items.slice(0, -1).join(COMMA_WITH_SPACE), conjunction, items.at(-1)].join(SPACE);
 }
 
-export { listWithConjunction };
+function putInQuotes(value: string) {
+  return `'${value}'`;
+}
+
+export { listWithConjunction, putInQuotes };

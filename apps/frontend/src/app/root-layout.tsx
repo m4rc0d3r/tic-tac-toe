@@ -1,6 +1,7 @@
 import { SPACE } from "@tic-tac-toe/core";
 import { GamepadIcon, MenuIcon, Moon, Sun } from "lucide-react";
 import type { ComponentProps } from "react";
+import { useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router";
 import { toast } from "sonner";
 
@@ -10,6 +11,7 @@ import { THEMES, useTheme } from "./theming";
 import type { Me } from "~/entities/auth";
 import { useAuthStore } from "~/entities/auth";
 import { UserAvatar } from "~/entities/user";
+import { ClassicGameOptionsDialog } from "~/pages/classic-game";
 import { trpc } from "~/shared/api";
 import AboutIcon from "~/shared/assets/about.svg?react";
 import EnglishFlagIcon from "~/shared/assets/english-flag.svg?react";
@@ -33,6 +35,7 @@ function RootLayout() {
   const {
     postproc: { tc },
   } = useTranslation2();
+  const navigate = useNavigate();
 
   type State = ReturnType<(typeof useAuthStore)["getState"]>;
   const { status, me } = {
@@ -42,18 +45,32 @@ function RootLayout() {
     | Pick<Extract<State, { status: "UNCERTAIN" | "UNAUTHENTICATED" }>, "status" | "me">
     | Pick<Extract<State, { status: "AUTHENTICATED" }>, "status" | "me">;
 
+  const [isClassicGameOptionsDialogOpen, setIsClassicGameOptionsDialogOpen] = useState(false);
+
   const menuItems = [
     {
+      type: "LINK",
       name: tc(TRANSLATION_KEYS.ABOUT_US),
-      path: ROUTES.about,
       Icon: AboutIcon,
+      path: ROUTES.about,
     },
     {
+      type: "DIALOG",
       name: tc(TRANSLATION_KEYS.PLAY),
-      path: ROUTES.classicGame,
       Icon: GamepadIcon,
+      Component: ClassicGameOptionsDialog,
+      props: {
+        open: isClassicGameOptionsDialogOpen,
+        onOpenChange: setIsClassicGameOptionsDialogOpen,
+        onSubmit: (options) => {
+          setIsClassicGameOptionsDialogOpen(false);
+          void navigate(ROUTES.classicGame, {
+            state: options,
+          });
+        },
+      } satisfies ComponentProps<typeof ClassicGameOptionsDialog>,
     },
-  ];
+  ] as const;
 
   const authMenuItems = [
     {
@@ -74,21 +91,35 @@ function RootLayout() {
         <nav>
           <ul className="flex justify-between gap-2 border-b p-2">
             <li className="flex items-center md:hidden">
-              <DropdownMenu>
+              <DropdownMenu modal={!isClassicGameOptionsDialogOpen}>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="icon">
                     <MenuIcon />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  {menuItems.map(({ name, path, Icon }) => (
-                    <DropdownMenuItem key={path} asChild>
-                      <Link to={path}>
-                        <Icon />
-                        {name}
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
+                  {menuItems.map((item, index) => {
+                    const { type, name, Icon } = item;
+                    return type === "LINK" ? (
+                      <DropdownMenuItem key={index} asChild>
+                        <Link to={item.path}>
+                          <Icon />
+                          {name}
+                        </Link>
+                      </DropdownMenuItem>
+                    ) : (
+                      <item.Component
+                        key={index}
+                        trigger={
+                          <DropdownMenuItem>
+                            <Icon />
+                            {name}
+                          </DropdownMenuItem>
+                        }
+                        {...item.props}
+                      />
+                    );
+                  })}
                 </DropdownMenuContent>
               </DropdownMenu>
             </li>
@@ -99,13 +130,23 @@ function RootLayout() {
             </li>
             <li className="hidden items-center md:flex">
               <ul className="flex">
-                {menuItems.map(({ name, path }) => (
-                  <li key={path}>
-                    <Button asChild variant="link">
-                      <Link to={path}>{name}</Link>
-                    </Button>
-                  </li>
-                ))}
+                {menuItems.map((item, index) => {
+                  const { type, name } = item;
+                  return (
+                    <li key={index}>
+                      {type === "LINK" ? (
+                        <Button asChild variant="link">
+                          <Link to={item.path}>{name}</Link>
+                        </Button>
+                      ) : (
+                        <item.Component
+                          trigger={<Button variant="link">{name}</Button>}
+                          {...item.props}
+                        />
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </li>
             <li className="flex items-center">
