@@ -82,7 +82,7 @@ function ClassicGame({
   );
 
   useEffect(() => {
-    if (isGameInProgress() && whoseTurn !== opponent) return;
+    if (!(isGameInProgress() && whoseTurn === opponent)) return;
 
     const { position } = findBestMove(moves, opponent);
     if (!isMoveAllowed(moves, position, opponent)) return;
