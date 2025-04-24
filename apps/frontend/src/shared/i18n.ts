@@ -105,6 +105,11 @@ const TRANSLATION_KEYS = z.enum([
   "CREATE",
   "GAME_PARAMETERS",
   "CHANGE",
+  "TIME_REMAINING",
+  "I_HAVE",
+  "OPPONENT_HAS",
+  "S",
+  "THE_GAME_STARTS_IN_N",
 ]).Values;
 
 const RESOURCES = {
@@ -197,6 +202,11 @@ const RESOURCES = {
       [TRANSLATION_KEYS.CREATE]: "create",
       [TRANSLATION_KEYS.GAME_PARAMETERS]: "game parameters",
       [TRANSLATION_KEYS.CHANGE]: "change",
+      [TRANSLATION_KEYS.TIME_REMAINING]: "time remaining",
+      [TRANSLATION_KEYS.I_HAVE]: "i have",
+      [TRANSLATION_KEYS.OPPONENT_HAS]: "opponent has",
+      [TRANSLATION_KEYS.S]: "s",
+      [TRANSLATION_KEYS.THE_GAME_STARTS_IN_N]: "the game starts in {{n}}",
     },
   },
   uk: {
@@ -293,6 +303,11 @@ const RESOURCES = {
       [TRANSLATION_KEYS.CREATE]: "створити",
       [TRANSLATION_KEYS.GAME_PARAMETERS]: "параметри гри",
       [TRANSLATION_KEYS.CHANGE]: "змінити",
+      [TRANSLATION_KEYS.TIME_REMAINING]: "залишилось часу",
+      [TRANSLATION_KEYS.I_HAVE]: "у мене",
+      [TRANSLATION_KEYS.OPPONENT_HAS]: "у суперника",
+      [TRANSLATION_KEYS.S]: "с",
+      [TRANSLATION_KEYS.THE_GAME_STARTS_IN_N]: "гра починається через {{n}}",
     },
   },
 };

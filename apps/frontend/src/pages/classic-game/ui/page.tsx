@@ -4,10 +4,10 @@ import { useState } from "react";
 import { useLocation } from "react-router";
 
 import type { GameOverState } from "./game";
-import { ClassicGame } from "./game";
 import { ClassicGameOverDialog } from "./game-over-dialog";
 import type { GameOptions } from "./shared";
 import { zGameOptions } from "./shared";
+import { ClassicTimeLimitGame } from "./time-limit-game";
 
 import { usePreviousValue } from "~/shared/lib/react";
 import { cn } from "~/shared/ui/utils";
@@ -70,10 +70,12 @@ function ClassicGamePage({ className, ...props }: Props) {
 
   return (
     <div className={cn("flex-grow overflow-auto", className)} {...props}>
-      <ClassicGame
+      <ClassicTimeLimitGame
         key={gameStartedAt}
         myPlayer={gameOptions.myPlayerIcon}
         whoseMoveIsFirst={gameOptions.whoMakesFirstMove}
+        timePerMove={3000}
+        timePerPlayer={30000}
         onGameOver={(gameState) => {
           setGameOverState(gameState);
           setIsGameOverDialogOpen(true);
