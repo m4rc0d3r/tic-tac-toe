@@ -12,6 +12,7 @@
     "@tic-tac-toe/lint-staged-config": "workspace:*",
     "@tic-tac-toe/typescript-config": "workspace:*",
     "concurrently": "^9.0.0",
+    "type-fest": "^4.34.1",
     "typescript": "^5.7.3"
   },
   "exports": {

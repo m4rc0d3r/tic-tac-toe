@@ -1,3 +1,5 @@
+import type { ReadonlyTuple } from "type-fest";
+
 const NON_EXISTENT_INDEX = -1;
 
 function range(stop: number): number[];
@@ -28,4 +30,12 @@ function shuffle<T>(values: T[]) {
   return values.toSorted(() => Math.random() - 0.5);
 }
 
-export { NON_EXISTENT_INDEX, range, shuffle };
+function toArrayWindows<T, S extends number>(values: T[], size: S) {
+  type ArrayWindow = ReadonlyTuple<T, S>;
+  return values.reduce((acc, _, index, array) => {
+    if (index + size > array.length) return acc;
+    return acc.concat([array.slice(index, index + size)] as ArrayWindow);
+  }, [] as ArrayWindow[]);
+}
+
+export { NON_EXISTENT_INDEX, range, shuffle, toArrayWindows };

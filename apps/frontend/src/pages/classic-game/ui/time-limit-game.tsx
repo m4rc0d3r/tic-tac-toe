@@ -1,7 +1,15 @@
-import type { GameState, Move, Player, Vec2, WinningLineParams } from "@tic-tac-toe/core";
+import type {
+  ColorStop,
+  GameState,
+  Move,
+  Player,
+  Vec2,
+  WinningLineParams,
+} from "@tic-tac-toe/core";
 import {
   BOARD_AREA,
   buildBoard,
+  calculateColorFromGradient,
   findBestMove,
   getGameState,
   getOpponent,
@@ -14,7 +22,7 @@ import {
   SPACE,
   X,
 } from "@tic-tac-toe/core";
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Countdown from "react-countdown";
 import type { Entries } from "type-fest";
@@ -23,9 +31,13 @@ import { ICONS_BY_PLAYER } from "./shared";
 import type { WinningLineInstanceRef } from "./winning-line";
 import { WinningLine } from "./winning-line";
 
+import type { User } from "~/entities/user";
+import { UserAvatar } from "~/entities/user";
 import { TRANSLATION_KEYS, useTranslation2 } from "~/shared/i18n";
-import { toSeconds } from "~/shared/lib/format";
+import { rgb } from "~/shared/lib/css";
+import { asPercentage, toSeconds } from "~/shared/lib/format";
 import type { PlayerIconInstanceRef } from "~/shared/ui/player-icons";
+import { Progress } from "~/shared/ui/progress";
 import { cn } from "~/shared/ui/utils";
 
 const DELAY_BEFORE_BOT_MOVE = 1000;
@@ -46,9 +58,13 @@ type GameState2 =
       reason: "N_IN_ROW" | "TIME_IS_UP";
     });
 
+type PlayerInfo = Pick<User, "firstName" | "lastName" | "avatar">;
+type PlayersInfo = Record<Player, PlayerInfo>;
+
 type WhoseMoveIsFirst = "I" | "OPPONENT";
 type GameOverState = Extract<GameState, { status: "OVER" }>;
 type Props = ComponentProps<"div"> & {
+  playersInfo: PlayersInfo;
   myPlayer?: Player | undefined;
   whoseMoveIsFirst?: WhoseMoveIsFirst | undefined;
   timePerMove?: number | undefined;
@@ -60,6 +76,7 @@ type Props = ComponentProps<"div"> & {
 };
 
 function ClassicTimeLimitGame({
+  playersInfo,
   myPlayer = X,
   whoseMoveIsFirst = "I",
   timePerMove,
@@ -293,52 +310,110 @@ function ClassicTimeLimitGame({
     makeMove(myPlayer, position);
   };
 
+  const PROGRESS_BAR_GRADIENT: ColorStop[] = [
+    { color: [255, 0, 0], offset: 0 },
+    { color: [255, 255, 0], offset: 0.5 },
+    { color: [0, 255, 0], offset: 1 },
+  ];
   return (
     <div className={cn("overflow-auto", className)} {...props}>
-      {gameState.status === "NOT_STARTED" && (
-        <Countdown
-          {...DEFAULT_COUNTDOWN_PROPS}
-          ref={pregameCountdownRef}
-          date={gameStartsAt.current}
-          onComplete={startGame}
-          renderer={({ total }) => (
-            <p className="text-center">
-              {tc(TRANSLATION_KEYS.THE_GAME_STARTS_IN_N, {
-                n: toSeconds(total),
-              })}
-              &nbsp;{t(TRANSLATION_KEYS.S)}
-            </p>
-          )}
-        />
-      )}
-      {(typeof timeRemainingToMove === "number" || playersRemainingTime) && (
-        <div>
-          <p className="text-center">{tc(TRANSLATION_KEYS.TIME_REMAINING)}</p>
-          {playersRemainingTime && (
-            <div className="grid grid-cols-2">
-              {[
-                Object.keys(playersRemainingTime).map((value) =>
-                  tc(value === myPlayer ? TRANSLATION_KEYS.I_HAVE : TRANSLATION_KEYS.OPPONENT_HAS),
-                ),
-                Object.values(playersRemainingTime).map((value) =>
-                  [toSeconds(value), t(TRANSLATION_KEYS.S)].join(SPACE),
-                ),
-              ]
-                .flat()
-                .map((value, index) => (
-                  <p key={index} className="text-center">
-                    {value}
-                  </p>
-                ))}
-            </div>
-          )}
-          {typeof timeRemainingToMove === "number" && (
-            <p className="text-center">
-              {toSeconds(timeRemainingToMove)}&nbsp;{t(TRANSLATION_KEYS.S)}
-            </p>
-          )}
-        </div>
-      )}
+      <div className="flex items-center justify-evenly">
+        {
+          <Countdown
+            {...DEFAULT_COUNTDOWN_PROPS}
+            ref={pregameCountdownRef}
+            date={gameStartsAt.current}
+            onComplete={startGame}
+            renderer={({ total }) => (
+              <p
+                className={cn(
+                  "order-2 text-center",
+                  gameState.status !== "NOT_STARTED" && "invisible",
+                )}
+              >
+                {tc(TRANSLATION_KEYS.THE_GAME_STARTS_IN_N, {
+                  n: toSeconds(total),
+                })}
+                &nbsp;{t(TRANSLATION_KEYS.S)}
+              </p>
+            )}
+          />
+        }
+        {Object.entries(playersInfo).map(
+          ([player, { firstName, lastName, avatar }], index, { length }) => {
+            const fullName = [firstName, lastName].join(SPACE).trim();
+
+            return (
+              <div
+                key={index}
+                style={
+                  {
+                    "--order": index < length / 2 ? index : index + 1,
+                  } as CSSProperties
+                }
+                className="order-(--order) flex items-center gap-1"
+              >
+                <UserAvatar
+                  firstName={firstName}
+                  lastName={lastName}
+                  avatar={avatar}
+                  className="size-16"
+                />
+                <div className="flex flex-col gap-1">
+                  <span>{fullName || tc(TRANSLATION_KEYS.NAME_NOT_SPECIFIED)}</span>
+                  {timePerPlayer && playersRemainingTime && (
+                    <div className="relative">
+                      <Progress
+                        value={asPercentage(playersRemainingTime[player as Player] / timePerPlayer)}
+                        style={
+                          {
+                            "--fill-color": rgb(
+                              calculateColorFromGradient(
+                                PROGRESS_BAR_GRADIENT,
+                                playersRemainingTime[player as Player] / timePerPlayer,
+                              ),
+                            ),
+                          } as CSSProperties
+                        }
+                        className="h-4 min-w-16 bg-gray-200 [&>*]:bg-(--fill-color)"
+                      />
+                      <span className="absolute top-1/2 left-1/2 -translate-1/2 text-nowrap text-gray-900">
+                        {[
+                          toSeconds(playersRemainingTime[player as Player]),
+                          t(TRANSLATION_KEYS.S),
+                        ].join(SPACE)}
+                      </span>
+                    </div>
+                  )}
+                  {typeof timePerMove === "number" && typeof timeRemainingToMove === "number" && (
+                    <div className={cn("relative", whoseTurn !== player && "invisible")}>
+                      <Progress
+                        value={asPercentage(timeRemainingToMove / timePerMove)}
+                        style={
+                          {
+                            "--fill-color": rgb(
+                              calculateColorFromGradient(
+                                PROGRESS_BAR_GRADIENT,
+                                timeRemainingToMove / timePerMove,
+                              ),
+                            ),
+                          } as CSSProperties
+                        }
+                        className={cn(
+                          "h-3 bg-gray-200 [&>*]:bg-(--fill-color) [&>*]:transition-none",
+                        )}
+                      />
+                      <span className="absolute top-1/2 left-1/2 -translate-1/2 text-xs text-nowrap text-gray-900">
+                        {[toSeconds(timeRemainingToMove), t(TRANSLATION_KEYS.S)].join(SPACE)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          },
+        )}
+      </div>
       <div className="bg-primary relative m-auto grid max-w-180 min-w-80 grid-cols-3 gap-1">
         {winningLineParams && (
           <WinningLine
@@ -372,4 +447,4 @@ function ClassicTimeLimitGame({
 }
 
 export { ClassicTimeLimitGame };
-export type { GameOverState };
+export type { GameOverState, PlayerInfo, PlayersInfo };

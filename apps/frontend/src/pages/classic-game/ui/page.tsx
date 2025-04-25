@@ -1,4 +1,4 @@
-import { X } from "@tic-tac-toe/core";
+import { getOpponent, X } from "@tic-tac-toe/core";
 import type { ComponentProps } from "react";
 import { useState } from "react";
 import { useLocation } from "react-router";
@@ -7,8 +7,12 @@ import type { GameOverState } from "./game";
 import { ClassicGameOverDialog } from "./game-over-dialog";
 import type { GameOptions } from "./shared";
 import { zGameOptions } from "./shared";
+import type { PlayersInfo } from "./time-limit-game";
 import { ClassicTimeLimitGame } from "./time-limit-game";
 
+import { useAuthStore } from "~/entities/auth";
+import anonymousImage from "~/shared/assets/anonymous.png";
+import robotImage from "~/shared/assets/robot.png";
 import { usePreviousValue } from "~/shared/lib/react";
 import { cn } from "~/shared/ui/utils";
 
@@ -57,6 +61,19 @@ function ClassicGamePage({ className, ...props }: Props) {
   );
   const [gameOptions, setGameOptions] = useState(DEFAULT_STATE.gameOptions);
 
+  const playersInfo = {
+    [gameOptions.myPlayerIcon]: useAuthStore.use.me() ?? {
+      firstName: "Anonymous",
+      lastName: "",
+      avatar: anonymousImage,
+    },
+    [getOpponent(gameOptions.myPlayerIcon)]: {
+      firstName: "Bot",
+      lastName: "",
+      avatar: robotImage,
+    },
+  } as PlayersInfo;
+
   const handlePlayAgain = () => {
     resetState(gameOptions);
   };
@@ -72,6 +89,7 @@ function ClassicGamePage({ className, ...props }: Props) {
     <div className={cn("flex-grow overflow-auto", className)} {...props}>
       <ClassicTimeLimitGame
         key={gameStartedAt}
+        playersInfo={playersInfo}
         myPlayer={gameOptions.myPlayerIcon}
         whoseMoveIsFirst={gameOptions.whoMakesFirstMove}
         timePerMove={3000}

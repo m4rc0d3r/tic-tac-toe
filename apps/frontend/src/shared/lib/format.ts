@@ -4,4 +4,8 @@ function toSeconds(milliseconds: number, precision = 1) {
   return (milliseconds / MILLISECONDS_PER_SECOND).toFixed(precision);
 }
 
-export { toSeconds };
+function asPercentage(value: number) {
+  return value * 100;
+}
+
+export { asPercentage, toSeconds };

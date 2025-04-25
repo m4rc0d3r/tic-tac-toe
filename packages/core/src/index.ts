@@ -1,4 +1,5 @@
 export * from "./array";
+export * from "./color";
 export * from "./error-handling";
 export * from "./file";
 export * from "./game";

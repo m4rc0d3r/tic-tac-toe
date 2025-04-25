@@ -11,5 +11,9 @@ function circumference(radius: number) {
   return 2 * Math.PI * radius;
 }
 
-export { circumference, distanceBetweenPoints };
+function lerp(from: number, to: number, weight: number) {
+  return from * (1 - weight) + to * weight;
+}
+
+export { circumference, distanceBetweenPoints, lerp };
 export type { Vec2 };
