@@ -1,3 +1,4 @@
+import type { GameState } from "@tic-tac-toe/core";
 import { O, PLAYERS, X } from "@tic-tac-toe/core";
 import { z } from "zod";
 
@@ -15,5 +16,22 @@ const zGameOptions = z.object({
 });
 type GameOptions = z.infer<typeof zGameOptions>;
 
+type GameState2 =
+  | {
+      status: "NOT_STARTED";
+    }
+  | Exclude<GameState, { result: "VICTORY" }>
+  | (Extract<GameState, { result: "VICTORY" }> & {
+      reason: "N_IN_ROW" | "TIME_IS_UP";
+    });
+type GameOverState = Extract<GameState2, { status: "OVER" }>;
+
+type CompletedGame = {
+  gameOptions: GameOptions;
+  gameOverState: GameOverState;
+  startedAt: Date;
+  endedAt: Date;
+};
+
 export { ICONS_BY_PLAYER, zGameOptions };
-export type { GameOptions };
+export type { CompletedGame, GameOptions, GameOverState, GameState2 };

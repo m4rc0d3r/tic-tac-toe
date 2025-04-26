@@ -3,9 +3,8 @@ import type { ComponentProps } from "react";
 import { useState } from "react";
 import { useLocation } from "react-router";
 
-import type { GameOverState } from "./game";
 import { ClassicGameOverDialog } from "./game-over-dialog";
-import type { GameOptions } from "./shared";
+import type { CompletedGame, GameOptions } from "./shared";
 import { zGameOptions } from "./shared";
 import type { PlayersInfo } from "./time-limit-game";
 import { ClassicTimeLimitGame } from "./time-limit-game";
@@ -22,11 +21,9 @@ const DEFAULT_GAME_OPTIONS: GameOptions = {
 };
 
 function getDefaultState(gameOptions: GameOptions) {
-  const gameOverState = null;
   return {
-    gameStartedAt: Date.now(),
-    gameOverState,
-    isGameOverDialogOpen: !!gameOverState,
+    gameStartedAt: new Date(),
+    isGameOverDialogOpen: false,
     gameOptions,
   };
 }
@@ -45,7 +42,6 @@ function ClassicGamePage({ className, ...props }: Props) {
   const resetState = (gameOptions: GameOptions) => {
     const DEFAULT_STATE = getDefaultState(gameOptions);
     setGameStartedAt(DEFAULT_STATE.gameStartedAt);
-    setGameOverState(DEFAULT_STATE.gameOverState);
     setIsGameOverDialogOpen(DEFAULT_STATE.isGameOverDialogOpen);
     setGameOptions(DEFAULT_STATE.gameOptions);
   };
@@ -53,13 +49,11 @@ function ClassicGamePage({ className, ...props }: Props) {
   const DEFAULT_STATE = getDefaultState(initialGameOptions);
 
   const [gameStartedAt, setGameStartedAt] = useState(DEFAULT_STATE.gameStartedAt);
-  const [gameOverState, setGameOverState] = useState<GameOverState | null>(
-    DEFAULT_STATE.gameOverState,
-  );
   const [isGameOverDialogOpen, setIsGameOverDialogOpen] = useState(
     DEFAULT_STATE.isGameOverDialogOpen,
   );
   const [gameOptions, setGameOptions] = useState(DEFAULT_STATE.gameOptions);
+  const [completedGames, setCompletedGames] = useState<CompletedGame[]>([]);
 
   const playersInfo = {
     [gameOptions.myPlayerIcon]: useAuthStore.use.me() ?? {
@@ -85,30 +79,36 @@ function ClassicGamePage({ className, ...props }: Props) {
     return;
   }
 
+  const handleGameOver: ComponentProps<typeof ClassicTimeLimitGame>["onGameOver"] = (gameState) => {
+    setCompletedGames((prev) => [
+      ...prev,
+      {
+        gameOptions,
+        gameOverState: gameState,
+        startedAt: gameStartedAt,
+        endedAt: new Date(),
+      },
+    ]);
+    setIsGameOverDialogOpen(true);
+  };
+
   return (
     <div className={cn("flex-grow overflow-auto", className)} {...props}>
       <ClassicTimeLimitGame
-        key={gameStartedAt}
+        key={gameStartedAt.getTime()}
         playersInfo={playersInfo}
         myPlayer={gameOptions.myPlayerIcon}
         whoseMoveIsFirst={gameOptions.whoMakesFirstMove}
         timePerMove={3000}
         timePerPlayer={30000}
-        onGameOver={(gameState) => {
-          setGameOverState(gameState);
-          setIsGameOverDialogOpen(true);
-        }}
+        onGameOver={handleGameOver}
       />
-      {gameOverState && (
-        <ClassicGameOverDialog
-          open={isGameOverDialogOpen}
-          myPlayer={gameOptions.myPlayerIcon}
-          gameOverState={gameOverState}
-          gameOptions={gameOptions}
-          onGameOptionsChange={setGameOptions}
-          onPlayAgain={handlePlayAgain}
-        />
-      )}
+      <ClassicGameOverDialog
+        open={isGameOverDialogOpen}
+        completedGames={completedGames}
+        onGameOptionsChange={setGameOptions}
+        onPlayAgain={handlePlayAgain}
+      />
     </div>
   );
 }

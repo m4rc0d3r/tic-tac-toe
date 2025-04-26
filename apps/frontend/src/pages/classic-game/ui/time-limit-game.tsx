@@ -1,11 +1,4 @@
-import type {
-  ColorStop,
-  GameState,
-  Move,
-  Player,
-  Vec2,
-  WinningLineParams,
-} from "@tic-tac-toe/core";
+import type { ColorStop, Move, Player, Vec2, WinningLineParams } from "@tic-tac-toe/core";
 import {
   BOARD_AREA,
   buildBoard,
@@ -27,6 +20,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import Countdown from "react-countdown";
 import type { Entries } from "type-fest";
 
+import type { GameOverState, GameState2 } from "./shared";
 import { ICONS_BY_PLAYER } from "./shared";
 import type { WinningLineInstanceRef } from "./winning-line";
 import { WinningLine } from "./winning-line";
@@ -49,20 +43,10 @@ const DEFAULT_COUNTDOWN_PROPS: Partial<ComponentProps<typeof Countdown>> = {
 
 const STOPWATCH_INTERVAL = 100;
 
-type GameState2 =
-  | {
-      status: "NOT_STARTED";
-    }
-  | Exclude<GameState, { result: "VICTORY" }>
-  | (Extract<GameState, { result: "VICTORY" }> & {
-      reason: "N_IN_ROW" | "TIME_IS_UP";
-    });
-
 type PlayerInfo = Pick<User, "firstName" | "lastName" | "avatar">;
 type PlayersInfo = Record<Player, PlayerInfo>;
 
 type WhoseMoveIsFirst = "I" | "OPPONENT";
-type GameOverState = Extract<GameState, { status: "OVER" }>;
 type Props = ComponentProps<"div"> & {
   playersInfo: PlayersInfo;
   myPlayer?: Player | undefined;
@@ -179,8 +163,9 @@ function ClassicTimeLimitGame({
           : newGameState,
       );
       setWinningLineParams(getWinningLineParams(board));
+      setTimeRemainingToMove(timePerMove);
     },
-    [moves],
+    [moves, timePerMove],
   );
 
   useEffect(() => {
@@ -213,7 +198,8 @@ function ClassicTimeLimitGame({
       reason: "TIME_IS_UP",
       winner: getOpponent(playerWithExpiredTime),
     });
-  }, [playersRemainingTime, timeRemainingToMove, whoseTurn]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playersRemainingTime, timeRemainingToMove]);
 
   useEffect(() => {
     if (!(isGameInProgress() && whoseTurn === opponent)) return;
@@ -250,8 +236,9 @@ function ClassicTimeLimitGame({
 
     playerIconAnimation.current = animation;
     void animation.finished.then(() => {
-      setTimeRemainingToMove(timePerMove);
-      startStopwatch();
+      if (gameState.status === "IN_PROGRESS") {
+        startStopwatch();
+      }
       playerIconAnimation.current = null;
     });
 

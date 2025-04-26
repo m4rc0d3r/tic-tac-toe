@@ -1,16 +1,15 @@
-import type { Player } from "@tic-tac-toe/core";
-import { getOpponent } from "@tic-tac-toe/core";
+import { BOARD_SIZE, EMPTY_STRING, getOpponent, SPACE } from "@tic-tac-toe/core";
 import type { ComponentProps } from "react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Link } from "react-router";
 
-import type { GameOverState } from "./game";
 import { ClassicGameOptionsDialog } from "./game-options-dialog";
 import { MedalIcon } from "./icons";
-import type { GameOptions } from "./shared";
+import type { CompletedGame, GameOptions } from "./shared";
 import { ICONS_BY_PLAYER } from "./shared";
 
 import { TRANSLATION_KEYS, useTranslation2 } from "~/shared/i18n";
+import { toSeconds } from "~/shared/lib/format";
 import { ROUTES } from "~/shared/routing";
 import { Button } from "~/shared/ui/button";
 import {
@@ -21,31 +20,34 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/shared/ui/dialog";
-import type { PlayerIcon } from "~/shared/ui/player-icons";
-import { CrossIcon, NoughtIcon } from "~/shared/ui/player-icons";
+import type { PlayerIcon, PlayerIconProps } from "~/shared/ui/player-icons";
 import { cn } from "~/shared/ui/utils";
 
 type Props = ComponentProps<typeof Dialog> & {
-  myPlayer: Player;
-  gameOverState: GameOverState;
-  gameOptions: GameOptions;
+  completedGames?: CompletedGame[] | undefined;
   onGameOptionsChange?: ((gameOptions: GameOptions) => void) | undefined;
   onPlayAgain?: (() => void) | undefined;
 };
 
 function ClassicGameOverDialog({
-  myPlayer,
-  gameOverState,
-  gameOptions,
+  completedGames = [],
   onGameOptionsChange,
   onPlayAgain,
   ...props
 }: Props) {
   const {
+    translation: { t },
     postproc: { tc, tsp },
   } = useTranslation2();
 
   const [isClassicGameOptionsDialogOpen, setIsClassicGameOptionsDialogOpen] = useState(false);
+
+  const lastGame = completedGames.at(-1);
+
+  if (!lastGame) return null;
+
+  const { gameOptions, gameOverState } = lastGame;
+  const { myPlayerIcon: myPlayer } = gameOptions;
 
   const [titleTranslationKey, descriptionTranslationKey] =
     gameOverState.result === "DRAW"
@@ -56,19 +58,105 @@ function ClassicGameOverDialog({
 
   const MyPlayerIcon = ICONS_BY_PLAYER[gameOptions.myPlayerIcon];
 
+  const STROKE_WIDTH = 8;
+
   return (
     <Dialog {...props}>
-      <DialogContent withCross={false} className="overflow-auto">
+      <DialogContent withCross={false} className="max-h-9/10 overflow-auto">
         <DialogHeader>
           <DialogTitle>{tc(titleTranslationKey)}</DialogTitle>
           <DialogDescription>{tsp(descriptionTranslationKey)}</DialogDescription>
         </DialogHeader>
-        <PlayerIconsWithMedals gameOverState={gameOverState} />
+        <div>
+          <h3 className="text-center font-medium">
+            {tc(TRANSLATION_KEYS.HISTORY_OF_COMPLETED_GAMES)}
+          </h3>
+          <div className="grid grid-cols-5 place-items-center">
+            {[
+              tc(TRANSLATION_KEYS.I),
+              tc(TRANSLATION_KEYS.OPPONENT),
+              tc(TRANSLATION_KEYS.MOVES_FIRST),
+              tc(TRANSLATION_KEYS.RESULT),
+              tc(TRANSLATION_KEYS.DURATION),
+            ].map((value, index) => (
+              <span key={index} className="text-center">
+                {value}
+              </span>
+            ))}
+            {completedGames.map(
+              ({
+                gameOptions: { myPlayerIcon, whoMakesFirstMove },
+                gameOverState,
+                startedAt,
+                endedAt,
+              }) => {
+                const { result } = gameOverState;
+
+                return (
+                  <Fragment key={startedAt.getTime()}>
+                    {[myPlayerIcon, getOpponent(myPlayerIcon)].map((player, index) => {
+                      const PlayerIcon = ICONS_BY_PLAYER[player];
+                      return (
+                        <span key={index}>
+                          {PlayerIcon &&
+                            (result === "VICTORY" ? (
+                              <PlayerIconWithMedal
+                                PlayerIcon={PlayerIcon}
+                                medalMetal={gameOverState.winner === player ? "GOLD" : "SILVER"}
+                                playerIconProps={{
+                                  strokeWidth: STROKE_WIDTH,
+                                }}
+                                className="size-9"
+                              />
+                            ) : (
+                              <PlayerIcon strokeWidth={STROKE_WIDTH} className="size-6" />
+                            ))}
+                        </span>
+                      );
+                    })}
+                    {[
+                      tc(TRANSLATION_KEYS[whoMakesFirstMove]),
+                      tc(
+                        TRANSLATION_KEYS[
+                          result === "VICTORY"
+                            ? gameOverState.winner === myPlayerIcon
+                              ? result
+                              : "DEFEAT"
+                            : result
+                        ],
+                      ) +
+                        (result === "VICTORY"
+                          ? ` (${t(
+                              TRANSLATION_KEYS[
+                                gameOverState.reason === "N_IN_ROW"
+                                  ? "N_IN_A_ROW"
+                                  : gameOverState.reason
+                              ],
+                              {
+                                n: BOARD_SIZE,
+                              },
+                            )})`
+                          : EMPTY_STRING),
+                      [
+                        toSeconds(endedAt.getTime() - startedAt.getTime()),
+                        t(TRANSLATION_KEYS.S),
+                      ].join(SPACE),
+                    ].map((value, index) => (
+                      <span key={index} className="text-center">
+                        {value}
+                      </span>
+                    ))}
+                  </Fragment>
+                );
+              },
+            )}
+          </div>
+        </div>
         <div className="flex flex-col">
-          <h3 className="text-center font-bold">{tc(TRANSLATION_KEYS.GAME_PARAMETERS)}</h3>
+          <h3 className="text-center font-medium">{tc(TRANSLATION_KEYS.NEXT_GAME_PARAMETERS)}</h3>
           <p className="flex items-center">
             {tc(TRANSLATION_KEYS.MY_PLAYER_ICON)}:&nbsp;
-            {MyPlayerIcon && <MyPlayerIcon strokeWidth={16} className="size-6" />}
+            {MyPlayerIcon && <MyPlayerIcon strokeWidth={STROKE_WIDTH} className="size-6" />}
           </p>
           <p>
             {tc(TRANSLATION_KEYS.WHO_MAKES_THE_FIRST_MOVE)}:&nbsp;
@@ -105,46 +193,26 @@ function ClassicGameOverDialog({
 }
 
 type MedalMetal = ComponentProps<typeof MedalIcon>["metal"];
-
-type PlayerIconsWithMedalsProps = ComponentProps<"div"> & {
-  gameOverState: GameOverState;
+type PlayerIconWithMedalProps = ComponentProps<"div"> & {
+  PlayerIcon: PlayerIcon;
+  medalMetal: MedalMetal;
+  playerIconProps?: PlayerIconProps | undefined;
 };
 
-function PlayerIconsWithMedals({ gameOverState, className, ...props }: PlayerIconsWithMedalsProps) {
-  if (gameOverState.result === "DRAW") {
-    return (
-      <div className={cn("flex items-center justify-evenly", className)} {...props}>
-        <CrossIcon className="size-16" />
-        <div>
-          <MedalIcon metal="GOLD" className="size-16" />
-          <MedalIcon metal="SILVER" className="size-16" />
-        </div>
-        <NoughtIcon className="size-16" />
-      </div>
-    );
-  }
-
-  const winner = gameOverState.result === "VICTORY" ? gameOverState.winner : "";
-
-  const playerIcons: {
-    icon: PlayerIcon | undefined;
-    medalMetal: MedalMetal;
-  }[] = [
-    { icon: ICONS_BY_PLAYER[winner], medalMetal: "GOLD" },
-    { icon: winner ? ICONS_BY_PLAYER[getOpponent(winner)] : undefined, medalMetal: "SILVER" },
-  ];
-
+function PlayerIconWithMedal({
+  PlayerIcon,
+  medalMetal,
+  playerIconProps: { className: playerIconClassName, ...playerIconProps } = {},
+  className,
+  ...props
+}: PlayerIconWithMedalProps) {
   return (
-    <div className={cn("flex justify-evenly", className)} {...props}>
-      {playerIcons.map(
-        ({ icon: PlayerIcon, medalMetal }, index) =>
-          PlayerIcon && (
-            <div key={index} className="relative h-24 w-16">
-              <PlayerIcon className="absolute h-2/3 w-full" />
-              <MedalIcon metal={medalMetal} className="absolute top-1/3 h-2/3 w-full" />
-            </div>
-          ),
-      )}
+    <div className={cn("relative h-24 w-16", className)} {...props}>
+      <PlayerIcon
+        className={cn("absolute h-2/3 w-full", playerIconClassName)}
+        {...playerIconProps}
+      />
+      <MedalIcon metal={medalMetal} className="absolute top-1/3 h-2/3 w-full" />
     </div>
   );
 }
