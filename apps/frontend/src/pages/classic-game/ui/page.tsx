@@ -1,11 +1,11 @@
-import { getOpponent, X } from "@tic-tac-toe/core";
+import { getOpponent } from "@tic-tac-toe/core";
 import type { ComponentProps } from "react";
 import { useState } from "react";
 import { useLocation } from "react-router";
 
 import { ClassicGameOverDialog } from "./game-over-dialog";
 import type { CompletedGame, GameOptions } from "./shared";
-import { zGameOptions } from "./shared";
+import { DEFAULT_GAME_OPTIONS, zGameOptions } from "./shared";
 import type { PlayersInfo } from "./time-limit-game";
 import { ClassicTimeLimitGame } from "./time-limit-game";
 
@@ -14,11 +14,6 @@ import anonymousImage from "~/shared/assets/anonymous.png";
 import robotImage from "~/shared/assets/robot.png";
 import { usePreviousValue } from "~/shared/lib/react";
 import { cn } from "~/shared/ui/utils";
-
-const DEFAULT_GAME_OPTIONS: GameOptions = {
-  myPlayerIcon: X,
-  whoMakesFirstMove: "I",
-};
 
 function getDefaultState(gameOptions: GameOptions) {
   return {
@@ -99,12 +94,13 @@ function ClassicGamePage({ className, ...props }: Props) {
         playersInfo={playersInfo}
         myPlayer={gameOptions.myPlayerIcon}
         whoseMoveIsFirst={gameOptions.whoMakesFirstMove}
-        timePerMove={3000}
-        timePerPlayer={30000}
+        timePerMove={gameOptions.timePerMove}
+        timePerPlayer={gameOptions.timePerPlayer}
         onGameOver={handleGameOver}
       />
       <ClassicGameOverDialog
         open={isGameOverDialogOpen}
+        nextGameOptions={gameOptions}
         completedGames={completedGames}
         onGameOptionsChange={setGameOptions}
         onPlayAgain={handlePlayAgain}

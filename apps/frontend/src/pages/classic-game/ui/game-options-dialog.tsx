@@ -1,12 +1,22 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogTrigger } from "@radix-ui/react-dialog";
-import { X } from "@tic-tac-toe/core";
+import { MILLISECONDS_PER_SECOND } from "@tic-tac-toe/core";
 import type { ComponentProps, ReactNode } from "react";
 import { useId } from "react";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zfd } from "zod-form-data";
 
 import type { GameOptions } from "./shared";
-import { zGameOptions } from "./shared";
+import {
+  convertTimeToSeconds,
+  DEFAULT_GAME_OPTIONS,
+  MAXIMUM_TIME_PER_MOVE,
+  MAXIMUM_TIME_PER_PLAYER,
+  MINIMUM_TIME_PER_MOVE,
+  MINIMUM_TIME_PER_PLAYER,
+  zGameOptions,
+} from "./shared";
 
 import { TRANSLATION_KEYS, useTranslation2 } from "~/shared/i18n";
 import { errorMapForForms } from "~/shared/lib/zod";
@@ -20,7 +30,46 @@ import {
   DialogTitle,
 } from "~/shared/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/shared/ui/form";
+import { Input } from "~/shared/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/shared/ui/select";
+
+const MINIMUM_TIME_PER_MOVE_IN_SECONDS = MINIMUM_TIME_PER_MOVE / MILLISECONDS_PER_SECOND;
+const MINIMUM_TIME_PER_PLAYER_IN_SECONDS = MINIMUM_TIME_PER_PLAYER / MILLISECONDS_PER_SECOND;
+
+const zGameOptionsForm = zfd.formData(
+  zGameOptions
+    .pick({
+      myPlayerIcon: true,
+      whoMakesFirstMove: true,
+    })
+    .extend({
+      timePerMove: zfd.numeric(
+        z
+          .number()
+          .step(0.1)
+          .min(MINIMUM_TIME_PER_MOVE_IN_SECONDS)
+          .max(MAXIMUM_TIME_PER_MOVE / MILLISECONDS_PER_SECOND)
+          .optional()
+          .transform((value) =>
+            typeof value === "number" ? value * MILLISECONDS_PER_SECOND : value,
+          )
+          .pipe(zGameOptions.shape.timePerMove),
+      ),
+      timePerPlayer: zfd.numeric(
+        z
+          .number()
+          .step(0.1)
+          .min(MINIMUM_TIME_PER_PLAYER_IN_SECONDS)
+          .max(MAXIMUM_TIME_PER_PLAYER / MILLISECONDS_PER_SECOND)
+          .optional()
+          .transform((value) =>
+            typeof value === "number" ? value * MILLISECONDS_PER_SECOND : value,
+          )
+          .pipe(zGameOptions.shape.timePerPlayer),
+      ),
+    }),
+);
+type GameOptionsForm = z.infer<typeof zGameOptionsForm>;
 
 type Props = ComponentProps<typeof Dialog> & {
   title?: string | undefined;
@@ -45,13 +94,13 @@ function ClassicGameOptionsDialog({
     postproc: { tc, tsp },
   } = useTranslation2();
 
-  const form = useForm<GameOptions>({
-    resolver: zodResolver(zGameOptions, {
+  const form = useForm<GameOptionsForm>({
+    resolver: zodResolver(zGameOptionsForm, {
       errorMap: errorMapForForms(t),
     }),
     defaultValues: {
-      myPlayerIcon: X,
-      whoMakesFirstMove: "I",
+      ...DEFAULT_GAME_OPTIONS,
+      ...convertTimeToSeconds(DEFAULT_GAME_OPTIONS),
       ...initialValues,
     },
   });
@@ -122,6 +171,30 @@ function ClassicGameOptionsDialog({
                       ))}
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="timePerMove"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{tc(TRANSLATION_KEYS.TIME_PER_MOVE)}</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="timePerPlayer"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{tc(TRANSLATION_KEYS.TIME_PER_PLAYER)}</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

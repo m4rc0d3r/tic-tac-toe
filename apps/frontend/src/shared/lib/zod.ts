@@ -11,6 +11,16 @@ function errorMapForForms<Ns extends Namespace, KPrefix>(t: TFunction<Ns, KPrefi
   const map: z.ZodErrorMap = (issue, ctx) => {
     const { code } = issue;
 
+    if (code === z.ZodIssueCode.invalid_type) {
+      const { expected } = issue;
+
+      if (expected === "number") {
+        return {
+          message: tc(TRANSLATION_KEYS.MUST_BE_A_NUMBER),
+        };
+      }
+    }
+
     if (code === z.ZodIssueCode.invalid_enum_value) {
       const onlyTranslatedOptions = issue.options
         .map((option) => (TRANSLATION_KEYS as Record<string, string>)[option])
@@ -92,7 +102,41 @@ function errorMapForForms<Ns extends Namespace, KPrefix>(t: TFunction<Ns, KPrefi
             count: exactMinimum,
           }),
         };
+      } else if (type === "number") {
+        return {
+          message: tc(
+            inclusive
+              ? TRANSLATION_KEYS.MUST_BE_AT_LEAST_N
+              : TRANSLATION_KEYS.MUST_BE_GREATER_THAN_N,
+            {
+              n: minimum,
+            },
+          ),
+        };
       }
+    }
+
+    if (code === z.ZodIssueCode.too_big) {
+      const { inclusive, maximum, type } = issue;
+      if (type === "number") {
+        return {
+          message: tc(
+            inclusive ? TRANSLATION_KEYS.SHOULD_NOT_EXCEED_N : TRANSLATION_KEYS.MUST_BE_LESS_THAN_N,
+            {
+              n: maximum,
+            },
+          ),
+        };
+      }
+    }
+
+    if (code === z.ZodIssueCode.not_multiple_of) {
+      const { multipleOf } = issue;
+      return {
+        message: tc(TRANSLATION_KEYS.MUST_BE_A_MULTIPLE_OF_N, {
+          n: multipleOf,
+        }),
+      };
     }
 
     return {

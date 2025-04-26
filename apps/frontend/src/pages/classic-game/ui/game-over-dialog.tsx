@@ -6,7 +6,7 @@ import { Link } from "react-router";
 import { ClassicGameOptionsDialog } from "./game-options-dialog";
 import { MedalIcon } from "./icons";
 import type { CompletedGame, GameOptions } from "./shared";
-import { ICONS_BY_PLAYER } from "./shared";
+import { convertTimeToSeconds, ICONS_BY_PLAYER } from "./shared";
 
 import { TRANSLATION_KEYS, useTranslation2 } from "~/shared/i18n";
 import { toSeconds } from "~/shared/lib/format";
@@ -24,12 +24,14 @@ import type { PlayerIcon, PlayerIconProps } from "~/shared/ui/player-icons";
 import { cn } from "~/shared/ui/utils";
 
 type Props = ComponentProps<typeof Dialog> & {
+  nextGameOptions: GameOptions;
   completedGames?: CompletedGame[] | undefined;
   onGameOptionsChange?: ((gameOptions: GameOptions) => void) | undefined;
   onPlayAgain?: (() => void) | undefined;
 };
 
 function ClassicGameOverDialog({
+  nextGameOptions,
   completedGames = [],
   onGameOptionsChange,
   onPlayAgain,
@@ -46,17 +48,19 @@ function ClassicGameOverDialog({
 
   if (!lastGame) return null;
 
-  const { gameOptions, gameOverState } = lastGame;
-  const { myPlayerIcon: myPlayer } = gameOptions;
+  const {
+    gameOptions: { myPlayerIcon: myPlayer },
+    gameOverState: lastGameOverState,
+  } = lastGame;
 
   const [titleTranslationKey, descriptionTranslationKey] =
-    gameOverState.result === "DRAW"
+    lastGameOverState.result === "DRAW"
       ? [TRANSLATION_KEYS.DRAW, TRANSLATION_KEYS.THE_GAME_ENDED_IN_A_DRAW]
-      : gameOverState.winner === myPlayer
+      : lastGameOverState.winner === myPlayer
         ? [TRANSLATION_KEYS.VICTORY, TRANSLATION_KEYS.YOU_WON]
         : [TRANSLATION_KEYS.DEFEAT, TRANSLATION_KEYS.YOU_LOST];
 
-  const MyPlayerIcon = ICONS_BY_PLAYER[gameOptions.myPlayerIcon];
+  const MyPlayerIcon = ICONS_BY_PLAYER[nextGameOptions.myPlayerIcon];
 
   const STROKE_WIDTH = 8;
 
@@ -160,8 +164,20 @@ function ClassicGameOverDialog({
           </p>
           <p>
             {tc(TRANSLATION_KEYS.WHO_MAKES_THE_FIRST_MOVE)}:&nbsp;
-            {tc(TRANSLATION_KEYS[gameOptions.whoMakesFirstMove])}
+            {tc(TRANSLATION_KEYS[nextGameOptions.whoMakesFirstMove])}
           </p>
+          {typeof nextGameOptions.timePerMove === "number" && (
+            <p>
+              {tc(TRANSLATION_KEYS.TIME_PER_MOVE)}:&nbsp;
+              {[toSeconds(nextGameOptions.timePerMove), t(TRANSLATION_KEYS.S)].join(SPACE)}
+            </p>
+          )}
+          {typeof nextGameOptions.timePerPlayer === "number" && (
+            <p>
+              {tc(TRANSLATION_KEYS.TIME_PER_PLAYER)}:&nbsp;
+              {[toSeconds(nextGameOptions.timePerPlayer), t(TRANSLATION_KEYS.S)].join(SPACE)}
+            </p>
+          )}
           <ClassicGameOptionsDialog
             open={isClassicGameOptionsDialogOpen}
             onOpenChange={setIsClassicGameOptionsDialogOpen}
@@ -172,7 +188,10 @@ function ClassicGameOverDialog({
                 {tc(TRANSLATION_KEYS.CHANGE)}
               </Button>
             }
-            initialValues={gameOptions}
+            initialValues={{
+              ...nextGameOptions,
+              ...convertTimeToSeconds(nextGameOptions),
+            }}
             onSubmit={(options) => {
               onGameOptionsChange?.(options);
               setIsClassicGameOptionsDialogOpen(false);

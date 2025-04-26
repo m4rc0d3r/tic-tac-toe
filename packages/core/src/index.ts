@@ -9,5 +9,6 @@ export * from "./number";
 export * from "./primitive";
 export type * from "./record";
 export * from "./string";
+export * from "./time";
 export * from "./type-guards";
 export * from "./utilities";
