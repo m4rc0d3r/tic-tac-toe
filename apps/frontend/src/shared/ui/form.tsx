@@ -1,5 +1,6 @@
 import type * as LabelPrimitive from "@radix-ui/react-label";
 import { Slot } from "@radix-ui/react-slot";
+import { PERIOD } from "@tic-tac-toe/core";
 import * as React from "react";
 import type { ControllerProps, FieldPath, FieldValues } from "react-hook-form";
 import { Controller, FormProvider, useFormContext, useFormState } from "react-hook-form";
@@ -32,12 +33,14 @@ const FormField = <
   );
 };
 
-const useFormField = () => {
+const useFormField = (subname?: string) => {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
   const { getFieldState } = useFormContext();
-  const formState = useFormState({ name: fieldContext.name });
-  const fieldState = getFieldState(fieldContext.name, formState);
+  const name =
+    typeof subname === "string" ? [fieldContext.name, subname].join(PERIOD) : fieldContext.name;
+  const formState = useFormState({ name });
+  const fieldState = getFieldState(name, formState);
 
   if (!fieldContext) {
     throw new Error("useFormField should be used within <FormField>");
@@ -47,7 +50,7 @@ const useFormField = () => {
 
   return {
     id,
-    name: fieldContext.name,
+    name,
     formItemId: `${id}-form-item`,
     formDescriptionId: `${id}-form-item-description`,
     formMessageId: `${id}-form-item-message`,
@@ -112,8 +115,26 @@ function FormDescription({ className, ...props }: React.ComponentProps<"p">) {
   );
 }
 
-function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
-  const { error, formMessageId } = useFormField();
+type FormMessageProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+> = React.ComponentProps<"p"> &
+  (
+    | {
+        fieldValue: TFieldValues;
+        subname: TName;
+      }
+    | {
+        fieldValue?: undefined;
+        subname?: undefined;
+      }
+  );
+
+function FormMessage<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({ fieldValue, subname, className, ...props }: FormMessageProps<TFieldValues, TName>) {
+  const { error, formMessageId } = useFormField(subname);
   const body = error ? String(error?.message) : props.children;
 
   if (!body) {
@@ -142,3 +163,4 @@ export {
   FormMessage,
   useFormField,
 };
+export type { FormMessageProps };
