@@ -125,6 +125,10 @@ const TRANSLATION_KEYS = z.enum([
   "SHOULD_NOT_EXCEED_N",
   "MUST_BE_LESS_THAN_N",
   "MUST_BE_A_MULTIPLE_OF_N",
+  "ANY",
+  "ANYONE",
+  "UNLIMITED",
+  "SPECIFIC",
 ]).Values;
 
 const RESOURCES = {
@@ -237,6 +241,10 @@ const RESOURCES = {
       [TRANSLATION_KEYS.SHOULD_NOT_EXCEED_N]: "should not exceed {{n}}",
       [TRANSLATION_KEYS.MUST_BE_LESS_THAN_N]: "must be less than {{n}}",
       [TRANSLATION_KEYS.MUST_BE_A_MULTIPLE_OF_N]: "must be a multiple of {{n}}",
+      [TRANSLATION_KEYS.ANY]: "any",
+      [TRANSLATION_KEYS.ANYONE]: "anyone",
+      [TRANSLATION_KEYS.UNLIMITED]: "unlimited",
+      [TRANSLATION_KEYS.SPECIFIC]: "specific",
     },
   },
   uk: {
@@ -353,6 +361,10 @@ const RESOURCES = {
       [TRANSLATION_KEYS.SHOULD_NOT_EXCEED_N]: "не повинно перевищувати {{n}}",
       [TRANSLATION_KEYS.MUST_BE_LESS_THAN_N]: "має бути менше ніж {{n}}",
       [TRANSLATION_KEYS.MUST_BE_A_MULTIPLE_OF_N]: "має бути кратним {{n}}",
+      [TRANSLATION_KEYS.ANY]: "будь-який",
+      [TRANSLATION_KEYS.ANYONE]: "будь-хто",
+      [TRANSLATION_KEYS.UNLIMITED]: "необмежений",
+      [TRANSLATION_KEYS.SPECIFIC]: "конкретний",
     },
   },
 };
