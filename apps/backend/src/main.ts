@@ -28,7 +28,6 @@ type AppRouter = typeof appRouter;
 expand(dotenvConfig());
 const eitherConfig = createConfig(process.env);
 if (eitherConfig._tag === "Left") {
-  // eslint-disable-next-line @typescript-eslint/only-throw-error
   throw eitherConfig.left;
 }
 const config = eitherConfig.right;

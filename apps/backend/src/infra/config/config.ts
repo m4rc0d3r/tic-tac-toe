@@ -19,7 +19,6 @@ const zConfig = z.object({
   cookie: zCookieConfig,
   frontendApp: zFrontendAppConfig,
   cors: zCorsConfig,
-
   trpc: zTrpcConfig,
   vercel: zVercelConfig,
 });

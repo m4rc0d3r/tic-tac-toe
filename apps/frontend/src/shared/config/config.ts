@@ -6,7 +6,6 @@ import { zTrpcConfig } from "./trpc";
 
 const zConfig = z.object({
   backendApp: zBackendAppConfig,
-
   trpc: zTrpcConfig,
 });
 type Config = z.infer<typeof zConfig>;

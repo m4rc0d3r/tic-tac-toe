@@ -298,7 +298,6 @@ const RESOURCES = {
       [TRANSLATION_KEYS.FAILED_TO_REGISTER]: "не вдалося зареєструватися",
       [TRANSLATION_KEYS.INCORRECT_EMAIL_ADDRESS_AND_OR_PASSWORD]:
         "неправильна адреса електронної пошти та/або пароль",
-
       [TRANSLATION_KEYS.LOGIN_COMPLETED_SUCCESSFULLY]: "вхід успішно завершено",
       [TRANSLATION_KEYS.FAILED_TO_LOGIN]: "не вдалося увійти",
       [TRANSLATION_KEYS.LIGHT]: "світла",
