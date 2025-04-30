@@ -12,3 +12,4 @@ export * from "./string";
 export * from "./time";
 export * from "./type-guards";
 export * from "./utilities";
+export * from "./zod";
