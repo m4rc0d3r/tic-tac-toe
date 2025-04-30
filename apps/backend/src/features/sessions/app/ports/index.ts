@@ -1,0 +1,1 @@
+export { SessionsRepository } from "./repository";

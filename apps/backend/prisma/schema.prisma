@@ -22,5 +22,22 @@ model User {
   avatar       String @default("")
   passwordHash String @map("password_hash")
 
+  Session Session[]
+
   @@map("users")
+}
+
+model Session {
+  id         String   @id @db.Char(32)
+  ip         String?  @db.Inet
+  ua         String   @default("")
+  os         String   @default("")
+  browser    String   @default("")
+  createdAt  DateTime @default(now()) @map("created_at")
+  maximumAge Int      @map("maximum_age")
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @map("user_id")
+
+  @@map("sessions")
 }

@@ -9,6 +9,7 @@ import { zCookieConfig } from "./cookie";
 import type { CorsConfig } from "./cors";
 import { zCorsConfig } from "./cors";
 import { zFrontendAppConfig } from "./frontend-app";
+import { zSessionConfig } from "./session";
 import { zTrpcConfig } from "./trpc";
 import { zVercelConfig } from "./vercel";
 
@@ -19,6 +20,7 @@ const zConfig = z.object({
   cookie: zCookieConfig,
   frontendApp: zFrontendAppConfig,
   cors: zCorsConfig,
+  session: zSessionConfig,
   trpc: zTrpcConfig,
   vercel: zVercelConfig,
 });
@@ -38,6 +40,7 @@ function createConfig(variables: Record<string, unknown>): e.Either<ConfigVarsEr
           credentials: true,
         } satisfies CorsConfig),
         frontendApp,
+        session: zSessionConfig.parse(variables),
         trpc: zTrpcConfig.parse(variables),
         vercel: zVercelConfig.parse(variables),
       };
