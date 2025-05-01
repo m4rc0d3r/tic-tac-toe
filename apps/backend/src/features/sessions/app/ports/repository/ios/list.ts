@@ -1,8 +1,8 @@
+import { createPageSchema, zPageOptions } from "@tic-tac-toe/core";
 import { z } from "zod";
 
 import { zFindOneOut } from "./find-one";
 
-import { zPageOptions } from "@tic-tac-toe/core";
 import { zSession } from "~/core";
 
 const zListIn = z.object({
@@ -13,7 +13,7 @@ const zListIn = z.object({
 });
 type ListIn = z.infer<typeof zListIn>;
 
-const zListOut = z.array(zFindOneOut);
+const zListOut = createPageSchema(zFindOneOut);
 type ListOut = z.infer<typeof zListOut>;
 
 export { zListIn, zListOut };

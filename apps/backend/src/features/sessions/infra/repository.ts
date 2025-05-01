@@ -1,5 +1,6 @@
 import type { PrismaClient } from "@prisma/client";
 import type { ExcludeUndefinedFromOptionalKeys } from "@tic-tac-toe/core";
+import { createPageMeta, getTheNumberOfSkippedItems } from "@tic-tac-toe/core";
 import { either as e, taskEither as te } from "fp-ts";
 
 import { SessionsRepository } from "../app/ports";
@@ -89,10 +90,20 @@ class PrismaSessionsRepository extends SessionsRepository {
     );
   }
 
-  override async list(params: ListIn): Promise<ListOut> {
-    return this.prisma.session.findMany({
-      where: params,
+  override async list({ filter, pageOptions }: ListIn): Promise<ListOut> {
+    const args = {
+      where: filter,
+    };
+    const numberOfSessions = await this.prisma.session.count(args);
+    const sessions = await this.prisma.session.findMany({
+      ...args,
+      skip: getTheNumberOfSkippedItems(pageOptions),
+      take: pageOptions.take,
     });
+    return {
+      data: sessions,
+      meta: createPageMeta(pageOptions, numberOfSessions),
+    };
   }
 
   override async deleteOne(params: DeleteOneIn): Promise<e.Either<NotFoundError, DeleteOneOut>> {

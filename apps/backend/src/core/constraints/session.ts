@@ -1,12 +1,12 @@
 import type { UnionToTuple } from "type-fest";
 
-import type { RawSession } from "../entities";
+import type { Session } from "../entities";
 
 import type { ConstraintsMap } from "./constraints";
 
 const sessionUniqueConstraintsMap = {
   id: ["id"],
-} as const satisfies ConstraintsMap<RawSession>;
+} as const satisfies ConstraintsMap<Session>;
 type SessionUniqueConstraintsMap = typeof sessionUniqueConstraintsMap;
 
 type SessionFieldsInUniqueConstraints =

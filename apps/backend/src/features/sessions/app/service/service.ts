@@ -1,11 +1,10 @@
 import { getNumberOfBytesToStoreBase64 } from "@tic-tac-toe/core";
-import { either as e } from "fp-ts";
+import { either as e, function as f } from "fp-ts";
 import uid from "uid-safe";
 
 import type { SessionsRepository } from "../ports";
 import type {
   CreateOneOut,
-  DeleteIn,
   DeleteOneOut,
   DeleteOut,
   FindOneIn,
@@ -17,10 +16,10 @@ import type {
 } from "../ports/repository";
 
 import { SessionDeletionError } from "./errors";
-import type { CreateOneIn, DeleteOneIn } from "./ios";
+import type { CreateOneIn, DeleteIn, DeleteOneIn } from "./ios";
 
 import type { NotFoundError, UniqueKeyViolationError } from "~/app";
-import type { RawSession, SessionFieldsInUniqueConstraints } from "~/core";
+import type { Session, SessionFieldsInUniqueConstraints } from "~/core";
 import { SESSION_ID_LENGTH } from "~/core";
 import type { Config } from "~/infra";
 
@@ -63,37 +62,59 @@ class SessionsService {
     id,
     initiatingSessionId,
   }: DeleteOneIn): Promise<e.Either<NotFoundError | SessionDeletionError, DeleteOneOut>> {
-    const check = await this.canDeleteOthers(initiatingSessionId);
-    if (check !== null) {
-      return check;
+    const eitherInitiatingSession = await this.canDeleteOthers(initiatingSessionId);
+    if (eitherInitiatingSession._tag === "Left") {
+      return eitherInitiatingSession;
     }
 
     return this.sessionsRepository.deleteOne({
       id,
+      userId: eitherInitiatingSession.right.userId,
     });
   }
 
-  delete(params: DeleteIn): Promise<DeleteOut> {
-    return this.sessionsRepository.delete(params);
-  }
-
-  private async canDeleteOthers(initiatingSessionId: RawSession["id"]) {
-    const eitherInitiatingSession = await this.sessionsRepository.findOne({
-      id: initiatingSessionId,
-    });
+  async delete({
+    initiatingSessionId,
+  }: DeleteIn): Promise<e.Either<SessionDeletionError, DeleteOut>> {
+    const eitherInitiatingSession = await this.canDeleteOthers(initiatingSessionId);
     if (eitherInitiatingSession._tag === "Left") {
-      return e.left(new SessionDeletionError("INITIATING_SESSION_DOES_NOT_EXIST"));
-    }
-    const initiatingSession = eitherInitiatingSession.right;
-
-    if (
-      Date.now() - initiatingSession.createdAt.getTime() <
-      this.config.session.minimumAgeForDestructionOfOthers
-    ) {
-      return e.left(new SessionDeletionError("INITIATING_SESSION_IS_TOO_YOUNG"));
+      return eitherInitiatingSession;
     }
 
-    return null;
+    return e.right(
+      await this.sessionsRepository.delete({
+        userId: eitherInitiatingSession.right.userId,
+      }),
+    );
+  }
+
+  private async canDeleteOthers(id: Session["id"]) {
+    return f.pipe(
+      await this.sessionsRepository.findOne({
+        id,
+      }),
+      e.mapLeft(() => new SessionDeletionError("INITIATING_SESSION_DOES_NOT_EXIST")),
+      e.flatMap((session) =>
+        f.pipe(
+          session,
+          e.fromPredicate(
+            ({ createdAt }) =>
+              Date.now() - createdAt.getTime() >=
+              this.config.session.minimumAgeForDestructionOfOthers,
+            () => new SessionDeletionError("INITIATING_SESSION_IS_TOO_YOUNG"),
+          ),
+        ),
+      ),
+      e.flatMap((session) =>
+        f.pipe(
+          session,
+          e.fromPredicate(
+            ({ createdAt, maximumAge }) => Date.now() - (createdAt.getTime() + maximumAge) >= 0,
+            () => new SessionDeletionError("INITIATING_SESSION_HAS_ALREADY_EXPIRED"),
+          ),
+        ),
+      ),
+    );
   }
 }
 
