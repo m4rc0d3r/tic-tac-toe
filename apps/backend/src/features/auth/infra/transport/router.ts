@@ -1,4 +1,6 @@
-import type { FastifyReply } from "fastify";
+import type { FastifyReply, FastifyRequest } from "fastify";
+import { getClientIp } from "request-ip";
+import { UAParser } from "ua-parser-js";
 
 import type { AuthService } from "../../app";
 import type { PayloadToSign } from "../../app/service";
@@ -7,23 +9,23 @@ import { AuthenticationError } from "./errors";
 import type { LoginOut, RefreshOut, RegisterOut } from "./ios";
 import { zLoginIn, zRefreshIn, zRegisterIn } from "./ios";
 
+import type { Session, User } from "~/core";
+import type { SessionsService } from "~/features/sessions";
+import type { Config } from "~/infra";
 import { procedureWithTracing, toTrpcError, trpcProcedure, trpcRouter } from "~/infra";
 
 const authRouter = trpcRouter({
   register: trpcProcedure.input(zRegisterIn).mutation(
     procedureWithTracing(async (opts): Promise<RegisterOut> => {
       const {
-        ctx: {
-          res,
-          config: {
-            authentication: { refreshTokenCookieName },
-            frontendApp,
-          },
-          usersService,
-          authService,
-        },
+        ctx: { res, config, usersService, authService },
         input,
       } = opts;
+
+      const {
+        authentication: { refreshTokenCookieName },
+        frontendApp,
+      } = config;
 
       const resultOfCreation = await usersService.create(input);
 
@@ -165,6 +167,48 @@ const authRouter = trpcRouter({
     }),
   ),
 });
+
+async function createSession(
+  req: FastifyRequest,
+  sessionsService: SessionsService,
+  userId: User["id"],
+) {
+  const ip = getClientIp(req);
+  const { browser, os } = UAParser(req.headers["user-agent"]);
+
+  return sessionsService.createOne({
+    browser: browser.toString(),
+    geolocation: "",
+    ip,
+    os: os.toString(),
+    userId,
+  });
+}
+
+function setSessionCookie(res: FastifyReply, session: Session, config: Config) {
+  const MILLISECONDS_PER_SECOND = 1000;
+  const {
+    cookie: { domain },
+    session: { cookieName },
+  } = config;
+
+  res.setCookie(cookieName, session.id, {
+    maxAge:
+      (session.createdAt.getTime() + session.maximumAge - Date.now()) / MILLISECONDS_PER_SECOND,
+    domain,
+    path: "/",
+    secure: true,
+    httpOnly: true,
+    sameSite: "strict",
+    signed: true,
+  });
+}
+
+function clearSessionCookie(res: FastifyReply, config: Config) {
+  res.clearCookie(config.session.cookieName);
+}
+
+console.log(createSession, setSessionCookie, clearSessionCookie);
 
 async function setUpAuthentication(
   res: FastifyReply,
