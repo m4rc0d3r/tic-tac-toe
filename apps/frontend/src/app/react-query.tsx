@@ -3,12 +3,10 @@ import {
   QueryClientProvider as ReactQueryClientProvider,
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { SPACE } from "@tic-tac-toe/core";
 import { httpLink } from "@trpc/client";
 import type { ReactNode } from "react";
 import { useState } from "react";
 
-import { useAuthStore } from "~/entities/auth";
 import { trpc } from "~/shared/api";
 import { useConfigStore } from "~/shared/config";
 
@@ -32,9 +30,6 @@ function QueryClientProvider({ children }: Props) {
               credentials: "include",
               signal: options?.signal ?? null,
             }),
-          headers: () => ({
-            authorization: ["Bearer", useAuthStore.getState().token].join(SPACE),
-          }),
         }),
       ],
     }),

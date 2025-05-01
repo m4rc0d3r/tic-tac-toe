@@ -6,7 +6,6 @@ const zRegisterIn = zCreateIn;
 type RegisterIn = z.infer<typeof zRegisterIn>;
 
 const zRegisterOut = z.object({
-  accessToken: z.string().jwt(),
   me: zCreateOut.omit({
     passwordHash: true,
   }),

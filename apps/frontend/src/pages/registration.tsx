@@ -89,9 +89,9 @@ function RegistrationPage() {
 
   const onSubmit: Parameters<(typeof form)["handleSubmit"]>[0] = (data) => {
     register(data, {
-      onSuccess: ({ accessToken, me }) => {
+      onSuccess: ({ me }) => {
         toast.success(tc(TRANSLATION_KEYS.REGISTRATION_SUCCESSFULLY_COMPLETED));
-        loginLocally(accessToken, me);
+        loginLocally(me);
         void navigate(ROUTES.home);
       },
       onError: (error) => {

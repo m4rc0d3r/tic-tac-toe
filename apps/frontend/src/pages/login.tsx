@@ -65,9 +65,9 @@ function LoginPage() {
 
   const onSubmit: Parameters<(typeof form)["handleSubmit"]>[0] = (data) => {
     login(data, {
-      onSuccess: ({ accessToken, me }) => {
+      onSuccess: ({ me }) => {
         toast.success(tc(TRANSLATION_KEYS.LOGIN_COMPLETED_SUCCESSFULLY));
-        loginLocally(accessToken, me);
+        loginLocally(me);
         void navigate(ROUTES.home);
       },
       onError: (error) => {

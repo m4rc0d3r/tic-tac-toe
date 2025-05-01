@@ -1,3 +1,5 @@
+import { either as e, function as f } from "fp-ts";
+
 import { UserUpdateError } from "./errors";
 import type { UpdateCredentialsOut, UpdatePersonalDataOut } from "./ios";
 import { zUpdateCredentialsIn, zUpdatePersonalDataIn } from "./ios";
@@ -6,7 +8,9 @@ import type { User } from "~/core";
 import {
   procedureWithTracing,
   processFormData,
+  sessionMiddleware,
   toTrpcError,
+  trpcProcedure,
   trpcProcedureWithAuth,
   trpcRouter,
 } from "~/infra";
@@ -68,6 +72,27 @@ const usersRouter = trpcRouter({
       const { passwordHash, ...me } = updateResult.right;
 
       return me;
+    }),
+  ),
+
+  getMe: trpcProcedure.use(sessionMiddleware).query(
+    procedureWithTracing(async (opts) => {
+      const {
+        ctx: { usersService, session },
+      } = opts;
+
+      if (session === null) {
+        return null;
+      }
+
+      return e.toUnion(
+        f.pipe(
+          await usersService.findOneBy({
+            id: session.userId,
+          }),
+          e.mapLeft(() => null),
+        ),
+      );
     }),
   ),
 });
