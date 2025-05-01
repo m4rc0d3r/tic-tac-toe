@@ -1,3 +1,4 @@
+import type { CookieSerializeOptions } from "@fastify/cookie";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { getClientIp } from "request-ip";
 import { UAParser } from "ua-parser-js";
@@ -18,7 +19,7 @@ const authRouter = trpcRouter({
   register: trpcProcedure.input(zRegisterIn).mutation(
     procedureWithTracing(async (opts): Promise<RegisterOut> => {
       const {
-        ctx: { res, config, usersService, authService },
+        ctx: { req, res, config, usersService, authService, sessionsService },
         input,
       } = opts;
 
@@ -35,6 +36,8 @@ const authRouter = trpcRouter({
 
       const { passwordHash, ...me } = resultOfCreation.right;
 
+      await setUpSession(req, res, sessionsService, config, me.id);
+
       return {
         accessToken: await setUpAuthentication(res, authService, resultOfCreation.right.id, {
           name: refreshTokenCookieName,
@@ -48,17 +51,14 @@ const authRouter = trpcRouter({
   login: trpcProcedure.input(zLoginIn).mutation(
     procedureWithTracing(async (opts): Promise<LoginOut> => {
       const {
-        ctx: {
-          res,
-          config: {
-            authentication: { refreshTokenCookieName },
-            frontendApp,
-          },
-          usersService,
-          authService,
-        },
+        ctx: { req, res, config, usersService, authService, sessionsService },
         input: { email, password },
       } = opts;
+
+      const {
+        authentication: { refreshTokenCookieName },
+        frontendApp,
+      } = config;
 
       const searchResult = await usersService.findOneBy({
         email,
@@ -71,6 +71,8 @@ const authRouter = trpcRouter({
 
       const { passwordHash, ...me } = searchResult.right;
 
+      await setUpSession(req, res, sessionsService, config, me.id);
+
       return {
         accessToken: await setUpAuthentication(res, authService, searchResult.right.id, {
           name: refreshTokenCookieName,
@@ -82,17 +84,31 @@ const authRouter = trpcRouter({
   ),
 
   logout: trpcProcedure.mutation(
-    procedureWithTracing((opts) => {
+    procedureWithTracing(async (opts) => {
       const {
-        ctx: {
-          res,
-          config: {
-            authentication: { refreshTokenCookieName },
-          },
-        },
+        ctx: { req, res, config, sessionsService },
       } = opts;
 
+      const {
+        authentication: { refreshTokenCookieName },
+        session: { cookieName },
+      } = config;
+
       res.clearCookie(refreshTokenCookieName);
+
+      const sessionCookie = req.cookies[cookieName];
+
+      if (typeof sessionCookie !== "string") {
+        return;
+      }
+
+      const result = req.unsignCookie(sessionCookie);
+
+      if (!result.valid) {
+        return;
+      }
+
+      await destroySession(res, config, sessionsService, result.value);
     }),
   ),
 
@@ -168,6 +184,21 @@ const authRouter = trpcRouter({
   ),
 });
 
+async function setUpSession(
+  req: FastifyRequest,
+  res: FastifyReply,
+  sessionsService: SessionsService,
+  config: Config,
+  userId: User["id"],
+) {
+  const eitherSession = await createSession(req, sessionsService, userId);
+  if (eitherSession._tag === "Right") {
+    setSessionCookie(res, eitherSession.right, config);
+  } else {
+    throw toTrpcError(new Error("Failed to create session."));
+  }
+}
+
 async function createSession(
   req: FastifyRequest,
   sessionsService: SessionsService,
@@ -185,6 +216,14 @@ async function createSession(
   });
 }
 
+const COOKIE_OPTIONS: CookieSerializeOptions = {
+  path: "/",
+  secure: true,
+  httpOnly: true,
+  sameSite: "strict",
+  signed: true,
+};
+
 function setSessionCookie(res: FastifyReply, session: Session, config: Config) {
   const MILLISECONDS_PER_SECOND = 1000;
   const {
@@ -192,23 +231,33 @@ function setSessionCookie(res: FastifyReply, session: Session, config: Config) {
     session: { cookieName },
   } = config;
 
+  const maxAge = Math.round(
+    (session.createdAt.getTime() + session.maximumAge - Date.now()) / MILLISECONDS_PER_SECOND,
+  );
+
   res.setCookie(cookieName, session.id, {
-    maxAge:
-      (session.createdAt.getTime() + session.maximumAge - Date.now()) / MILLISECONDS_PER_SECOND,
+    maxAge,
     domain,
-    path: "/",
-    secure: true,
-    httpOnly: true,
-    sameSite: "strict",
-    signed: true,
+    ...COOKIE_OPTIONS,
   });
+}
+
+async function destroySession(
+  res: FastifyReply,
+  config: Config,
+  sessionsService: SessionsService,
+  id: Session["id"],
+) {
+  await sessionsService.deleteOne({
+    id,
+    initiatingSessionId: id,
+  });
+  clearSessionCookie(res, config);
 }
 
 function clearSessionCookie(res: FastifyReply, config: Config) {
   res.clearCookie(config.session.cookieName);
 }
-
-console.log(createSession, setSessionCookie, clearSessionCookie);
 
 async function setUpAuthentication(
   res: FastifyReply,
@@ -231,10 +280,8 @@ async function setUpAuthentication(
     expires: new Date(payload.exp),
     maxAge: payload.exp - payload.iat,
     domain,
-    path: "/",
-    secure: true,
-    httpOnly: true,
-    sameSite: "strict",
+    ...COOKIE_OPTIONS,
+    signed: false,
   });
 
   const accessToken = tokenMap.access.token;

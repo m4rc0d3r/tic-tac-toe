@@ -2,6 +2,8 @@ import type { z } from "zod";
 
 import { trpcInstance } from "./instance";
 
+import type { Session } from "~/core";
+
 function processFormData<Schema extends z.ZodSchema<unknown>>(
   schema: Parameters<typeof trpcInstance.procedure.input<Schema>>[0],
 ) {
@@ -26,4 +28,36 @@ function processFormData<Schema extends z.ZodSchema<unknown>>(
   });
 }
 
-export { processFormData };
+const sessionMiddleware = trpcInstance.middleware(async (opts) => {
+  const {
+    ctx: { req, config, sessionsService },
+    next,
+  } = opts;
+
+  const {
+    session: { cookieName },
+  } = config;
+
+  let session: Session | null = null;
+
+  const sessionCookie = req.cookies[cookieName];
+
+  if (typeof sessionCookie === "string") {
+    const result = req.unsignCookie(sessionCookie);
+
+    if (result.valid) {
+      const eitherSession = await sessionsService.findOne({ id: result.value });
+      if (eitherSession._tag === "Right") {
+        session = eitherSession.right;
+      }
+    }
+  }
+
+  return next({
+    ctx: {
+      session,
+    },
+  });
+});
+
+export { processFormData, sessionMiddleware };

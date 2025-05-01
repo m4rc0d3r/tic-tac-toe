@@ -62,6 +62,12 @@ class SessionsService {
     id,
     initiatingSessionId,
   }: DeleteOneIn): Promise<e.Either<NotFoundError | SessionDeletionError, DeleteOneOut>> {
+    if (id === initiatingSessionId) {
+      return this.sessionsRepository.deleteOne({
+        id,
+      });
+    }
+
     const eitherInitiatingSession = await this.canDeleteOthers(initiatingSessionId);
     if (eitherInitiatingSession._tag === "Left") {
       return eitherInitiatingSession;

@@ -107,9 +107,13 @@ class PrismaSessionsRepository extends SessionsRepository {
   }
 
   override async deleteOne(params: DeleteOneIn): Promise<e.Either<NotFoundError, DeleteOneOut>> {
+    const { id, userId } = params;
     return e.fromNullable(new NotFoundError(params))(
       await this.prisma.session.delete({
-        where: params,
+        where: {
+          id,
+          ...(userId && { userId }),
+        },
       }),
     );
   }
