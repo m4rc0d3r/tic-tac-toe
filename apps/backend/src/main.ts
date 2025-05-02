@@ -1,6 +1,7 @@
 import fastifyCookie from "@fastify/cookie";
 import fastifyCors from "@fastify/cors";
 import fastifyMultipart from "@fastify/multipart";
+import { SLASH } from "@tic-tac-toe/core";
 import type { FastifyTRPCPluginOptions } from "@trpc/server/adapters/fastify";
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import closeWithGrace from "close-with-grace";
@@ -51,11 +52,19 @@ const dependencies = createDependencies(config, app.log);
 app.register(fastifyCors, config.cors);
 
 const {
-  cookie: { secret },
+  cookie: { secret, domain },
 } = config;
 app.register(fastifyCookie, {
   secret,
   hook: "onRequest",
+  parseOptions: {
+    domain,
+    httpOnly: true,
+    path: SLASH,
+    sameSite: "strict",
+    secure: true,
+    signed: true,
+  },
 });
 
 app.register(fastifyMultipart, {

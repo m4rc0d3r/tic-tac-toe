@@ -19,6 +19,9 @@ type QuestionMark = typeof QUESTION_MARK;
 const COMMA_WITH_SPACE = `${COMMA}${SPACE}`;
 type CommaWithSpace = typeof COMMA_WITH_SPACE;
 
+const SLASH = "/";
+type Slash = typeof SLASH;
+
 function capitalize<T extends string>(value: T): Capitalize<T> {
   return [value.at(0)?.toLocaleUpperCase(), value.slice(1)].join(EMPTY_STRING) as Capitalize<T>;
 }
@@ -40,7 +43,8 @@ export {
   getNumberOfBytesToStoreBase64,
   PERIOD,
   QUESTION_MARK,
+  SLASH,
   SPACE,
   UNDERSCORE,
 };
-export type { Comma, CommaWithSpace, EmptyString, Period, QuestionMark, Space, Underscore };
+export type { Comma, CommaWithSpace, EmptyString, Period, QuestionMark, Slash, Space, Underscore };

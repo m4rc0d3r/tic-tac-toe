@@ -1,4 +1,3 @@
-import type { CookieSerializeOptions } from "@fastify/cookie";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { getClientIp } from "request-ip";
 import { UAParser } from "ua-parser-js";
@@ -15,7 +14,15 @@ const authRouter = trpcRouter({
   register: trpcProcedure.input(zRegisterIn).mutation(
     procedureWithTracing(async (opts): Promise<RegisterOut> => {
       const {
-        ctx: { req, res, config, usersService, sessionsService },
+        ctx: {
+          req,
+          res,
+          config: {
+            session: { cookieName },
+          },
+          usersService,
+          sessionsService,
+        },
         input,
       } = opts;
 
@@ -27,7 +34,7 @@ const authRouter = trpcRouter({
 
       const { passwordHash, ...me } = resultOfCreation.right;
 
-      await setUpSession(req, res, sessionsService, config, me.id);
+      await setUpSession(req, res, sessionsService, cookieName, me.id);
 
       return {
         me,
@@ -38,7 +45,15 @@ const authRouter = trpcRouter({
   login: trpcProcedure.input(zLoginIn).mutation(
     procedureWithTracing(async (opts): Promise<LoginOut> => {
       const {
-        ctx: { req, res, config, usersService, sessionsService },
+        ctx: {
+          req,
+          res,
+          config: {
+            session: { cookieName },
+          },
+          usersService,
+          sessionsService,
+        },
         input: { email, password },
       } = opts;
 
@@ -53,7 +68,7 @@ const authRouter = trpcRouter({
 
       const { passwordHash, ...me } = searchResult.right;
 
-      await setUpSession(req, res, sessionsService, config, me.id);
+      await setUpSession(req, res, sessionsService, cookieName, me.id);
 
       return {
         me,
@@ -95,12 +110,12 @@ async function setUpSession(
   req: FastifyRequest,
   res: FastifyReply,
   sessionsService: SessionsService,
-  config: Config,
+  cookieName: string,
   userId: User["id"],
 ) {
   const eitherSession = await createSession(req, sessionsService, userId);
   if (eitherSession._tag === "Right") {
-    setSessionCookie(res, eitherSession.right, config);
+    setSessionCookie(res, eitherSession.right, cookieName);
   } else {
     throw toTrpcError(new Error("Failed to create session."));
   }
@@ -123,20 +138,8 @@ async function createSession(
   });
 }
 
-const COOKIE_OPTIONS: CookieSerializeOptions = {
-  path: "/",
-  secure: true,
-  httpOnly: true,
-  sameSite: "strict",
-  signed: true,
-};
-
-function setSessionCookie(res: FastifyReply, session: Session, config: Config) {
+function setSessionCookie(res: FastifyReply, session: Session, cookieName: string) {
   const MILLISECONDS_PER_SECOND = 1000;
-  const {
-    cookie: { domain },
-    session: { cookieName },
-  } = config;
 
   const maxAge = Math.round(
     (session.createdAt.getTime() + session.maximumAge - Date.now()) / MILLISECONDS_PER_SECOND,
@@ -144,8 +147,6 @@ function setSessionCookie(res: FastifyReply, session: Session, config: Config) {
 
   res.setCookie(cookieName, session.id, {
     maxAge,
-    domain,
-    ...COOKIE_OPTIONS,
   });
 }
 
