@@ -7,7 +7,6 @@ import { zLoginIn, zRegisterIn } from "./ios";
 
 import type { Session, User } from "~/core";
 import type { SessionsService } from "~/features/sessions";
-import type { Config } from "~/infra";
 import { procedureWithTracing, toTrpcError, trpcProcedure, trpcRouter } from "~/infra";
 
 const authRouter = trpcRouter({
@@ -79,15 +78,15 @@ const authRouter = trpcRouter({
   logout: trpcProcedure.mutation(
     procedureWithTracing(async (opts) => {
       const {
-        ctx: { req, res, config, sessionsService },
+        ctx: {
+          req,
+          res,
+          config: {
+            session: { cookieName },
+          },
+          sessionsService,
+        },
       } = opts;
-
-      const {
-        authentication: { refreshTokenCookieName },
-        session: { cookieName },
-      } = config;
-
-      res.clearCookie(refreshTokenCookieName);
 
       const sessionCookie = req.cookies[cookieName];
 
@@ -101,7 +100,7 @@ const authRouter = trpcRouter({
         return;
       }
 
-      await destroySession(res, config, sessionsService, result.value);
+      await destroySession(res, sessionsService, cookieName, result.value);
     }),
   ),
 });
@@ -152,19 +151,19 @@ function setSessionCookie(res: FastifyReply, session: Session, cookieName: strin
 
 async function destroySession(
   res: FastifyReply,
-  config: Config,
   sessionsService: SessionsService,
+  cookieName: string,
   id: Session["id"],
 ) {
   await sessionsService.deleteOne({
     id,
     initiatingSessionId: id,
   });
-  clearSessionCookie(res, config);
+  clearSessionCookie(res, cookieName);
 }
 
-function clearSessionCookie(res: FastifyReply, config: Config) {
-  res.clearCookie(config.session.cookieName);
+function clearSessionCookie(res: FastifyReply, cookieName: string) {
+  res.clearCookie(cookieName);
 }
 
 export { authRouter };

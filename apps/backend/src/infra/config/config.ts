@@ -3,7 +3,6 @@ import { either as e } from "fp-ts";
 import { z } from "zod";
 
 import { zAppConfig } from "./app";
-import { zAuthenticationConfig } from "./authentication";
 import { zBcryptConfig } from "./bcrypt";
 import { zCookieConfig } from "./cookie";
 import type { CorsConfig } from "./cors";
@@ -15,7 +14,6 @@ import { zVercelConfig } from "./vercel";
 
 const zConfig = z.object({
   app: zAppConfig,
-  authentication: zAuthenticationConfig,
   bcrypt: zBcryptConfig,
   cookie: zCookieConfig,
   frontendApp: zFrontendAppConfig,
@@ -32,7 +30,6 @@ function createConfig(variables: Record<string, unknown>): e.Either<ConfigVarsEr
       const frontendApp = zFrontendAppConfig.parse(variables);
       return {
         app: zAppConfig.parse(variables),
-        authentication: zAuthenticationConfig.parse(variables),
         bcrypt: zBcryptConfig.parse(variables),
         cookie: zCookieConfig.parse(variables),
         cors: zCorsConfig.parse({
