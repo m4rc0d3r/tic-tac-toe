@@ -1,5 +1,3 @@
-import { either as e, function as f } from "fp-ts";
-
 import { UserUpdateError } from "./errors";
 import type { UpdateCredentialsOut, UpdatePersonalDataOut } from "./ios";
 import { zUpdateCredentialsIn, zUpdatePersonalDataIn } from "./ios";
@@ -8,9 +6,7 @@ import type { User } from "~/core";
 import {
   procedureWithTracing,
   processFormData,
-  sessionMiddleware,
   toTrpcError,
-  trpcProcedure,
   trpcProcedureWithAuth,
   trpcRouter,
 } from "~/infra";
@@ -19,7 +15,11 @@ const usersRouter = trpcRouter({
   updatePersonalData: trpcProcedureWithAuth.use(processFormData(zUpdatePersonalDataIn)).mutation(
     procedureWithTracing(async (opts): Promise<UpdatePersonalDataOut> => {
       const {
-        ctx: { usersService, userId: id, input },
+        ctx: {
+          usersService,
+          session: { userId: id },
+          input,
+        },
       } = opts;
 
       const updateResult = await usersService.update({
@@ -40,7 +40,10 @@ const usersRouter = trpcRouter({
   updateCredentials: trpcProcedureWithAuth.input(zUpdateCredentialsIn).mutation(
     procedureWithTracing(async (opts): Promise<UpdateCredentialsOut> => {
       const {
-        ctx: { usersService, userId: id },
+        ctx: {
+          usersService,
+          session: { userId: id },
+        },
         input,
       } = opts;
 
@@ -75,24 +78,24 @@ const usersRouter = trpcRouter({
     }),
   ),
 
-  getMe: trpcProcedure.use(sessionMiddleware).query(
+  getMe: trpcProcedureWithAuth.query(
     procedureWithTracing(async (opts) => {
       const {
-        ctx: { usersService, session },
+        ctx: {
+          usersService,
+          session: { userId: id },
+        },
       } = opts;
 
-      if (session === null) {
-        return null;
+      const searchResult = await usersService.findOneBy({
+        id,
+      });
+
+      if (searchResult._tag === "Left") {
+        throw toTrpcError(searchResult.left);
       }
 
-      return e.toUnion(
-        f.pipe(
-          await usersService.findOneBy({
-            id: session.userId,
-          }),
-          e.mapLeft(() => null),
-        ),
-      );
+      return searchResult.right;
     }),
   ),
 });

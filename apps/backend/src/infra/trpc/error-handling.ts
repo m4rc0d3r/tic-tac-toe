@@ -5,7 +5,6 @@ import { TRPC_ERROR_CODES_BY_KEY } from "@trpc/server/unstable-core-do-not-impor
 import { z } from "zod";
 
 import { NotFoundError, UniqueKeyViolationError } from "~/app";
-import { JwtError } from "~/features/auth/app/ports/jwt";
 import { AuthenticationError } from "~/features/auth/infra/transport/errors";
 import { UserUpdateError } from "~/features/users/infra/transport/errors";
 
@@ -71,32 +70,10 @@ function convertErrorCause(cause: Error) {
       issues,
     } as const;
   } else if (cause instanceof AuthenticationError) {
-    if (cause.reason.inBrief === "INVALID_TOKEN") {
-      const { inBrief, inDetail } = cause.reason;
-      const area = "Jwt";
-      return {
-        area: "AUTHENTICATION" satisfies ErrorArea,
-        reason: {
-          inBrief,
-          inDetail: {
-            area,
-            ...(inDetail instanceof JwtError
-              ? ({
-                  reason: inDetail.reason,
-                } as const)
-              : ({
-                  reason: "EXPIRED",
-                  expiredAt: inDetail.expiredAt,
-                } as const)),
-          } as const,
-        },
-      } as const;
-    } else {
-      return {
-        area: "AUTHENTICATION" satisfies ErrorArea,
-        reason: cause.reason,
-      } as const;
-    }
+    return {
+      area: "AUTHENTICATION" satisfies ErrorArea,
+      reason: cause.reason,
+    } as const;
   } else if (cause instanceof NotFoundError) {
     return {
       area: "NOT_FOUND" satisfies ErrorArea,

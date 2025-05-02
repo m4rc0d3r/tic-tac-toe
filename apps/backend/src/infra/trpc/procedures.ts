@@ -8,19 +8,17 @@ const trpcProcedure = trpcInstance.procedure;
 const trpcProcedureWithAuth = trpcProcedure.use(sessionMiddleware).use(
   middlewareWithTracing(async (opts) => {
     const {
-      ctx: { session },
+      ctx: { eitherSession },
       next,
     } = opts;
 
-    if (session === null) {
-      throw toTrpcError(new Error("The request does not contain session information."));
+    if (eitherSession._tag === "Left") {
+      throw toTrpcError(eitherSession.left);
     }
-
-    const { userId } = session;
 
     return next({
       ctx: {
-        userId,
+        session: eitherSession.right,
       },
     });
   }, "authenticate user"),

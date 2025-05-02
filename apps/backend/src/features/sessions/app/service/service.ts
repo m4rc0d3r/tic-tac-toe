@@ -14,6 +14,7 @@ import type {
   UpdateOneIn,
   UpdateOneOut,
 } from "../ports/repository";
+import { isSessionExpired } from "../utils";
 
 import { SessionDeletionError } from "./errors";
 import type { CreateOneIn, DeleteIn, DeleteOneIn } from "./ios";
@@ -115,7 +116,7 @@ class SessionsService {
         f.pipe(
           session,
           e.fromPredicate(
-            ({ createdAt, maximumAge }) => Date.now() - (createdAt.getTime() + maximumAge) >= 0,
+            (session) => !isSessionExpired(session),
             () => new SessionDeletionError("INITIATING_SESSION_HAS_ALREADY_EXPIRED"),
           ),
         ),

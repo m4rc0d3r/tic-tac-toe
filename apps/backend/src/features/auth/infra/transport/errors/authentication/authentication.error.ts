@@ -9,17 +9,22 @@ class AuthenticationError extends OperationalError {
     options?: OperationalErrorOptions,
   ) {
     super(options);
-    switch (this.reason.inBrief) {
-      case "INVALID_REQUEST": {
-        this.message = "The request data related to authorization is not formed correctly.";
+    switch (this.reason) {
+      case "NO_DATA": {
+        this.message = "No authentication related data.";
         break;
       }
-      case "INVALID_TOKEN": {
-        this.message = "The provided access token is invalid for some reason.";
+      case "INCORRECT_DATA": {
+        this.message = "The provided authentication data is not formed correctly.";
         break;
       }
-      case "ALREADY_AUTHENTICATED": {
-        this.message = "You have already been authenticated.";
+      case "DATA_IS_MISSING_FROM_STORAGE": {
+        this.message =
+          "Unable to find data in internal storage that confirms the validity of the provided authentication data.";
+        break;
+      }
+      case "DATA_IS_EXPIRED": {
+        this.message = "The authentication data is present, but has expired.";
         break;
       }
       default: {
