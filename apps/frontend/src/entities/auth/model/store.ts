@@ -45,7 +45,7 @@ const useAuthStore = createSelectors(
               ...initialState,
               status: "UNAUTHENTICATED",
             }),
-          updateMe: (data) => set(({ me }) => (me ? { me: { ...me, ...data } } : { me })),
+          updateMe: (data) => set(({ me }) => (me ? { me: { ...me, ...data } as Me } : { me })),
           reset: () => set(initialState),
         }) satisfies State,
       {

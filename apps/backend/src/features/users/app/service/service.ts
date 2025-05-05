@@ -1,13 +1,22 @@
-import { either as e } from "fp-ts";
+import { either as e, function as f } from "fp-ts";
 
 import type { BlobService, HashingService, UsersRepository } from "../ports";
-import type { FindOneByOut, ListOut, UpdateOut } from "../ports/repository";
+import type { CreateOut, FindOneByOut, ListOut } from "../ports/repository";
 
-import type { CreateIn, CreateOut, FindOneByIn, UpdateIn } from "./ios";
+import type {
+  CreateIn,
+  FindOneByIn,
+  UpdateCredentialsIn,
+  UpdateCredentialsOut,
+  UpdatePersonalDataIn,
+  UpdatePersonalDataOut,
+} from "./ios";
 
 import type { UniqueKeyViolationError } from "~/app";
 import { NotFoundError } from "~/app";
 import type { UserFieldsInUniqueConstraints } from "~/core";
+
+const PASSWORD = "password";
 
 class UsersService {
   constructor(
@@ -16,29 +25,33 @@ class UsersService {
     private readonly blobService: BlobService,
   ) {}
 
-  async create({
-    password,
-    ...rest
-  }: CreateIn): Promise<
-    e.Either<UniqueKeyViolationError<UserFieldsInUniqueConstraints>, CreateOut>
-  > {
-    return await this.usersRepository.create({
-      ...rest,
-      passwordHash: await this.hashingService.hash(password),
-    });
+  async create(
+    params: CreateIn,
+  ): Promise<e.Either<UniqueKeyViolationError<UserFieldsInUniqueConstraints>, CreateOut>> {
+    if (PASSWORD in params) {
+      const { password, ...rest } = params;
+      return await this.usersRepository.create({
+        ...rest,
+        passwordHash: await this.hashingService.hash(password),
+      });
+    } else {
+      return await this.usersRepository.create(params);
+    }
   }
 
-  async update({
-    avatar,
-    password,
-    ...rest
-  }: UpdateIn): Promise<
-    e.Either<UniqueKeyViolationError<UserFieldsInUniqueConstraints> | NotFoundError, UpdateOut>
+  async updatePersonalData(
+    params: UpdatePersonalDataIn,
+  ): Promise<
+    e.Either<
+      UniqueKeyViolationError<UserFieldsInUniqueConstraints> | NotFoundError,
+      UpdatePersonalDataOut
+    >
   > {
-    const newData: Parameters<typeof this.usersRepository.update>[0] = rest;
-    if (password) {
-      newData.passwordHash = await this.hashingService.hash(password);
-    }
+    const { avatar, ...rest } = params;
+    type DataForUpdate = Parameters<typeof this.usersRepository.update>[0];
+    const newData: DataForUpdate = rest;
+    let newAvatar: DataForUpdate["avatar"] = undefined;
+
     if (avatar !== undefined) {
       const searchResult = await this.usersRepository.findOneBy({
         id: rest.id,
@@ -50,28 +63,78 @@ class UsersService {
       if (currentAvatar) {
         await this.blobService.delete(currentAvatar);
       }
-      newData.avatar = avatar instanceof File ? await this.blobService.upload(avatar) : avatar;
+      newAvatar = avatar instanceof File ? await this.blobService.upload(avatar) : avatar;
     }
 
-    return this.usersRepository.update(newData);
+    return this.usersRepository.update({
+      ...newData,
+      ...(typeof newAvatar === "string" && { avatar: newAvatar }),
+    });
+  }
+
+  async updateCredentials({
+    password,
+    ...rest
+  }: UpdateCredentialsIn): Promise<
+    e.Either<
+      UniqueKeyViolationError<UserFieldsInUniqueConstraints> | NotFoundError,
+      UpdateCredentialsOut
+    >
+  > {
+    type DataForUpdate = Parameters<typeof this.usersRepository.update>[0];
+    const newData: DataForUpdate = rest;
+    let newPasswordHash: Extract<
+      DataForUpdate,
+      {
+        passwordHash?: string | undefined;
+      }
+    >["passwordHash"] = undefined;
+
+    if (typeof password === "string") {
+      newPasswordHash = await this.hashingService.hash(password);
+    }
+
+    const { id } = rest;
+
+    return f.pipe(
+      await this.usersRepository.update({
+        ...newData,
+        ...(typeof newPasswordHash === "string" && { passwordHash: newPasswordHash }),
+      }),
+      e.flatMap((value) =>
+        value.registrationStatus === "FULL"
+          ? e.right(value)
+          : e.left(
+              new NotFoundError({
+                id,
+              }),
+            ),
+      ),
+    );
   }
 
   async findOneBy(params: FindOneByIn): Promise<e.Either<NotFoundError, FindOneByOut>> {
     const filter = "id" in params ? { id: params.id } : { email: params.email };
     const searchResult = await this.usersRepository.findOneBy(filter);
 
-    if ("password" in params && params.password && searchResult._tag === "Right") {
-      const comparisonResult = await this.hashingService.compare(
-        params.password,
-        searchResult.right.passwordHash,
-      );
-      const newParams = {
-        ...params,
-      };
-      newParams.password = "*".repeat(params.password.length);
-      return comparisonResult ? searchResult : e.left(new NotFoundError(newParams));
+    if (!(PASSWORD in params && typeof params[PASSWORD] === "string")) {
+      return searchResult;
     }
-    return searchResult;
+
+    const newParams = {
+      ...params,
+    };
+    newParams[PASSWORD] = "*".repeat(params[PASSWORD].length);
+
+    if (!(searchResult._tag === "Right" && searchResult.right.registrationStatus === "FULL")) {
+      return e.left(new NotFoundError(newParams));
+    }
+
+    const comparisonResult = await this.hashingService.compare(
+      params[PASSWORD],
+      searchResult.right.passwordHash,
+    );
+    return comparisonResult ? searchResult : e.left(new NotFoundError(newParams));
   }
 
   async list(): Promise<ListOut> {

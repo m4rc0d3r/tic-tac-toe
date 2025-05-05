@@ -2,7 +2,7 @@ import { UserUpdateError } from "./errors";
 import type { UpdateCredentialsOut, UpdatePersonalDataOut } from "./ios";
 import { zUpdateCredentialsIn, zUpdatePersonalDataIn } from "./ios";
 
-import type { User } from "~/core";
+import type { FullyRegisteredUser } from "~/core";
 import {
   procedureWithTracing,
   processFormData,
@@ -22,7 +22,7 @@ const usersRouter = trpcRouter({
         },
       } = opts;
 
-      const updateResult = await usersService.update({
+      const updateResult = await usersService.updatePersonalData({
         id,
         ...input,
       });
@@ -31,9 +31,7 @@ const usersRouter = trpcRouter({
         throw toTrpcError(updateResult.left);
       }
 
-      const { passwordHash, ...me } = updateResult.right;
-
-      return me;
+      return updateResult.right;
     }),
   ),
 
@@ -56,14 +54,15 @@ const usersRouter = trpcRouter({
 
       if (searchResult._tag === "Left") {
         if (
-          ("password" satisfies Extract<keyof User, "password">) in searchResult.left.filterCriteria
+          ("password" satisfies Extract<keyof FullyRegisteredUser, "password">) in
+          searchResult.left.filterCriteria
         ) {
           throw toTrpcError(new UserUpdateError("INCORRECT_PASSWORD"));
         }
         throw toTrpcError(searchResult.left);
       }
 
-      const updateResult = await usersService.update({
+      const updateResult = await usersService.updateCredentials({
         id,
         ...rest,
       });

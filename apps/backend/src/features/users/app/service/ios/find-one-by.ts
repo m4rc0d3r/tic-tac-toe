@@ -1,25 +1,17 @@
 import { z } from "zod";
 
-import { zUser } from "~/core";
+import { zBasicUser, zFullyRegisteredUser } from "~/core";
 
 const zFindOneByIn = z.union([
-  zUser
-    .pick({
-      id: true,
-    })
-    .merge(
-      zUser
-        .pick({
-          password: true,
-        })
-        .partial(),
-    ),
-  zUser
+  zBasicUser.pick({
+    id: true,
+  }),
+  zFullyRegisteredUser
     .pick({
       email: true,
     })
     .merge(
-      zUser
+      zFullyRegisteredUser
         .pick({
           password: true,
         })

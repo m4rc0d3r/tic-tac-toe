@@ -1,7 +1,7 @@
 import { EMPTY_STRING } from "@tic-tac-toe/core";
 import { z } from "zod";
 
-import { zUser } from "./user";
+import { zBasicUser } from "./user";
 
 const SESSION_ID_LENGTH = 32;
 
@@ -13,7 +13,7 @@ const zSession = z.object({
   browser: z.string().default(EMPTY_STRING),
   createdAt: z.date(),
   maximumAge: z.number().int().gt(0),
-  userId: zUser.shape.id,
+  userId: zBasicUser.shape.id,
 });
 type Session = z.infer<typeof zSession>;
 

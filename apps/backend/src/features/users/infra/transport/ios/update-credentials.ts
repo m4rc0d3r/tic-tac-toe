@@ -1,20 +1,19 @@
 import type { z } from "zod";
 
-import { zUser } from "~/core";
-import { zUpdateOut } from "~/features/users/app/ports/repository";
+import { zFullyRegisteredUser } from "~/core";
 
-const zUpdateCredentialsIn = zUser
+const zUpdateCredentialsIn = zFullyRegisteredUser
   .pick({
     email: true,
     password: true,
   })
   .partial()
   .extend({
-    currentPassword: zUser.shape.password,
+    currentPassword: zFullyRegisteredUser.shape.password,
   });
 type UpdateCredentialsIn = z.infer<typeof zUpdateCredentialsIn>;
 
-const zUpdateCredentialsOut = zUpdateOut.pick({
+const zUpdateCredentialsOut = zFullyRegisteredUser.pick({
   id: true,
   email: true,
 });

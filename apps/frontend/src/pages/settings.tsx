@@ -71,12 +71,12 @@ function SettingsPage() {
   const updateMeLocally = useAuthStore.use.updateMe();
 
   const {
-    email = EMPTY_STRING,
     nickname = EMPTY_STRING,
     firstName = EMPTY_STRING,
     lastName = EMPTY_STRING,
     avatar = EMPTY_STRING,
   } = me ?? {};
+  const email = me?.registrationStatus === "FULL" ? me.email : EMPTY_STRING;
 
   const zUpdatePersonalDataIn = zfd.formData(zBaseUpdatePersonalDataIn.innerType().required());
 
@@ -308,80 +308,82 @@ function SettingsPage() {
           </Form>
         </CardContent>
       </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <H1>{tc(TRANSLATION_KEYS.LOGIN_DETAILS)}</H1>
-          </CardTitle>
-        </CardHeader>
-        <div className="px-6 pb-6">
-          <Separator />
-        </div>
-        <CardContent>
-          <Form {...updateCredentialsForm}>
-            <form
-              onSubmit={(event) =>
-                void updateCredentialsForm.handleSubmit(onSubmitCredentials)(event)
-              }
-              className="space-y-4"
-            >
-              <FormField
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{tc(TRANSLATION_KEYS.EMAIL)}</FormLabel>
-                    <FormControl>
-                      <Input disabled={isUpdateCredentialsPending} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{tc(TRANSLATION_KEYS.PASSWORD)}</FormLabel>
-                    <FormControl>
-                      <Input type="password" disabled={isUpdateCredentialsPending} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Separator />
-              <FormField
-                name="currentPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      {[tc(TRANSLATION_KEYS.CURRENT), t(TRANSLATION_KEYS.PASSWORD)].join(SPACE)}
-                    </FormLabel>
-                    <FormControl>
-                      <Input type="password" disabled={isUpdateCredentialsPending} {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      {tsp(TRANSLATION_KEYS.YOU_MUST_ENTER_YOUR_CURRENT_PASSWORD_TO_MAKE_CHANGES)}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="flex justify-end gap-2">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={isUpdateCredentialsPending}
-                  onClick={() => updateCredentialsForm.reset()}
-                >
-                  {tc(TRANSLATION_KEYS.RESET)}
-                </Button>
-                <Button disabled={isUpdateCredentialsPending}>{tc(TRANSLATION_KEYS.SAVE)}</Button>
-              </div>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+      {me?.registrationStatus === "FULL" && (
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              <H1>{tc(TRANSLATION_KEYS.LOGIN_DETAILS)}</H1>
+            </CardTitle>
+          </CardHeader>
+          <div className="px-6 pb-6">
+            <Separator />
+          </div>
+          <CardContent>
+            <Form {...updateCredentialsForm}>
+              <form
+                onSubmit={(event) =>
+                  void updateCredentialsForm.handleSubmit(onSubmitCredentials)(event)
+                }
+                className="space-y-4"
+              >
+                <FormField
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{tc(TRANSLATION_KEYS.EMAIL)}</FormLabel>
+                      <FormControl>
+                        <Input disabled={isUpdateCredentialsPending} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{tc(TRANSLATION_KEYS.PASSWORD)}</FormLabel>
+                      <FormControl>
+                        <Input type="password" disabled={isUpdateCredentialsPending} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Separator />
+                <FormField
+                  name="currentPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {[tc(TRANSLATION_KEYS.CURRENT), t(TRANSLATION_KEYS.PASSWORD)].join(SPACE)}
+                      </FormLabel>
+                      <FormControl>
+                        <Input type="password" disabled={isUpdateCredentialsPending} {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        {tsp(TRANSLATION_KEYS.YOU_MUST_ENTER_YOUR_CURRENT_PASSWORD_TO_MAKE_CHANGES)}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex justify-end gap-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={isUpdateCredentialsPending}
+                    onClick={() => updateCredentialsForm.reset()}
+                  >
+                    {tc(TRANSLATION_KEYS.RESET)}
+                  </Button>
+                  <Button disabled={isUpdateCredentialsPending}>{tc(TRANSLATION_KEYS.SAVE)}</Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { zLoginIn, zRegisterIn } from "./ios";
 
 import type { Session, User } from "~/core";
 import type { SessionsService } from "~/features/sessions";
+import type { FindOneByOut } from "~/features/users/app/ports/repository";
 import { procedureWithTracing, toTrpcError, trpcProcedure, trpcRouter } from "~/infra";
 
 const authRouter = trpcRouter({
@@ -22,7 +23,7 @@ const authRouter = trpcRouter({
           usersService,
           sessionsService,
         },
-        input,
+        input: { registrationType, ...input },
       } = opts;
 
       const resultOfCreation = await usersService.create(input);
@@ -31,7 +32,7 @@ const authRouter = trpcRouter({
         throw toTrpcError(resultOfCreation.left);
       }
 
-      const { passwordHash, ...me } = resultOfCreation.right;
+      const me = getUserWithoutPasswordHash(resultOfCreation.right);
 
       await setUpSession(req, res, sessionsService, cookieName, me.id);
 
@@ -65,7 +66,7 @@ const authRouter = trpcRouter({
         throw toTrpcError(searchResult.left);
       }
 
-      const { passwordHash, ...me } = searchResult.right;
+      const me = getUserWithoutPasswordHash(searchResult.right);
 
       await setUpSession(req, res, sessionsService, cookieName, me.id);
 
@@ -104,6 +105,15 @@ const authRouter = trpcRouter({
     }),
   ),
 });
+
+function getUserWithoutPasswordHash(user: FindOneByOut) {
+  if (user.registrationStatus === "FULL") {
+    const { passwordHash, ...rest } = user;
+    return rest;
+  } else {
+    return user;
+  }
+}
 
 async function setUpSession(
   req: FastifyRequest,

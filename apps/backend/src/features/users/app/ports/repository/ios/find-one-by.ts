@@ -1,20 +1,20 @@
 import { z } from "zod";
 
-import { zUser } from "~/core";
+import { zCreateOut } from "./create";
+
+import { zBasicUser, zFullyRegisteredUser } from "~/core";
 
 const zFindOneByIn = z.union([
-  zUser.pick({
+  zBasicUser.pick({
     id: true,
   }),
-  zUser.pick({
+  zFullyRegisteredUser.pick({
     email: true,
   }),
 ]);
 type FindOneByIn = z.infer<typeof zFindOneByIn>;
 
-const zFindOneByOut = zUser.omit({
-  password: true,
-});
+const zFindOneByOut = zCreateOut;
 type FindOneByOut = z.infer<typeof zFindOneByOut>;
 
 export { zFindOneByIn, zFindOneByOut };

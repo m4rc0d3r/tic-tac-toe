@@ -14,13 +14,13 @@ datasource db {
 }
 
 model User {
-  id           Int    @id @default(autoincrement())
-  email        String @unique
-  nickname     String @unique
-  firstName    String @default("") @map("first_name")
-  lastName     String @default("") @map("last_name")
-  avatar       String @default("")
-  passwordHash String @map("password_hash")
+  id           Int     @id @default(autoincrement())
+  email        String? @unique
+  nickname     String  @unique
+  firstName    String  @default("") @map("first_name")
+  lastName     String  @default("") @map("last_name")
+  avatar       String  @default("")
+  passwordHash String? @map("password_hash")
 
   Session Session[]
 

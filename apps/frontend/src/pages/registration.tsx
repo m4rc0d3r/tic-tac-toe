@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { zRegisterIn } from "@tic-tac-toe/backend";
+import { zFullRegisterIn } from "@tic-tac-toe/backend";
 import { EMPTY_STRING, QUESTION_MARK } from "@tic-tac-toe/core";
 import type { Namespace, TFunction } from "i18next";
 import { useForm } from "react-hook-form";
@@ -74,11 +74,12 @@ function RegistrationPage() {
   const { mutate: register, isPending: isRegistrationPending } = trpc.auth.register.useMutation();
   const loginLocally = useAuthStore.use.login();
 
-  const form = useForm<z.infer<typeof zRegisterIn>>({
-    resolver: zodResolver(zRegisterIn, {
+  const form = useForm<z.infer<typeof zFullRegisterIn>>({
+    resolver: zodResolver(zFullRegisterIn, {
       errorMap: errorMapForForms(t),
     }),
     defaultValues: {
+      registrationType: "FULL",
       email: EMPTY_STRING,
       nickname: EMPTY_STRING,
       firstName: EMPTY_STRING,

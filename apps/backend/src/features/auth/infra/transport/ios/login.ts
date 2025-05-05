@@ -2,9 +2,9 @@ import type { z } from "zod";
 
 import { zRegisterOut } from "./register";
 
-import { zUser } from "~/core";
+import { zFullyRegisteredUser } from "~/core";
 
-const zLoginIn = zUser.pick({
+const zLoginIn = zFullyRegisteredUser.pick({
   email: true,
   password: true,
 });
