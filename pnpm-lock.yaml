@@ -319,6 +319,9 @@ importers:
       '@vitejs/plugin-react-swc':
         specifier: ^3.5.0
         version: 3.7.2(vite@6.0.11(@types/node@22.10.7)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(sass@1.83.4)(stylus@0.62.0)(tsx@4.19.2)(yaml@2.6.1))
+      concurrently:
+        specifier: ^9.0.0
+        version: 9.1.2
       eslint-plugin-react-hooks:
         specifier: ^5.0.0
         version: 5.1.0(eslint@9.18.0(jiti@2.4.2))

@@ -23,7 +23,8 @@
     "format:fix": "prettier --write . '!apps'; pnpm --filter './apps/**' format:fix",
     "lint:check": "eslint --flag unstable_config_lookup_from_file --ignore-pattern 'apps' '.'; pnpm --filter './apps/**' lint:check",
     "lint:fix": "eslint --fix --flag unstable_config_lookup_from_file --ignore-pattern 'apps' '.'; pnpm --filter './apps/**' lint:fix",
-    "prepare": "husky"
+    "prepare": "husky",
+    "type-check": "pnpm --parallel --filter './**' type-check"
   },
   "type": "module"
 }

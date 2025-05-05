@@ -52,6 +52,7 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react-swc": "^3.5.0",
+    "concurrently": "^9.0.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.16",
     "globals": "^15.14.0",
@@ -74,7 +75,10 @@
     "format:fix": "prettier --write .",
     "lint:check": "eslint . && stylelint '**/*.css'",
     "lint:fix": "eslint --fix . && stylelint --fix '**/*.css'",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "type-check": "concurrently -p \"[{name}]\" -n \"App,Node\" -c \"blue.bold,yellow.bold\" \"pnpm type-check-app\" \"pnpm type-check-node\"",
+    "type-check-app": "tsc --noEmit -p tsconfig.app.json",
+    "type-check-node": "tsc --noEmit -p tsconfig.node.json"
   },
   "type": "module"
 }
