@@ -25,6 +25,7 @@
     "build": "concurrently --kill-others-on-fail -p \"[{name}]\" -n \"TSC,SWC\" -c \"blue.bold,yellow.bold\" \"pnpm build:ts\" \"pnpm build:swc\"",
     "build:swc": "swc src -d dist --strip-leading-paths",
     "build:ts": "tsc",
+    "dev": "pnpm watch",
     "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
     "lint:check": "eslint .",
