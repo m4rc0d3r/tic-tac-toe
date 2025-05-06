@@ -40,6 +40,7 @@ import {
 } from "~/shared/ui/form";
 import { H1 } from "~/shared/ui/h1";
 import { Input } from "~/shared/ui/input";
+import { SecretInput } from "~/shared/ui/secret-input";
 import { Separator } from "~/shared/ui/separator";
 
 function composeErrorMessage<Ns extends Namespace, KPrefix>(
@@ -344,7 +345,12 @@ function SettingsPage() {
                     <FormItem>
                       <FormLabel>{tc(TRANSLATION_KEYS.PASSWORD)}</FormLabel>
                       <FormControl>
-                        <Input type="password" disabled={isUpdateCredentialsPending} {...field} />
+                        <SecretInput
+                          inputProps={{
+                            disabled: isUpdateCredentialsPending,
+                            ...field,
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -359,7 +365,12 @@ function SettingsPage() {
                         {[tc(TRANSLATION_KEYS.CURRENT), t(TRANSLATION_KEYS.PASSWORD)].join(SPACE)}
                       </FormLabel>
                       <FormControl>
-                        <Input type="password" disabled={isUpdateCredentialsPending} {...field} />
+                        <SecretInput
+                          inputProps={{
+                            disabled: isUpdateCredentialsPending,
+                            ...field,
+                          }}
+                        />
                       </FormControl>
                       <FormDescription>
                         {tsp(TRANSLATION_KEYS.YOU_MUST_ENTER_YOUR_CURRENT_PASSWORD_TO_MAKE_CHANGES)}

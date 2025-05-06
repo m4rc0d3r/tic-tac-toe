@@ -28,6 +28,7 @@ import { H1 } from "~/shared/ui/h1";
 import { Input } from "~/shared/ui/input";
 import { Link2 } from "~/shared/ui/link2";
 import { P } from "~/shared/ui/p";
+import { SecretInput } from "~/shared/ui/secret-input";
 import { Separator } from "~/shared/ui/separator";
 
 function composeErrorMessage<Ns extends Namespace, KPrefix>(
@@ -181,7 +182,12 @@ function RegistrationPage() {
                   <FormItem>
                     <FormLabel>{tc(TRANSLATION_KEYS.PASSWORD)}</FormLabel>
                     <FormControl>
-                      <Input type="password" disabled={isRegistrationPending} {...field} />
+                      <SecretInput
+                        inputProps={{
+                          disabled: isRegistrationPending,
+                          ...field,
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
