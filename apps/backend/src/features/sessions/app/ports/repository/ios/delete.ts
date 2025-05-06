@@ -1,10 +1,16 @@
-import type { z } from "zod";
+import { z } from "zod";
 
 import { zSession } from "~/core";
 
-const zDeleteIn = zSession.pick({
-  userId: true,
-});
+const zDeleteIn = zSession
+  .pick({
+    userId: true,
+  })
+  .merge(
+    z.object({
+      exceptForSessionId: zSession.shape.id.optional(),
+    }),
+  );
 type DeleteIn = z.infer<typeof zDeleteIn>;
 
 type DeleteOut = number;

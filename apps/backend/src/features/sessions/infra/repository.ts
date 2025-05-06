@@ -108,20 +108,36 @@ class PrismaSessionsRepository extends SessionsRepository {
 
   override async deleteOne(params: DeleteOneIn): Promise<e.Either<NotFoundError, DeleteOneOut>> {
     const { id, userId } = params;
-    return e.fromNullable(new NotFoundError(params))(
-      await this.prisma.session.delete({
-        where: {
-          id,
-          ...(userId && { userId }),
-        },
-      }),
-    );
+    return te.tryCatch(
+      () =>
+        this.prisma.session.delete({
+          where: {
+            id,
+            ...(userId && { userId }),
+          },
+        }),
+      (reason) => {
+        if (isNotFoundError(reason)) {
+          return new NotFoundError({
+            id,
+          });
+        }
+        throw reason;
+      },
+    )();
   }
 
-  override async delete(params: DeleteIn): Promise<DeleteOut> {
+  override async delete({ userId, exceptForSessionId }: DeleteIn): Promise<DeleteOut> {
     return (
       await this.prisma.session.deleteMany({
-        where: params,
+        where: {
+          userId,
+          ...(typeof exceptForSessionId === "string" && {
+            NOT: {
+              id: exceptForSessionId,
+            },
+          }),
+        },
       })
     ).count;
   }

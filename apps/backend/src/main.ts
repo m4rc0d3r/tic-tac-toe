@@ -10,6 +10,7 @@ import { expand } from "dotenv-expand";
 import fastify from "fastify";
 
 import { authRouter } from "./features/auth";
+import { sessionsRouter } from "./features/sessions/infra/transport";
 import { usersRouter } from "./features/users/infra/transport";
 import { createConfig, createDependencies, createTrpcContext, trpcRouter } from "./infra";
 
@@ -23,6 +24,7 @@ declare module "fastify" {
 const appRouter = trpcRouter({
   auth: authRouter,
   users: usersRouter,
+  sessions: sessionsRouter,
 });
 type AppRouter = typeof appRouter;
 

@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { NotFoundError, UniqueKeyViolationError } from "~/app";
 import { AuthenticationError } from "~/features/auth/infra/transport/errors";
+import { SessionDeletionError } from "~/features/sessions";
 import { UserUpdateError } from "~/features/users/infra/transport/errors";
 
 const HTTP_STATUS_PHRASES_BY_ERROR_AREA = {
@@ -88,6 +89,12 @@ function convertErrorCause(cause: Error) {
     return {
       area: "BAD_REQUEST" satisfies ErrorArea,
       reason,
+    } as const;
+  } else if (cause instanceof SessionDeletionError) {
+    const { explanation } = cause;
+    return {
+      area: "BAD_REQUEST" satisfies ErrorArea,
+      explanation,
     } as const;
   }
 

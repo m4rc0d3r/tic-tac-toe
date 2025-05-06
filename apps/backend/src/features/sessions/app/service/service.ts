@@ -17,7 +17,7 @@ import type {
 import { isSessionExpired } from "../utils";
 
 import { SessionDeletionError } from "./errors";
-import type { CreateOneIn, DeleteIn, DeleteOneIn } from "./ios";
+import type { CreateOneIn, DeleteOneIn, DeleteUserSessionsIn } from "./ios";
 
 import type { NotFoundError, UniqueKeyViolationError } from "~/app";
 import type { Session, SessionFieldsInUniqueConstraints } from "~/core";
@@ -69,7 +69,8 @@ class SessionsService {
       });
     }
 
-    const eitherInitiatingSession = await this.canDeleteOthers(initiatingSessionId);
+    const eitherInitiatingSession =
+      await this.getSessionOrReasonWhyItCannotDeleteOthers(initiatingSessionId);
     if (eitherInitiatingSession._tag === "Left") {
       return eitherInitiatingSession;
     }
@@ -80,27 +81,32 @@ class SessionsService {
     });
   }
 
-  async delete({
+  async deleteUserSessions({
     initiatingSessionId,
-  }: DeleteIn): Promise<e.Either<SessionDeletionError, DeleteOut>> {
-    const eitherInitiatingSession = await this.canDeleteOthers(initiatingSessionId);
+    deleteMode,
+  }: DeleteUserSessionsIn): Promise<e.Either<SessionDeletionError, DeleteOut>> {
+    const eitherInitiatingSession =
+      await this.getSessionOrReasonWhyItCannotDeleteOthers(initiatingSessionId);
     if (eitherInitiatingSession._tag === "Left") {
       return eitherInitiatingSession;
     }
 
+    const initiatingSession = eitherInitiatingSession.right;
+
     return e.right(
       await this.sessionsRepository.delete({
-        userId: eitherInitiatingSession.right.userId,
+        userId: initiatingSession.userId,
+        ...(deleteMode === "OTHER" && { exceptForSessionId: initiatingSession.id }),
       }),
     );
   }
 
-  private async canDeleteOthers(id: Session["id"]) {
+  private async getSessionOrReasonWhyItCannotDeleteOthers(id: Session["id"]) {
     return f.pipe(
       await this.sessionsRepository.findOne({
         id,
       }),
-      e.mapLeft(() => new SessionDeletionError("INITIATING_SESSION_DOES_NOT_EXIST")),
+      e.mapLeft(() => new SessionDeletionError({ reason: "INITIATING_SESSION_DOES_NOT_EXIST" })),
       e.flatMap((session) =>
         f.pipe(
           session,
@@ -108,7 +114,13 @@ class SessionsService {
             ({ createdAt }) =>
               Date.now() - createdAt.getTime() >=
               this.config.session.minimumAgeForDestructionOfOthers,
-            () => new SessionDeletionError("INITIATING_SESSION_IS_TOO_YOUNG"),
+            ({ createdAt }) =>
+              new SessionDeletionError({
+                reason: "INITIATING_SESSION_IS_TOO_YOUNG",
+                whenItWillBePossible: new Date(
+                  createdAt.getTime() + this.config.session.minimumAgeForDestructionOfOthers,
+                ),
+              }),
           ),
         ),
       ),
@@ -117,7 +129,7 @@ class SessionsService {
           session,
           e.fromPredicate(
             (session) => !isSessionExpired(session),
-            () => new SessionDeletionError("INITIATING_SESSION_HAS_ALREADY_EXPIRED"),
+            () => new SessionDeletionError({ reason: "INITIATING_SESSION_HAS_ALREADY_EXPIRED" }),
           ),
         ),
       ),
