@@ -1,4 +1,12 @@
-import { capitalize, EMPTY_STRING, UNDERSCORE } from "@tic-tac-toe/core";
+import type { Duration } from "@tic-tac-toe/core";
+import {
+  capitalize,
+  COMMA_WITH_SPACE,
+  EMPTY_STRING,
+  SPACE,
+  UNDERSCORE,
+  zDuration,
+} from "@tic-tac-toe/core";
 import type { FlatNamespace, KeyPrefix, Namespace, TFunction } from "i18next";
 import type { $Tuple } from "node_modules/react-i18next/helpers";
 import type { FallbackNs, UseTranslationOptions, UseTranslationResponse } from "react-i18next";
@@ -129,6 +137,23 @@ const TRANSLATION_KEYS = z.enum([
   "ANYONE",
   "UNLIMITED",
   "SPECIFIC",
+  "ACTIVE_SESSIONS",
+  "CURRENT_SESSION",
+  "TERMINATE_ALL_SESSIONS",
+  "EXCEPT_THE_CURRENT_ONE",
+  "INCLUDING_THE_CURRENT_ONE",
+  "SESSIONS_SUCCESSFULLY_TERMINATED",
+  "FAILED_TO_TERMINATE_SESSIONS",
+  "TERMINATE",
+  "SESSION_SUCCESSFULLY_TERMINATED",
+  "FAILED_TO_TERMINATE_SESSION",
+  "NO_SUCH_SESSION_EXISTS",
+  "YOUR_CURRENT_SESSION_DOES_NOT_EXIST",
+  "YOUR_CURRENT_SESSION_HAS_EXPIRED",
+  "YOUR_CURRENT_SESSION_WAS_RECENTLY_CREATED_THE_DELETE_FUNCTION_WILL_ONLY_BE_AVAILABLE",
+  "FAILED_TO_AUTHENTICATE_YOU",
+  "YOUR_AUTHENTICATION_DATA_IS_CORRUPTED_OR_INCORRECT",
+  "YOUR_CURRENT_AUTHENTICATION_SESSION_HAS_ALREADY_EXPIRED",
 ]).Values;
 
 const RESOURCES = {
@@ -245,6 +270,26 @@ const RESOURCES = {
       [TRANSLATION_KEYS.ANYONE]: "anyone",
       [TRANSLATION_KEYS.UNLIMITED]: "unlimited",
       [TRANSLATION_KEYS.SPECIFIC]: "specific",
+      [TRANSLATION_KEYS.ACTIVE_SESSIONS]: "active sessions",
+      [TRANSLATION_KEYS.CURRENT_SESSION]: "current session",
+      [TRANSLATION_KEYS.TERMINATE_ALL_SESSIONS]: "terminate all sessions",
+      [TRANSLATION_KEYS.EXCEPT_THE_CURRENT_ONE]: "except the current one",
+      [TRANSLATION_KEYS.INCLUDING_THE_CURRENT_ONE]: "including the current one",
+      [TRANSLATION_KEYS.SESSIONS_SUCCESSFULLY_TERMINATED]: "sessions successfully terminated",
+      [TRANSLATION_KEYS.FAILED_TO_TERMINATE_SESSIONS]: "failed to terminate sessions",
+      [TRANSLATION_KEYS.TERMINATE]: "terminate",
+      [TRANSLATION_KEYS.SESSION_SUCCESSFULLY_TERMINATED]: "session successfully terminated",
+      [TRANSLATION_KEYS.FAILED_TO_TERMINATE_SESSION]: "failed to terminate session",
+      [TRANSLATION_KEYS.NO_SUCH_SESSION_EXISTS]: "no such session exists",
+      [TRANSLATION_KEYS.YOUR_CURRENT_SESSION_DOES_NOT_EXIST]: "your current session does not exist",
+      [TRANSLATION_KEYS.YOUR_CURRENT_SESSION_HAS_EXPIRED]: "your current session has expired",
+      [TRANSLATION_KEYS.YOUR_CURRENT_SESSION_WAS_RECENTLY_CREATED_THE_DELETE_FUNCTION_WILL_ONLY_BE_AVAILABLE]:
+        "your current session was recently created. The delete function will only be available {{when}}",
+      [TRANSLATION_KEYS.FAILED_TO_AUTHENTICATE_YOU]: "failed to authenticate you",
+      [TRANSLATION_KEYS.YOUR_AUTHENTICATION_DATA_IS_CORRUPTED_OR_INCORRECT]:
+        "your authentication data is corrupted or incorrect",
+      [TRANSLATION_KEYS.YOUR_CURRENT_AUTHENTICATION_SESSION_HAS_ALREADY_EXPIRED]:
+        "your current authentication session has already expired",
     },
   },
   uk: {
@@ -364,6 +409,27 @@ const RESOURCES = {
       [TRANSLATION_KEYS.ANYONE]: "будь-хто",
       [TRANSLATION_KEYS.UNLIMITED]: "необмежений",
       [TRANSLATION_KEYS.SPECIFIC]: "конкретний",
+      [TRANSLATION_KEYS.ACTIVE_SESSIONS]: "активні сесії",
+      [TRANSLATION_KEYS.CURRENT_SESSION]: "поточний сеанс",
+      [TRANSLATION_KEYS.TERMINATE_ALL_SESSIONS]: "завершити всі сеанси",
+      [TRANSLATION_KEYS.EXCEPT_THE_CURRENT_ONE]: "крім поточного",
+      [TRANSLATION_KEYS.INCLUDING_THE_CURRENT_ONE]: "включаючи поточний",
+      [TRANSLATION_KEYS.SESSIONS_SUCCESSFULLY_TERMINATED]: "сеанси успішно завершено",
+      [TRANSLATION_KEYS.FAILED_TO_TERMINATE_SESSIONS]: "не вдалося завершити сеанси",
+      [TRANSLATION_KEYS.TERMINATE]: "припинити",
+      [TRANSLATION_KEYS.SESSION_SUCCESSFULLY_TERMINATED]: "сеанс успішно завершено",
+      [TRANSLATION_KEYS.FAILED_TO_TERMINATE_SESSION]: "не вдалося завершити сеанс",
+      [TRANSLATION_KEYS.NO_SUCH_SESSION_EXISTS]: "такого сеансу не існує",
+      [TRANSLATION_KEYS.YOUR_CURRENT_SESSION_DOES_NOT_EXIST]: "вашого поточного сеансу не існує",
+      [TRANSLATION_KEYS.YOUR_CURRENT_SESSION_HAS_EXPIRED]:
+        "термін дії вашого поточного сеансу закінчився",
+      [TRANSLATION_KEYS.YOUR_CURRENT_SESSION_WAS_RECENTLY_CREATED_THE_DELETE_FUNCTION_WILL_ONLY_BE_AVAILABLE]:
+        "ваш поточний сеанс нещодавно створено. Функція видалення буде доступна лише {{when}}",
+      [TRANSLATION_KEYS.FAILED_TO_AUTHENTICATE_YOU]: "не вдалося вас автентифікувати",
+      [TRANSLATION_KEYS.YOUR_AUTHENTICATION_DATA_IS_CORRUPTED_OR_INCORRECT]:
+        "ваші дані автентифікації пошкоджені або неправильні",
+      [TRANSLATION_KEYS.YOUR_CURRENT_AUTHENTICATION_SESSION_HAS_ALREADY_EXPIRED]:
+        "термін дії вашого поточного сеансу автентифікації вже минув",
     },
   },
 };
@@ -425,11 +491,83 @@ function createTsp<Ns extends Namespace, KPrefix>(t: TFunction<Ns, KPrefix>) {
   return (...args: Parameters<typeof t>) => createTs(t)(".")(...args);
 }
 
+function formatDuration(language: string, duration_: Duration) {
+  const duration: Duration = zDuration.parse(duration_);
+
+  const entries = Object.entries(duration);
+  type Component = [string, number];
+
+  const [firstComponentUnitName, firstComponentUnitValue] = entries[0] as Component;
+
+  if (entries.length === 0) {
+    throw new Error("Duration must contain at least 1 component.");
+  }
+  const sign = Math.sign(firstComponentUnitValue);
+  const [lastComponentUnitName, lastComponentUnitValue] = entries.at(-1) as Component;
+
+  const formatter = new Intl.RelativeTimeFormat(language, {
+    style: "short",
+  });
+
+  const isUnit = (value: Intl.RelativeTimeFormatPart) => "unit" in value;
+
+  const relativeTimeIndicator = (() => {
+    if (sign === 1) {
+      const parts = formatter.formatToParts(
+        firstComponentUnitValue,
+        firstComponentUnitName as keyof Duration,
+      );
+      const indexOfUnit = parts.findIndex(isUnit);
+      return parts
+        .slice(0, indexOfUnit)
+        .map(({ value }) => value)
+        .join(SPACE);
+    } else {
+      const parts = formatter.formatToParts(
+        lastComponentUnitValue,
+        lastComponentUnitName as keyof Duration,
+      );
+      const indexOfUnit = parts.findIndex(isUnit);
+      return parts
+        .slice(indexOfUnit + 1)
+        .map(({ value }) => value)
+        .join(SPACE);
+    }
+  })();
+
+  const formattedComponents = entries.map(([componentName, componentValue]) => {
+    const parts = formatter.formatToParts(
+      Math.abs(componentValue!),
+      componentName as keyof Duration,
+    );
+    const indexOfUnit = parts.findIndex(isUnit);
+    return parts.slice(indexOfUnit);
+  });
+
+  if (sign === -1) {
+    const lastComponentParts = formattedComponents.at(-1);
+    if (lastComponentParts) {
+      const lastComponentPart = lastComponentParts.at(-1);
+      if (lastComponentPart) {
+        lastComponentPart.value = relativeTimeIndicator;
+      }
+    }
+  }
+
+  return [
+    ...(sign === 1 ? [relativeTimeIndicator] : []),
+    formattedComponents
+      .map((component) => component.map(({ value }) => value).join(SPACE))
+      .join(COMMA_WITH_SPACE),
+  ].join(SPACE);
+}
+
 export {
   CASES,
   createTc,
   createTs,
   createTsp,
+  formatDuration,
   GENDERS,
   PLURALS,
   RESOURCES,
