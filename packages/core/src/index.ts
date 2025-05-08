@@ -11,5 +11,6 @@ export type * from "./record";
 export * from "./string";
 export * from "./time";
 export * from "./type-guards";
+export * from "./user-agent-parser";
 export * from "./utilities";
 export * from "./zod";
