@@ -54,7 +54,7 @@ const dependencies = createDependencies(config, app.log);
 app.register(fastifyCors, config.cors);
 
 const {
-  cookie: { secret, domain },
+  cookie: { secret, domain, secure },
 } = config;
 app.register(fastifyCookie, {
   secret,
@@ -64,7 +64,7 @@ app.register(fastifyCookie, {
     httpOnly: true,
     path: SLASH,
     sameSite: "strict",
-    secure: true,
+    secure,
     signed: true,
   },
 });
@@ -113,10 +113,11 @@ closeWithGrace(
 );
 
 const {
-  app: { port },
+  app: { address, port },
 } = config;
 app.listen(
   {
+    host: address,
     port,
   },
   (err) => {
