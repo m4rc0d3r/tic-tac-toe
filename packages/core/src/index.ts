@@ -3,6 +3,7 @@ export * from "./color";
 export * from "./error-handling";
 export * from "./file";
 export * from "./game";
+export * from "./geolocation";
 export * from "./geometry";
 export * from "./json";
 export * from "./number";
