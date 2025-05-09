@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "sessions" ADD COLUMN     "city" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "country_code" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "country_name" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "latitude" DOUBLE PRECISION,
+ADD COLUMN     "longitude" DOUBLE PRECISION;

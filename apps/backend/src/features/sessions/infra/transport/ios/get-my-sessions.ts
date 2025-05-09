@@ -10,6 +10,7 @@ const zMySession = zSession
   .pick({
     id: true,
     ip: true,
+    geolocation: true,
     device: true,
     os: true,
     browser: true,

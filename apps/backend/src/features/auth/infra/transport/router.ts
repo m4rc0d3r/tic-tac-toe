@@ -1,5 +1,6 @@
-import type { UserAgentParserFunction } from "@tic-tac-toe/core";
+import type { GetGeolocationByIp, UserAgentParserFunction } from "@tic-tac-toe/core";
 import type { FastifyReply, FastifyRequest } from "fastify";
+import { either as e, function as f } from "fp-ts";
 import { getClientIp } from "request-ip";
 
 import type { LoginOut, RegisterOut } from "./ios";
@@ -22,6 +23,7 @@ const authRouter = trpcRouter({
           },
           usersService,
           sessionsService,
+          getGeolocationByIp,
           parseUserAgent,
         },
         input: { registrationType, ...input },
@@ -35,7 +37,15 @@ const authRouter = trpcRouter({
 
       const me = getUserWithoutPasswordHash(resultOfCreation.right);
 
-      await setUpSession(req, res, sessionsService, parseUserAgent, cookieName, me.id);
+      await setUpSession(
+        req,
+        res,
+        sessionsService,
+        getGeolocationByIp,
+        parseUserAgent,
+        cookieName,
+        me.id,
+      );
 
       return {
         me,
@@ -54,6 +64,7 @@ const authRouter = trpcRouter({
           },
           usersService,
           sessionsService,
+          getGeolocationByIp,
           parseUserAgent,
         },
         input: { email, password },
@@ -70,7 +81,15 @@ const authRouter = trpcRouter({
 
       const me = getUserWithoutPasswordHash(searchResult.right);
 
-      await setUpSession(req, res, sessionsService, parseUserAgent, cookieName, me.id);
+      await setUpSession(
+        req,
+        res,
+        sessionsService,
+        getGeolocationByIp,
+        parseUserAgent,
+        cookieName,
+        me.id,
+      );
 
       return {
         me,
@@ -121,11 +140,18 @@ async function setUpSession(
   req: FastifyRequest,
   res: FastifyReply,
   sessionsService: SessionsService,
+  getGeolocationByIp: GetGeolocationByIp,
   parseUserAgent: UserAgentParserFunction,
   cookieName: string,
   userId: User["id"],
 ) {
-  const eitherSession = await createSession(req, sessionsService, parseUserAgent, userId);
+  const eitherSession = await createSession(
+    req,
+    sessionsService,
+    getGeolocationByIp,
+    parseUserAgent,
+    userId,
+  );
   if (eitherSession._tag === "Right") {
     setSessionCookie(res, eitherSession.right, cookieName);
   } else {
@@ -136,16 +162,27 @@ async function setUpSession(
 async function createSession(
   req: FastifyRequest,
   sessionsService: SessionsService,
+  getGeolocationByIp: GetGeolocationByIp,
   parseUserAgent: UserAgentParserFunction,
   userId: User["id"],
 ) {
   const ip = getClientIp(req);
   const ua = req.headers["user-agent"] ?? "";
 
+  const geolocation =
+    typeof ip === "string"
+      ? f.pipe(
+          await getGeolocationByIp(ip),
+          e.mapLeft(() => null),
+          e.toUnion,
+        )
+      : null;
+
   return sessionsService.createOne({
     ua,
     ip,
     userId,
+    geolocation,
     ...parseUserAgent(ua),
   });
 }

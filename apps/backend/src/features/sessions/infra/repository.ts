@@ -35,6 +35,7 @@ class PrismaSessionsRepository extends SessionsRepository {
   }
 
   override async createOne({
+    geolocation,
     device,
     os,
     browser,
@@ -47,6 +48,13 @@ class PrismaSessionsRepository extends SessionsRepository {
         return mapModelToEntity(
           await this.prisma.session.create({
             data: {
+              ...(geolocation && {
+                latitude: geolocation.coordinates.latitude,
+                longitude: geolocation.coordinates.longitude,
+                countryCode: geolocation.country.code,
+                countryName: geolocation.country.name,
+                city: geolocation.city,
+              }),
               ...mapParsedUserAgent({
                 device: device ?? {
                   type: EMPTY_STRING,
@@ -182,6 +190,11 @@ class PrismaSessionsRepository extends SessionsRepository {
 
 function mapModelToEntity(value: SessionModel): FindOneOut {
   const {
+    latitude,
+    longitude,
+    countryCode,
+    countryName,
+    city,
     deviceType,
     deviceVendor,
     deviceModel,
@@ -194,6 +207,20 @@ function mapModelToEntity(value: SessionModel): FindOneOut {
 
   return {
     ...sessionModel,
+    geolocation:
+      typeof latitude === "number" && typeof longitude === "number"
+        ? {
+            coordinates: {
+              latitude,
+              longitude,
+            },
+            country: {
+              code: countryCode,
+              name: countryName,
+            },
+            city,
+          }
+        : null,
     ...mapParsedUserAgent({
       deviceType,
       deviceVendor,

@@ -29,9 +29,15 @@ model User {
 
 model Session {
   id         String   @id @db.Char(32)
-  ip         String?  @db.Inet
   createdAt  DateTime @default(now()) @map("created_at")
   maximumAge Int      @map("maximum_age")
+
+  ip          String? @db.Inet
+  latitude    Float?
+  longitude   Float?
+  countryCode String  @default("") @map("country_code")
+  countryName String  @default("") @map("country_name")
+  city        String  @default("")
 
   ua             String @default("")
   deviceType     String @default("") @map("device_type")

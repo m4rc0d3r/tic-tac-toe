@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { uaParserJs } from "@tic-tac-toe/core";
+import { freeIpApi, ipWhoIs, uaParserJs } from "@tic-tac-toe/core";
 import type { FastifyBaseLogger } from "fastify";
 
 import type { Config } from "./config";
@@ -24,6 +24,7 @@ function createDependencies(config: Config, logger: FastifyBaseLogger) {
   const usersService = new UsersService(usersRepository, hashingService, blobService);
   const sessionsService = new SessionsService(config, sessionsRepository);
 
+  const getGeolocationByIp = config.app.geolocationByIpProvider === "ipwhois" ? ipWhoIs : freeIpApi;
   const parseUserAgent = uaParserJs;
 
   if (config.app.nodeEnv === "dev") {
@@ -38,6 +39,7 @@ function createDependencies(config: Config, logger: FastifyBaseLogger) {
     config,
     usersService,
     sessionsService,
+    getGeolocationByIp,
     parseUserAgent,
   };
 }

@@ -9,6 +9,7 @@ const zAppConfig = z
     APP_CLOSE_GRACE_DELAY: z.coerce.number().nonnegative(),
     APP_LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]),
     APP_PRETTY_LOGS: zBooleanishString,
+    APP_GEOLOCATION_BY_IP_PROVIDER: z.enum(["ipwhois", "freeipapi"]),
   })
   .transform(
     ({
@@ -18,6 +19,7 @@ const zAppConfig = z
       APP_CLOSE_GRACE_DELAY,
       APP_LOG_LEVEL,
       APP_PRETTY_LOGS,
+      APP_GEOLOCATION_BY_IP_PROVIDER,
     }) => {
       const nodeEnv = NODE_ENV;
       const address = APP_ADDRESS;
@@ -25,6 +27,7 @@ const zAppConfig = z
       const closeGraceDelay = APP_CLOSE_GRACE_DELAY;
       const logLevel = APP_LOG_LEVEL;
       const prettyLogs = APP_PRETTY_LOGS;
+      const geolocationByIpProvider = APP_GEOLOCATION_BY_IP_PROVIDER;
       return {
         nodeEnv,
         address,
@@ -32,6 +35,7 @@ const zAppConfig = z
         closeGraceDelay,
         logLevel,
         prettyLogs,
+        geolocationByIpProvider,
       };
     },
   );
