@@ -4,4 +4,12 @@ const TRUE = "true";
 
 const zBooleanishString = z.enum([TRUE, "false"]).transform((value) => value === TRUE);
 
-export { zBooleanishString };
+function isTruthy(value: unknown) {
+  return !!value;
+}
+
+function isFalsy(value: unknown) {
+  return !value;
+}
+
+export { isFalsy, isTruthy, zBooleanishString };

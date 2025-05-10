@@ -8,19 +8,25 @@ import {
 } from "@tic-tac-toe/backend";
 import type { PageOptions } from "@tic-tac-toe/core";
 import {
+  capitalize,
+  COLON_WITH_SPACE,
   COMMA_WITH_SPACE,
   EMPTY_STRING,
   EXTENSIONS_BY_MIME_TYPE,
+  getFlagEmoji,
   isNullish,
+  isTruthy,
   isZMimeTypeIssue,
   SPACE,
+  zCommonDeviceType,
+  zCommonOsName,
 } from "@tic-tac-toe/core";
 import { getQueryKey } from "@trpc/react-query";
 import dayjs from "dayjs";
 import dayjsPluginDuration from "dayjs/plugin/duration";
 import type { Namespace, TFunction } from "i18next";
-import { Ban, TrashIcon, UserIcon } from "lucide-react";
-import type { ComponentProps } from "react";
+import { Ban, Monitor, Smartphone, Tablet, TrashIcon, UserIcon } from "lucide-react";
+import type { ComponentProps, ComponentType } from "react";
 import { useRef, useState } from "react";
 import type { DefaultValues, FieldValues, UseFormProps, UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -31,9 +37,21 @@ import { zfd } from "zod-form-data";
 import { useAuthStore } from "~/entities/auth";
 import type { TrpcErrorCause } from "~/shared/api";
 import { trpc } from "~/shared/api";
+import AndroidIcon from "~/shared/assets/android.svg?react";
+import ChromeIcon from "~/shared/assets/chrome.svg?react";
+import EdgeIcon from "~/shared/assets/edge.svg?react";
+import FirefoxIcon from "~/shared/assets/firefox.svg?react";
+import IosIcon from "~/shared/assets/ios.svg?react";
+import LinuxIcon from "~/shared/assets/linux.svg?react";
+import MacosIcon from "~/shared/assets/macos.svg?react";
+import OperaIcon from "~/shared/assets/opera.svg?react";
+import QuestionIcon from "~/shared/assets/question.svg?react";
+import SafariIcon from "~/shared/assets/safari.svg?react";
+import WindowsIcon from "~/shared/assets/windows.svg?react";
 import { createTsp, formatDuration, TRANSLATION_KEYS, useTranslation2 } from "~/shared/i18n";
 import { listWithConjunction } from "~/shared/lib/text";
 import { errorMapForForms } from "~/shared/lib/zod";
+import { Badge } from "~/shared/ui/badge";
 import { Button } from "~/shared/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/shared/ui/card";
 import {
@@ -63,6 +81,7 @@ import {
 import { SecretInput } from "~/shared/ui/secret-input";
 import { Separator } from "~/shared/ui/separator";
 import { Spinner } from "~/shared/ui/spinner";
+import { cn } from "~/shared/ui/utils";
 
 dayjs.extend(dayjsPluginDuration);
 
@@ -650,26 +669,119 @@ function SessionCard({
   ...props
 }: SessionCardProps) {
   const {
+    translation: { t },
     postproc: { tc },
   } = useTranslation2();
 
-  const { ip, os, browser, isCurrent } = session;
+  const { ip, geolocation, device, os, browser, isCurrent } = session;
+
+  const ICONS_BY_COMMON_DEVICE_TYPE: Record<string, ComponentType> = {
+    [zCommonDeviceType.Values.desktop]: Monitor,
+    [zCommonDeviceType.Values.tablet]: ({ className, ...props }: ComponentProps<typeof Tablet>) => (
+      <Tablet className={cn("-rotate-90", className)} {...props} />
+    ),
+    [zCommonDeviceType.Values.mobile]: Smartphone,
+  };
+  const ICONS_BY_COMMON_OPERATING_SYSTEMS: Record<string, ComponentType> = {
+    [zCommonOsName.Values.Windows]: WindowsIcon,
+    [zCommonOsName.Values.Linux]: LinuxIcon,
+    [zCommonOsName.Values.macOS]: MacosIcon,
+    [zCommonOsName.Values.Android]: AndroidIcon,
+    [zCommonOsName.Values.iOS]: IosIcon,
+  };
+
+  const getIconByBrowser = (name: string) =>
+    name.toLowerCase().includes("chrom")
+      ? ChromeIcon
+      : name.toLowerCase().includes("firefox")
+        ? FirefoxIcon
+        : name.toLowerCase().includes("opera")
+          ? OperaIcon
+          : name.toLowerCase().includes("edge")
+            ? EdgeIcon
+            : name.toLowerCase().includes("safari")
+              ? SafariIcon
+              : QuestionIcon;
+
+  const DeviceTypeIcon = ICONS_BY_COMMON_DEVICE_TYPE[device?.type ?? EMPTY_STRING] ?? QuestionIcon;
+  const OperatingSystemIcon =
+    ICONS_BY_COMMON_OPERATING_SYSTEMS[os?.name ?? EMPTY_STRING] ?? QuestionIcon;
+  const BrowserIcon = getIconByBrowser(browser?.name ?? EMPTY_STRING);
+
+  const TITLE_PARTS = {
+    device: [device?.vendor, device?.model].filter(isTruthy).join(SPACE),
+    location: geolocation
+      ? [getFlagEmoji(geolocation.country.code), geolocation.country.name, geolocation.city].join(
+          SPACE,
+        )
+      : EMPTY_STRING,
+  };
+
+  const TRANSLATION_OF_KEYS_BY_TITLE_KEY: Record<
+    keyof typeof TITLE_PARTS,
+    keyof typeof TRANSLATION_KEYS
+  > = {
+    device: "THE_DEVICE_COULD_NOT_BE_RECOGNIZED",
+    location: "LOCATION_COULD_NOT_BE_DETERMINED",
+  };
+
+  const title = Object.values(TITLE_PARTS).some(isTruthy)
+    ? Object.entries(TITLE_PARTS)
+        .toSorted(([, { length: a }], [, { length: b }]) => b - a)
+        .map(([key, value]) => [
+          key,
+          value ||
+            t(TRANSLATION_KEYS[TRANSLATION_OF_KEYS_BY_TITLE_KEY[key as keyof typeof TITLE_PARTS]]),
+        ])
+        .map(([, value]) => value)
+        .join(COMMA_WITH_SPACE)
+    : tc(TRANSLATION_KEYS.NEITHER_THE_DEVICE_NOR_THE_LOCATION_COULD_BE_DETERMINED);
 
   return (
     <Card {...props}>
-      <CardHeader className="flex-row justify-between p-2">
-        <div className="flex flex-col gap-1.5">
-          <CardTitle>{ip} </CardTitle>
-          <CardDescription>{[os, browser].join(COMMA_WITH_SPACE)}</CardDescription>
+      <CardHeader className="flex-grow flex-row justify-between p-4">
+        <div
+          className="m-auto"
+          {...(device && {
+            title: capitalize(device.type),
+          })}
+        >
+          <DeviceTypeIcon className="size-16" />
         </div>
-        <Button variant="destructive" disabled={isSessionBeingDeleted} onClick={onSessionDelete}>
-          <Ban />
-          {tc(TRANSLATION_KEYS.TERMINATE)}
-        </Button>
+        <div className="flex-grow space-y-1">
+          <CardTitle>{title}</CardTitle>
+          <CardDescription>
+            <p>
+              {[tc(TRANSLATION_KEYS.IP_ADDRESS), ip ?? t(TRANSLATION_KEYS.NOT_RECOGNIZED)].join(
+                COLON_WITH_SPACE,
+              )}
+            </p>
+            <p className="flex items-center gap-1">
+              {[
+                tc(TRANSLATION_KEYS.OPERATING_SYSTEM),
+                [os?.name, os?.version].filter(isTruthy).join(SPACE) ??
+                  t(TRANSLATION_KEYS.NOT_RECOGNIZED),
+              ].join(COLON_WITH_SPACE)}
+              <OperatingSystemIcon className="size-6" />
+            </p>
+            <p className="flex items-center gap-1">
+              {[
+                tc(TRANSLATION_KEYS.BROWSER),
+                [browser?.name, browser?.version].filter(isTruthy).join(SPACE) ??
+                  t(TRANSLATION_KEYS.NOT_RECOGNIZED),
+              ].join(COLON_WITH_SPACE)}
+              <BrowserIcon className="size-6" />
+            </p>
+          </CardDescription>
+        </div>
+        <div className="flex flex-col items-center gap-2">
+          <Button variant="destructive" disabled={isSessionBeingDeleted} onClick={onSessionDelete}>
+            <Ban />
+            {tc(TRANSLATION_KEYS.TERMINATE)}
+          </Button>
+          {isCurrent && <Badge variant="outline">{tc(TRANSLATION_KEYS.CURRENT_SESSION)}</Badge>}
+        </div>
       </CardHeader>
-      <CardContent className="p-2 pt-0">
-        <p>{isCurrent && tc(TRANSLATION_KEYS.CURRENT_SESSION)}</p>
-      </CardContent>
     </Card>
   );
 }

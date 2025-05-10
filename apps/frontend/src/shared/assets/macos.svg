@@ -1,0 +1,22 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  xml:space="preserve"
+  width="24"
+  height="24"
+  style="shape-rendering:geometricPrecision;text-rendering:geometricPrecision;image-rendering:optimizeQuality;fill-rule:evenodd;clip-rule:evenodd"
+  viewBox="0 0 847 847"
+><defs><style>.fil1{fill:#fefefe;fill-rule:nonzero}</style></defs><g id="Layer_x0020_1"><circle
+      cx="423"
+      cy="423"
+      r="342"
+      style="fill:#4d63d2"
+    /><path
+      d="M232 266h383c5 0 10 5 10 10v295c0 6-5 10-10 10H232c-6 0-10-4-10-10V276c0-5 4-10 10-10zm373 20H242v275h363V286z"
+      class="fil1"
+    /><path
+      d="M476 217c3-4 10-5 14-1 4 3 4 9 1 14-30 35-52 71-68 107-14 32-22 65-24 98h59c6 0 10 4 10 10v2c-7 35-9 66-6 95s11 54 24 76c3 5 1 11-4 14-4 3-11 1-13-4-15-25-24-53-27-84-3-27-1-57 4-89h-58c-6 0-10-5-10-11 1-39 10-77 27-115 16-38 40-75 71-112z"
+      class="fil1"
+    /><path
+      d="M297 495c-5-3-7-9-5-14 3-4 9-7 14-4 38 19 78 29 118 29s80-10 122-29c5-2 11 0 13 5 3 5 0 11-5 13-44 20-87 31-130 31s-86-11-127-31zM497 326c0-5 5-10 10-10 6 0 10 5 10 10v40c0 6-4 10-10 10-5 0-10-4-10-10v-40zM330 326c0-5 4-10 10-10 5 0 10 5 10 10v40c0 6-5 10-10 10-6 0-10-4-10-10v-40z"
+      class="fil1"
+    /></g></svg>

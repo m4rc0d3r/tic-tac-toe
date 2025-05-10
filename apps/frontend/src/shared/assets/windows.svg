@@ -1,0 +1,11 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  xml:space="preserve"
+  width="24"
+  height="24"
+  style="shape-rendering:geometricPrecision;text-rendering:geometricPrecision;image-rendering:optimizeQuality;fill-rule:evenodd;clip-rule:evenodd"
+  viewBox="0 0 847 847"
+><circle cx="423" cy="423" r="342" style="fill:#01a1ee" /><path
+    d="m235 284 140-21 11-2v155H227V285l8-1zm173-26 187-28 11-2v188H400V259l8-1zm198 182v177l-11-1-187-28-8-2V430h206v10zM375 582l-140-21-8-1V430h159v154l-11-2z"
+    style="fill:#fefefe"
+  /></svg>

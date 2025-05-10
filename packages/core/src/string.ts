@@ -10,6 +10,9 @@ type Comma = typeof COMMA;
 const PERIOD = ".";
 type Period = typeof PERIOD;
 
+const COLON = ":";
+type Colon = typeof COLON;
+
 const UNDERSCORE = "_";
 type Underscore = typeof UNDERSCORE;
 
@@ -18,6 +21,9 @@ type QuestionMark = typeof QUESTION_MARK;
 
 const COMMA_WITH_SPACE = `${COMMA}${SPACE}`;
 type CommaWithSpace = typeof COMMA_WITH_SPACE;
+
+const COLON_WITH_SPACE = `${COLON}${SPACE}`;
+type ColonWithSpace = typeof COLON_WITH_SPACE;
 
 const SLASH = "/";
 type Slash = typeof SLASH;
@@ -37,6 +43,8 @@ export {
   BITS_PER_BYTE,
   BITS_PER_CHARACTER_BASE64,
   capitalize,
+  COLON,
+  COLON_WITH_SPACE,
   COMMA,
   COMMA_WITH_SPACE,
   EMPTY_STRING,
@@ -47,4 +55,15 @@ export {
   SPACE,
   UNDERSCORE,
 };
-export type { Comma, CommaWithSpace, EmptyString, Period, QuestionMark, Slash, Space, Underscore };
+export type {
+  Colon,
+  ColonWithSpace,
+  Comma,
+  CommaWithSpace,
+  EmptyString,
+  Period,
+  QuestionMark,
+  Slash,
+  Space,
+  Underscore,
+};

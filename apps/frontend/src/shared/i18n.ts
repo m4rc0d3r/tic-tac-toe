@@ -154,6 +154,13 @@ const TRANSLATION_KEYS = z.enum([
   "FAILED_TO_AUTHENTICATE_YOU",
   "YOUR_AUTHENTICATION_DATA_IS_CORRUPTED_OR_INCORRECT",
   "YOUR_CURRENT_AUTHENTICATION_SESSION_HAS_ALREADY_EXPIRED",
+  "LOCATION_COULD_NOT_BE_DETERMINED",
+  "THE_DEVICE_COULD_NOT_BE_RECOGNIZED",
+  "NEITHER_THE_DEVICE_NOR_THE_LOCATION_COULD_BE_DETERMINED",
+  "IP_ADDRESS",
+  "OPERATING_SYSTEM",
+  "BROWSER",
+  "NOT_RECOGNIZED",
 ]).Values;
 
 const RESOURCES = {
@@ -290,6 +297,14 @@ const RESOURCES = {
         "your authentication data is corrupted or incorrect",
       [TRANSLATION_KEYS.YOUR_CURRENT_AUTHENTICATION_SESSION_HAS_ALREADY_EXPIRED]:
         "your current authentication session has already expired",
+      [TRANSLATION_KEYS.LOCATION_COULD_NOT_BE_DETERMINED]: "location could not be determined",
+      [TRANSLATION_KEYS.THE_DEVICE_COULD_NOT_BE_RECOGNIZED]: "the device could not be recognized",
+      [TRANSLATION_KEYS.NEITHER_THE_DEVICE_NOR_THE_LOCATION_COULD_BE_DETERMINED]:
+        "neither the device nor the location could be determined",
+      [TRANSLATION_KEYS.IP_ADDRESS]: "IP address",
+      [TRANSLATION_KEYS.OPERATING_SYSTEM]: "operating system",
+      [TRANSLATION_KEYS.BROWSER]: "browser",
+      [TRANSLATION_KEYS.NOT_RECOGNIZED]: "not recognized",
     },
   },
   uk: {
@@ -430,6 +445,14 @@ const RESOURCES = {
         "ваші дані автентифікації пошкоджені або неправильні",
       [TRANSLATION_KEYS.YOUR_CURRENT_AUTHENTICATION_SESSION_HAS_ALREADY_EXPIRED]:
         "термін дії вашого поточного сеансу автентифікації вже минув",
+      [TRANSLATION_KEYS.LOCATION_COULD_NOT_BE_DETERMINED]: "місцезнаходження не вдалося визначити",
+      [TRANSLATION_KEYS.THE_DEVICE_COULD_NOT_BE_RECOGNIZED]: "пристрій не вдалося розпізнати",
+      [TRANSLATION_KEYS.NEITHER_THE_DEVICE_NOR_THE_LOCATION_COULD_BE_DETERMINED]:
+        "ні пристрій, ні місцезнаходження не вдалося визначити",
+      [TRANSLATION_KEYS.IP_ADDRESS]: "IP-адреса",
+      [TRANSLATION_KEYS.OPERATING_SYSTEM]: "операційна система",
+      [TRANSLATION_KEYS.BROWSER]: "браузер",
+      [TRANSLATION_KEYS.NOT_RECOGNIZED]: "не розпізнано",
     },
   },
 };
