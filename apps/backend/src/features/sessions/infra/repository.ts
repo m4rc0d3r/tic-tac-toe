@@ -1,7 +1,12 @@
-import type { PrismaClient } from "@prisma/client";
+import type { PrismaClient, Session as SessionModel } from "@prisma/client";
 import type { ExcludeUndefinedFromOptionalKeys } from "@tic-tac-toe/core";
-import { createPageMeta, getTheNumberOfSkippedItems } from "@tic-tac-toe/core";
-import { either as e, taskEither as te } from "fp-ts";
+import {
+  createPageMeta,
+  EMPTY_STRING,
+  getTheNumberOfSkippedItems,
+  mapParsedUserAgent,
+} from "@tic-tac-toe/core";
+import { either as e, function as f, taskEither as te } from "fp-ts";
 
 import { SessionsRepository } from "../app/ports";
 import type {
@@ -29,14 +34,39 @@ class PrismaSessionsRepository extends SessionsRepository {
     super();
   }
 
-  override async createOne(
-    params: CreateOneIn,
-  ): Promise<e.Either<UniqueKeyViolationError<SessionFieldsInUniqueConstraints>, CreateOneOut>> {
+  override async createOne({
+    device,
+    os,
+    browser,
+    ...params
+  }: CreateOneIn): Promise<
+    e.Either<UniqueKeyViolationError<SessionFieldsInUniqueConstraints>, CreateOneOut>
+  > {
     return te.tryCatch(
-      () =>
-        this.prisma.session.create({
-          data: params,
-        }),
+      async () => {
+        return mapModelToEntity(
+          await this.prisma.session.create({
+            data: {
+              ...mapParsedUserAgent({
+                device: device ?? {
+                  type: EMPTY_STRING,
+                  vendor: EMPTY_STRING,
+                  model: EMPTY_STRING,
+                },
+                os: os ?? {
+                  name: EMPTY_STRING,
+                  version: EMPTY_STRING,
+                },
+                browser: browser ?? {
+                  name: EMPTY_STRING,
+                  version: EMPTY_STRING,
+                },
+              }),
+              ...params,
+            },
+          }),
+        );
+      },
       (reason) => {
         if (isUniqueKeyViolation(reason)) {
           const target = reason.meta.target;
@@ -59,13 +89,15 @@ class PrismaSessionsRepository extends SessionsRepository {
     >
   > {
     return te.tryCatch(
-      () =>
-        this.prisma.session.update({
-          where: {
-            id,
-          },
-          data: rest as ExcludeUndefinedFromOptionalKeys<typeof rest>,
-        }),
+      async () =>
+        mapModelToEntity(
+          await this.prisma.session.update({
+            where: {
+              id,
+            },
+            data: rest as ExcludeUndefinedFromOptionalKeys<typeof rest>,
+          }),
+        ),
       (reason) => {
         if (isUniqueKeyViolation(reason)) {
           const target = reason.meta.target;
@@ -83,10 +115,13 @@ class PrismaSessionsRepository extends SessionsRepository {
   }
 
   override async findOne(params: FindOneIn): Promise<e.Either<NotFoundError, FindOneOut>> {
-    return e.fromNullable(new NotFoundError(params))(
-      await this.prisma.session.findFirst({
-        where: params,
-      }),
+    return f.pipe(
+      e.fromNullable(new NotFoundError(params))(
+        await this.prisma.session.findFirst({
+          where: params,
+        }),
+      ),
+      e.map(mapModelToEntity),
     );
   }
 
@@ -101,7 +136,7 @@ class PrismaSessionsRepository extends SessionsRepository {
       take: pageOptions.take,
     });
     return {
-      data: sessions,
+      data: sessions.map(mapModelToEntity),
       meta: createPageMeta(pageOptions, numberOfSessions),
     };
   }
@@ -109,13 +144,15 @@ class PrismaSessionsRepository extends SessionsRepository {
   override async deleteOne(params: DeleteOneIn): Promise<e.Either<NotFoundError, DeleteOneOut>> {
     const { id, userId } = params;
     return te.tryCatch(
-      () =>
-        this.prisma.session.delete({
-          where: {
-            id,
-            ...(userId && { userId }),
-          },
-        }),
+      async () =>
+        mapModelToEntity(
+          await this.prisma.session.delete({
+            where: {
+              id,
+              ...(userId && { userId }),
+            },
+          }),
+        ),
       (reason) => {
         if (isNotFoundError(reason)) {
           return new NotFoundError({
@@ -141,6 +178,32 @@ class PrismaSessionsRepository extends SessionsRepository {
       })
     ).count;
   }
+}
+
+function mapModelToEntity(value: SessionModel): FindOneOut {
+  const {
+    deviceType,
+    deviceVendor,
+    deviceModel,
+    osName,
+    osVersion,
+    browserName,
+    browserVersion,
+    ...sessionModel
+  } = value;
+
+  return {
+    ...sessionModel,
+    ...mapParsedUserAgent({
+      deviceType,
+      deviceVendor,
+      deviceModel,
+      osName,
+      osVersion,
+      browserName,
+      browserVersion,
+    }),
+  };
 }
 
 export { PrismaSessionsRepository };

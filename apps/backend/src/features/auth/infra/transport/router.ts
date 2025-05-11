@@ -1,6 +1,6 @@
+import type { UserAgentParserFunction } from "@tic-tac-toe/core";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { getClientIp } from "request-ip";
-import { UAParser } from "ua-parser-js";
 
 import type { LoginOut, RegisterOut } from "./ios";
 import { zLoginIn, zRegisterIn } from "./ios";
@@ -22,6 +22,7 @@ const authRouter = trpcRouter({
           },
           usersService,
           sessionsService,
+          parseUserAgent,
         },
         input: { registrationType, ...input },
       } = opts;
@@ -34,7 +35,7 @@ const authRouter = trpcRouter({
 
       const me = getUserWithoutPasswordHash(resultOfCreation.right);
 
-      await setUpSession(req, res, sessionsService, cookieName, me.id);
+      await setUpSession(req, res, sessionsService, parseUserAgent, cookieName, me.id);
 
       return {
         me,
@@ -53,6 +54,7 @@ const authRouter = trpcRouter({
           },
           usersService,
           sessionsService,
+          parseUserAgent,
         },
         input: { email, password },
       } = opts;
@@ -68,7 +70,7 @@ const authRouter = trpcRouter({
 
       const me = getUserWithoutPasswordHash(searchResult.right);
 
-      await setUpSession(req, res, sessionsService, cookieName, me.id);
+      await setUpSession(req, res, sessionsService, parseUserAgent, cookieName, me.id);
 
       return {
         me,
@@ -119,10 +121,11 @@ async function setUpSession(
   req: FastifyRequest,
   res: FastifyReply,
   sessionsService: SessionsService,
+  parseUserAgent: UserAgentParserFunction,
   cookieName: string,
   userId: User["id"],
 ) {
-  const eitherSession = await createSession(req, sessionsService, userId);
+  const eitherSession = await createSession(req, sessionsService, parseUserAgent, userId);
   if (eitherSession._tag === "Right") {
     setSessionCookie(res, eitherSession.right, cookieName);
   } else {
@@ -133,17 +136,17 @@ async function setUpSession(
 async function createSession(
   req: FastifyRequest,
   sessionsService: SessionsService,
+  parseUserAgent: UserAgentParserFunction,
   userId: User["id"],
 ) {
   const ip = getClientIp(req);
-  const { browser, os } = UAParser(req.headers["user-agent"]);
+  const ua = req.headers["user-agent"] ?? "";
 
   return sessionsService.createOne({
-    browser: browser.toString(),
-    geolocation: "",
+    ua,
     ip,
-    os: os.toString(),
     userId,
+    ...parseUserAgent(ua),
   });
 }
 

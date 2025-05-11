@@ -30,11 +30,17 @@ model User {
 model Session {
   id         String   @id @db.Char(32)
   ip         String?  @db.Inet
-  ua         String   @default("")
-  os         String   @default("")
-  browser    String   @default("")
   createdAt  DateTime @default(now()) @map("created_at")
   maximumAge Int      @map("maximum_age")
+
+  ua             String @default("")
+  deviceType     String @default("") @map("device_type")
+  deviceVendor   String @default("") @map("device_vendor")
+  deviceModel    String @default("") @map("device_model")
+  osName         String @default("") @map("os_name")
+  osVersion      String @default("") @map("os_version")
+  browserName    String @default("") @map("browser_name")
+  browserVersion String @default("") @map("browser_version")
 
   user   User @relation(fields: [userId], references: [id])
   userId Int  @map("user_id")

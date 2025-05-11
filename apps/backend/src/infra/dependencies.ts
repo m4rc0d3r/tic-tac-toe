@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { uaParserJs } from "@tic-tac-toe/core";
 import type { FastifyBaseLogger } from "fastify";
 
 import type { Config } from "./config";
@@ -23,6 +24,8 @@ function createDependencies(config: Config, logger: FastifyBaseLogger) {
   const usersService = new UsersService(usersRepository, hashingService, blobService);
   const sessionsService = new SessionsService(config, sessionsRepository);
 
+  const parseUserAgent = uaParserJs;
+
   if (config.app.nodeEnv === "dev") {
     withMethodTracing(usersRepository, logger);
     withMethodTracing(hashingService, logger);
@@ -35,6 +38,7 @@ function createDependencies(config: Config, logger: FastifyBaseLogger) {
     config,
     usersService,
     sessionsService,
+    parseUserAgent,
   };
 }
 
