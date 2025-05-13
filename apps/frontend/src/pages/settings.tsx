@@ -36,7 +36,7 @@ import { zfd } from "zod-form-data";
 
 import { useAuthStore } from "~/entities/auth";
 import type { TrpcErrorCause } from "~/shared/api";
-import { trpc } from "~/shared/api";
+import { trpc, useTrpcMutationState } from "~/shared/api";
 import AndroidIcon from "~/shared/assets/android.svg?react";
 import ChromeIcon from "~/shared/assets/chrome.svg?react";
 import EdgeIcon from "~/shared/assets/edge.svg?react";
@@ -145,11 +145,28 @@ function SettingsPage() {
     trpc.users.updatePersonalData.useMutation();
   const { mutate: updateCredentials, isPending: isUpdateCredentialsPending } =
     trpc.users.updateCredentials.useMutation();
-  const {
-    mutate: deleteSession,
-    isPending: isDeleteSessionPending,
-    variables: { id: sessionIdBeingDeleted } = {},
-  } = trpc.sessions.deleteOne.useMutation();
+
+  const deleteSessionProcedure = trpc.sessions.deleteOne;
+  const { mutate: deleteSession } = deleteSessionProcedure.useMutation({
+    onSuccess: (_data, variables) => {
+      toast.success(tc(TRANSLATION_KEYS.SESSION_SUCCESSFULLY_TERMINATED));
+      if (variables.id === mySessions?.data.find(({ isCurrent }) => isCurrent)?.id) {
+        logoutLocally();
+      } else {
+        void queryClient.invalidateQueries({
+          queryKey: getMySessionsQueryKey,
+        });
+      }
+    },
+    onError: (error) => {
+      handleTrpcError(error, TRANSLATION_KEYS.FAILED_TO_TERMINATE_SESSION);
+    },
+  });
+  const deletingSessionIds = useTrpcMutationState(deleteSessionProcedure, {
+    filters: { status: "pending" },
+    select: ({ state: { variables } }) => variables?.id,
+  });
+
   const { mutate: deleteMySessions, isPending: isDeleteMySessionsPending } =
     trpc.sessions.deleteMySessions.useMutation();
 
@@ -157,6 +174,7 @@ function SettingsPage() {
     page: 1,
     take: 10,
   });
+
   const getMySessionsProcedure = trpc.sessions.getMySessions;
   const {
     data: mySessions,
@@ -275,28 +293,8 @@ function SettingsPage() {
     });
   };
 
-  const handleSessionDelete = (
-    id: Parameters<typeof deleteSession>[0]["id"],
-    isCurrent: boolean,
-  ) => {
-    deleteSession(
-      { id },
-      {
-        onSuccess: () => {
-          toast.success(tc(TRANSLATION_KEYS.SESSION_SUCCESSFULLY_TERMINATED));
-          if (isCurrent) {
-            logoutLocally();
-          } else {
-            void queryClient.invalidateQueries({
-              queryKey: getMySessionsQueryKey,
-            });
-          }
-        },
-        onError: (error) => {
-          handleTrpcError(error, TRANSLATION_KEYS.FAILED_TO_TERMINATE_SESSION);
-        },
-      },
-    );
+  const handleSessionDelete = (id: Parameters<typeof deleteSession>[0]["id"]) => {
+    deleteSession({ id });
   };
 
   const handleDeleteMySessions = (
@@ -607,13 +605,13 @@ function SettingsPage() {
                   <Spinner className="absolute top-1/2 left-1/2 size-16 -translate-1/2" />
                 )}
                 {mySessions.data.map((session) => {
-                  const { id, isCurrent } = session;
+                  const { id } = session;
                   return (
                     <SessionCard
                       key={id}
                       session={session}
-                      isSessionBeingDeleted={isDeleteSessionPending && id === sessionIdBeingDeleted}
-                      onSessionDelete={() => handleSessionDelete(id, isCurrent)}
+                      isSessionBeingDeleted={deletingSessionIds.includes(id)}
+                      onSessionDelete={() => handleSessionDelete(id)}
                     />
                   );
                 })}
