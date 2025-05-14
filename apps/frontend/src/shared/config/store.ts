@@ -15,6 +15,9 @@ const initialState: Config = {
       throw new Error("Function not implemented.");
     },
   },
+  session: {
+    lastAccessDateUpdateInterval: 0,
+  },
   trpc: {
     prefix: EMPTY_STRING,
   },
