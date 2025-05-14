@@ -14,6 +14,7 @@ const zMySession = zSession
     device: true,
     os: true,
     browser: true,
+    lastAccessedAt: true,
   })
   .extend({
     isCurrent: z.boolean(),

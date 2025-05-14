@@ -4,6 +4,7 @@ import { zSession } from "~/core";
 
 const zCreateOneIn = zSession.omit({
   createdAt: true,
+  lastAccessedAt: true,
 });
 type CreateOneIn = z.infer<typeof zCreateOneIn>;
 

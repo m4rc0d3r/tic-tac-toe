@@ -14,6 +14,7 @@ const zSession = z.object({
   os: zOs.nullable(),
   browser: zBrowser.nullable(),
   createdAt: z.date(),
+  lastAccessedAt: z.date(),
   maximumAge: z.number().int().gt(0),
   userId: zBasicUser.shape.id,
 });

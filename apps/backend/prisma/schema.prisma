@@ -28,9 +28,10 @@ model User {
 }
 
 model Session {
-  id         String   @id @db.Char(32)
-  createdAt  DateTime @default(now()) @map("created_at")
-  maximumAge Int      @map("maximum_age")
+  id             String   @id @db.Char(32)
+  createdAt      DateTime @default(now()) @map("created_at")
+  lastAccessedAt DateTime @default(now()) @map("last_accessed_at")
+  maximumAge     Int      @map("maximum_age")
 
   ip          String? @db.Inet
   latitude    Float?
