@@ -20,6 +20,8 @@ import type {
   FindOneOut,
   ListIn,
   ListOut,
+  UpdateLastAccessDateIn,
+  UpdateLastAccessDateOut,
   UpdateOneIn,
   UpdateOneOut,
 } from "../app/ports/repository";
@@ -113,6 +115,32 @@ class PrismaSessionsRepository extends SessionsRepository {
             return new UniqueKeyViolationError(target);
           }
         } else if (isNotFoundError(reason)) {
+          return new NotFoundError({
+            id,
+          });
+        }
+        throw reason;
+      },
+    )();
+  }
+
+  override async updateLastAccessDate({
+    id,
+  }: UpdateLastAccessDateIn): Promise<e.Either<NotFoundError, UpdateLastAccessDateOut>> {
+    return te.tryCatch(
+      async () =>
+        mapModelToEntity(
+          await this.prisma.session.update({
+            where: {
+              id,
+            },
+            data: {
+              lastAccessedAt: new Date(),
+            },
+          }),
+        ),
+      (reason) => {
+        if (isNotFoundError(reason)) {
           return new NotFoundError({
             id,
           });

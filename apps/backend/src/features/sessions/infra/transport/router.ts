@@ -4,6 +4,29 @@ import { zDeleteMySessionsIn, zDeleteOneIn, zGetMySessionsIn, zGetMySessionsOut 
 import { procedureWithTracing, toTrpcError, trpcProcedureWithAuth, trpcRouter } from "~/infra";
 
 const sessionsRouter = trpcRouter({
+  updateLastAccessDate: trpcProcedureWithAuth.mutation(
+    procedureWithTracing(async (opts) => {
+      const {
+        ctx: {
+          sessionsService,
+          session: { id },
+        },
+      } = opts;
+
+      const updateResult = await sessionsService.updateLastAccessDate({
+        id,
+      });
+
+      if (updateResult._tag === "Left") {
+        throw toTrpcError(updateResult.left);
+      }
+
+      const { lastAccessedAt } = updateResult.right;
+      return {
+        lastAccessedAt,
+      };
+    }),
+  ),
   deleteOne: trpcProcedureWithAuth.input(zDeleteOneIn).mutation(
     procedureWithTracing(async (opts) => {
       const {

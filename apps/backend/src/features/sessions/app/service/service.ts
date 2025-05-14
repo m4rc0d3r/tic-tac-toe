@@ -11,6 +11,8 @@ import type {
   FindOneOut,
   ListIn,
   ListOut,
+  UpdateLastAccessDateIn,
+  UpdateLastAccessDateOut,
   UpdateOneIn,
   UpdateOneOut,
 } from "../ports/repository";
@@ -49,6 +51,12 @@ class SessionsService {
     >
   > {
     return this.sessionsRepository.updateOne(params);
+  }
+
+  updateLastAccessDate(
+    params: UpdateLastAccessDateIn,
+  ): Promise<e.Either<NotFoundError, UpdateLastAccessDateOut>> {
+    return this.sessionsRepository.updateLastAccessDate(params);
   }
 
   findOne(params: FindOneIn): Promise<e.Either<NotFoundError, FindOneOut>> {

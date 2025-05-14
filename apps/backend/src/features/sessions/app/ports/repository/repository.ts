@@ -11,6 +11,8 @@ import type {
   FindOneOut,
   ListIn,
   ListOut,
+  UpdateLastAccessDateIn,
+  UpdateLastAccessDateOut,
   UpdateOneIn,
   UpdateOneOut,
 } from "./ios";
@@ -30,6 +32,9 @@ abstract class SessionsRepository {
       UpdateOneOut
     >
   >;
+  abstract updateLastAccessDate(
+    params: UpdateLastAccessDateIn,
+  ): Promise<e.Either<NotFoundError, UpdateLastAccessDateOut>>;
   abstract findOne(params: FindOneIn): Promise<e.Either<NotFoundError, FindOneOut>>;
   abstract list(params: ListIn): Promise<ListOut>;
   abstract deleteOne(params: DeleteOneIn): Promise<e.Either<NotFoundError, DeleteOneOut>>;
