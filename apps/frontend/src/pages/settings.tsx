@@ -48,7 +48,13 @@ import OperaIcon from "~/shared/assets/opera.svg?react";
 import QuestionIcon from "~/shared/assets/question.svg?react";
 import SafariIcon from "~/shared/assets/safari.svg?react";
 import WindowsIcon from "~/shared/assets/windows.svg?react";
-import { createTsp, formatDuration, TRANSLATION_KEYS, useTranslation2 } from "~/shared/i18n";
+import {
+  createTsp,
+  formatDateTime,
+  formatDuration,
+  TRANSLATION_KEYS,
+  useTranslation2,
+} from "~/shared/i18n";
 import { listWithConjunction } from "~/shared/lib/text";
 import { errorMapForForms } from "~/shared/lib/zod";
 import { Badge } from "~/shared/ui/badge";
@@ -609,7 +615,7 @@ function SettingsPage() {
                   return (
                     <SessionCard
                       key={id}
-                      session={session}
+                      session={{ ...session, lastAccessedAt: new Date(session.lastAccessedAt) }}
                       isSessionBeingDeleted={deletingSessionIds.includes(id)}
                       onSessionDelete={() => handleSessionDelete(id)}
                     />
@@ -667,11 +673,14 @@ function SessionCard({
   ...props
 }: SessionCardProps) {
   const {
-    translation: { t },
+    translation: {
+      t,
+      i18n: { language },
+    },
     postproc: { tc },
   } = useTranslation2();
 
-  const { ip, geolocation, device, os, browser, isCurrent } = session;
+  const { ip, geolocation, device, os, browser, lastAccessedAt, isCurrent } = session;
 
   const ICONS_BY_COMMON_DEVICE_TYPE: Record<string, ComponentType> = {
     [zCommonDeviceType.Values.desktop]: Monitor,
@@ -769,6 +778,11 @@ function SessionCard({
                   t(TRANSLATION_KEYS.NOT_RECOGNIZED),
               ].join(COLON_WITH_SPACE)}
               <BrowserIcon className="size-6" />
+            </p>
+            <p>
+              {[tc(TRANSLATION_KEYS.LAST_ACCESS), formatDateTime(language, lastAccessedAt)].join(
+                COLON_WITH_SPACE,
+              )}
             </p>
           </CardDescription>
         </div>

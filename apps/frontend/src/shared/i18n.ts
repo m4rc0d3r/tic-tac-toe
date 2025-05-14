@@ -161,6 +161,7 @@ const TRANSLATION_KEYS = z.enum([
   "OPERATING_SYSTEM",
   "BROWSER",
   "NOT_RECOGNIZED",
+  "LAST_ACCESS",
 ]).Values;
 
 const RESOURCES = {
@@ -305,6 +306,7 @@ const RESOURCES = {
       [TRANSLATION_KEYS.OPERATING_SYSTEM]: "operating system",
       [TRANSLATION_KEYS.BROWSER]: "browser",
       [TRANSLATION_KEYS.NOT_RECOGNIZED]: "not recognized",
+      [TRANSLATION_KEYS.LAST_ACCESS]: "last access",
     },
   },
   uk: {
@@ -453,6 +455,7 @@ const RESOURCES = {
       [TRANSLATION_KEYS.OPERATING_SYSTEM]: "операційна система",
       [TRANSLATION_KEYS.BROWSER]: "браузер",
       [TRANSLATION_KEYS.NOT_RECOGNIZED]: "не розпізнано",
+      [TRANSLATION_KEYS.LAST_ACCESS]: "останній доступ",
     },
   },
 };
@@ -512,6 +515,13 @@ function createTs<Ns extends Namespace, KPrefix>(t: TFunction<Ns, KPrefix>) {
 
 function createTsp<Ns extends Namespace, KPrefix>(t: TFunction<Ns, KPrefix>) {
   return (...args: Parameters<typeof t>) => createTs(t)(".")(...args);
+}
+
+function formatDateTime(language: string, date: Date | number) {
+  return new Intl.DateTimeFormat(language, {
+    dateStyle: "medium",
+    timeStyle: "medium",
+  }).format(date);
 }
 
 function formatDuration(language: string, duration_: Duration) {
@@ -590,6 +600,7 @@ export {
   createTc,
   createTs,
   createTsp,
+  formatDateTime,
   formatDuration,
   GENDERS,
   PLURALS,
