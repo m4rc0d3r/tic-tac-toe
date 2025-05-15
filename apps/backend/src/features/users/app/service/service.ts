@@ -6,6 +6,8 @@ import type {
   FindOneByOut,
   FindOneWithLastOnlineDateIn,
   FindOneWithLastOnlineDateOut,
+  ListByNicknameIn,
+  ListByNicknameOut,
   ListOut,
 } from "../ports/repository";
 
@@ -151,6 +153,10 @@ class UsersService {
 
   async list(): Promise<ListOut> {
     return await this.usersRepository.list();
+  }
+
+  async listByNickname(params: ListByNicknameIn): Promise<ListByNicknameOut> {
+    return await this.usersRepository.listByNickname(params);
   }
 }
 

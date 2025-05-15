@@ -23,4 +23,14 @@ function isNotFoundError(error: unknown): error is PrismaClientKnownRequestError
   return error instanceof PrismaClientKnownRequestError && error.code === NOT_FOUND_CODE;
 }
 
-export { isNotFoundError, isUniqueKeyViolation };
+const SYMBOLS = ["%", "_"];
+
+function escapeLikeArgument(value: string) {
+  let escapedValue = value;
+  for (const symbol of SYMBOLS) {
+    escapedValue = escapedValue.replaceAll(symbol, `\\${symbol}`);
+  }
+  return escapedValue;
+}
+
+export { escapeLikeArgument, isNotFoundError, isUniqueKeyViolation };

@@ -1,6 +1,14 @@
+import { zListByNicknameIn } from "../../app/ports/repository";
+
 import { UserUpdateError } from "./errors";
 import type { UpdateCredentialsOut, UpdatePersonalDataOut } from "./ios";
-import { zGetUserIn, zGetUserOut, zUpdateCredentialsIn, zUpdatePersonalDataIn } from "./ios";
+import {
+  zGetUserIn,
+  zGetUserOut,
+  zGetUsersByNicknameOut,
+  zUpdateCredentialsIn,
+  zUpdatePersonalDataIn,
+} from "./ios";
 
 import type { FullyRegisteredUser } from "~/core";
 import {
@@ -115,6 +123,17 @@ const usersRouter = trpcRouter({
       }
 
       return zGetUserOut.parse(searchResult.right);
+    }),
+  ),
+
+  getUsersByNickname: trpcProcedure.input(zListByNicknameIn).query(
+    procedureWithTracing(async (opts) => {
+      const {
+        ctx: { usersService },
+        input,
+      } = opts;
+
+      return zGetUsersByNicknameOut.parse(await usersService.listByNickname(input));
     }),
   ),
 });

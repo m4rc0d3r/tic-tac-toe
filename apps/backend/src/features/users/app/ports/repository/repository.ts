@@ -7,6 +7,8 @@ import type {
   FindOneByOut,
   FindOneWithLastOnlineDateIn,
   FindOneWithLastOnlineDateOut,
+  ListByNicknameIn,
+  ListByNicknameOut,
   ListOut,
   UpdateIn,
   UpdateOut,
@@ -29,6 +31,7 @@ abstract class UsersRepository {
     params: FindOneWithLastOnlineDateIn,
   ): Promise<e.Either<NotFoundError, FindOneWithLastOnlineDateOut>>;
   abstract list(): Promise<ListOut>;
+  abstract listByNickname(params: ListByNicknameIn): Promise<ListByNicknameOut>;
 }
 
 export { UsersRepository };

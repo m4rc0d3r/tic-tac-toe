@@ -1,6 +1,7 @@
 import type { PrismaClient, User as UserModel } from "@prisma/client";
-import { getUserWithLastOnlineDate } from "@prisma/client/sql";
+import { getUsersWithLastOnlineDate, getUserWithLastOnlineDate } from "@prisma/client/sql";
 import type { ExcludeUndefinedFromOptionalKeys } from "@tic-tac-toe/core";
+import { createPageMeta, getTheNumberOfSkippedItems } from "@tic-tac-toe/core";
 import { camelCase } from "change-case-all";
 import { either as e, function as f, taskEither as te } from "fp-ts";
 
@@ -11,6 +12,8 @@ import type {
   FindOneByOut,
   FindOneWithLastOnlineDateIn,
   FindOneWithLastOnlineDateOut,
+  ListByNicknameIn,
+  ListByNicknameOut,
   ListOut,
   UpdateIn,
   UpdateOut,
@@ -20,7 +23,7 @@ import { UsersRepository } from "../app/ports/repository";
 import { NotFoundError, UniqueKeyViolationError } from "~/app";
 import type { FullyRegisteredUser, UserFieldsInUniqueConstraints } from "~/core";
 import { isConstrainedFields, userFieldsInUniqueConstraints } from "~/core";
-import { isNotFoundError, isUniqueKeyViolation } from "~/infra";
+import { escapeLikeArgument, isNotFoundError, isUniqueKeyViolation } from "~/infra";
 
 class PrismaUsersRepository extends UsersRepository {
   constructor(private readonly prisma: PrismaClient) {
@@ -104,6 +107,32 @@ class PrismaUsersRepository extends UsersRepository {
 
   override async list(): Promise<ListOut> {
     return (await this.prisma.user.findMany()).map(mapModelToEntity);
+  }
+
+  override async listByNickname({
+    nicknamePrefix,
+    pageOptions,
+  }: ListByNicknameIn): Promise<ListByNicknameOut> {
+    const numberOfUsers = await this.prisma.user.count({
+      where: {
+        nickname: {
+          startsWith: nicknamePrefix,
+        },
+      },
+    });
+
+    return {
+      data: (
+        await this.prisma.$queryRawTyped(
+          getUsersWithLastOnlineDate(
+            `${escapeLikeArgument(nicknamePrefix)}%`,
+            pageOptions.take,
+            getTheNumberOfSkippedItems(pageOptions),
+          ),
+        )
+      ).map(mapModelWithLastOnlineDateToEntity),
+      meta: createPageMeta(pageOptions, numberOfUsers),
+    };
   }
 }
 
