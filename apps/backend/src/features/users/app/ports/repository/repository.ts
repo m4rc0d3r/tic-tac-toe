@@ -5,6 +5,8 @@ import type {
   CreateOut,
   FindOneByIn,
   FindOneByOut,
+  FindOneWithLastOnlineDateIn,
+  FindOneWithLastOnlineDateOut,
   ListOut,
   UpdateIn,
   UpdateOut,
@@ -23,6 +25,9 @@ abstract class UsersRepository {
     e.Either<UniqueKeyViolationError<UserFieldsInUniqueConstraints> | NotFoundError, UpdateOut>
   >;
   abstract findOneBy(params: FindOneByIn): Promise<e.Either<NotFoundError, FindOneByOut>>;
+  abstract findOneWithLastOnlineDate(
+    params: FindOneWithLastOnlineDateIn,
+  ): Promise<e.Either<NotFoundError, FindOneWithLastOnlineDateOut>>;
   abstract list(): Promise<ListOut>;
 }
 

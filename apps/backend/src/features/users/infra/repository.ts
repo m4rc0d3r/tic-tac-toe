@@ -1,5 +1,7 @@
 import type { PrismaClient, User as UserModel } from "@prisma/client";
+import { getUserWithLastOnlineDate } from "@prisma/client/sql";
 import type { ExcludeUndefinedFromOptionalKeys } from "@tic-tac-toe/core";
+import { camelCase } from "change-case-all";
 import { either as e, function as f, taskEither as te } from "fp-ts";
 
 import type {
@@ -7,6 +9,8 @@ import type {
   CreateOut,
   FindOneByIn,
   FindOneByOut,
+  FindOneWithLastOnlineDateIn,
+  FindOneWithLastOnlineDateOut,
   ListOut,
   UpdateIn,
   UpdateOut,
@@ -88,6 +92,16 @@ class PrismaUsersRepository extends UsersRepository {
     );
   }
 
+  override async findOneWithLastOnlineDate(
+    params: FindOneWithLastOnlineDateIn,
+  ): Promise<e.Either<NotFoundError, FindOneWithLastOnlineDateOut>> {
+    return f.pipe(
+      (await this.prisma.$queryRawTyped(getUserWithLastOnlineDate(params.id)))[0],
+      e.fromNullable(new NotFoundError(params)),
+      e.map(mapModelWithLastOnlineDateToEntity),
+    );
+  }
+
   override async list(): Promise<ListOut> {
     return (await this.prisma.user.findMany()).map(mapModelToEntity);
   }
@@ -109,6 +123,19 @@ function mapModelToEntity(userModel: UserModel): CreateOut {
   return isFullyRegisteredUser(userModel)
     ? ({ registrationStatus: "FULL", ...userModel } as const)
     : ({ registrationStatus: "PARTIAL", ...sharedUserModel } as const);
+}
+
+function mapModelWithLastOnlineDateToEntity(
+  userModel: getUserWithLastOnlineDate.Result,
+): FindOneWithLastOnlineDateOut {
+  return f.pipe(
+    userModel,
+    (userModel) =>
+      Object.fromEntries(
+        Object.entries(userModel).map(([key, value]) => [camelCase(key), value]),
+      ) as UserModel & Pick<FindOneWithLastOnlineDateOut, "lastOnlineAt">,
+    ({ lastOnlineAt, ...userModel }) => ({ ...mapModelToEntity(userModel), lastOnlineAt }),
+  );
 }
 
 export { PrismaUsersRepository };

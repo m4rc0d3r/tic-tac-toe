@@ -1,7 +1,13 @@
 import { either as e, function as f } from "fp-ts";
 
 import type { BlobService, HashingService, UsersRepository } from "../ports";
-import type { CreateOut, FindOneByOut, ListOut } from "../ports/repository";
+import type {
+  CreateOut,
+  FindOneByOut,
+  FindOneWithLastOnlineDateIn,
+  FindOneWithLastOnlineDateOut,
+  ListOut,
+} from "../ports/repository";
 
 import type {
   CreateIn,
@@ -135,6 +141,12 @@ class UsersService {
       searchResult.right.passwordHash,
     );
     return comparisonResult ? searchResult : e.left(new NotFoundError(newParams));
+  }
+
+  async findOneWithLastOnlineDate(
+    params: FindOneWithLastOnlineDateIn,
+  ): Promise<e.Either<NotFoundError, FindOneWithLastOnlineDateOut>> {
+    return await this.usersRepository.findOneWithLastOnlineDate(params);
   }
 
   async list(): Promise<ListOut> {

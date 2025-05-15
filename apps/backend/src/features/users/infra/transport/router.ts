@@ -1,12 +1,13 @@
 import { UserUpdateError } from "./errors";
 import type { UpdateCredentialsOut, UpdatePersonalDataOut } from "./ios";
-import { zUpdateCredentialsIn, zUpdatePersonalDataIn } from "./ios";
+import { zGetUserIn, zGetUserOut, zUpdateCredentialsIn, zUpdatePersonalDataIn } from "./ios";
 
 import type { FullyRegisteredUser } from "~/core";
 import {
   procedureWithTracing,
   processFormData,
   toTrpcError,
+  trpcProcedure,
   trpcProcedureWithAuth,
   trpcRouter,
 } from "~/infra";
@@ -95,6 +96,25 @@ const usersRouter = trpcRouter({
       }
 
       return searchResult.right;
+    }),
+  ),
+
+  getUser: trpcProcedure.input(zGetUserIn).query(
+    procedureWithTracing(async (opts) => {
+      const {
+        ctx: { usersService },
+        input: { id },
+      } = opts;
+
+      const searchResult = await usersService.findOneWithLastOnlineDate({
+        id,
+      });
+
+      if (searchResult._tag === "Left") {
+        throw toTrpcError(searchResult.left);
+      }
+
+      return zGetUserOut.parse(searchResult.right);
     }),
   ),
 });
