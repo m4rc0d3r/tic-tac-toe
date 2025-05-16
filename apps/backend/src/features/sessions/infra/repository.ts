@@ -1,4 +1,5 @@
 import type { PrismaClient, Session as SessionModel } from "@prisma/client";
+import { getUnexpiredUserSessions } from "@prisma/client/sql";
 import type { ExcludeUndefinedFromOptionalKeys } from "@tic-tac-toe/core";
 import {
   createPageMeta,
@@ -6,6 +7,7 @@ import {
   getTheNumberOfSkippedItems,
   mapParsedUserAgent,
 } from "@tic-tac-toe/core";
+import { camelCase } from "change-case-all";
 import { either as e, function as f, taskEither as te } from "fp-ts";
 
 import { SessionsRepository } from "../app/ports";
@@ -162,17 +164,27 @@ class PrismaSessionsRepository extends SessionsRepository {
   }
 
   override async list({ filter, pageOptions }: ListIn): Promise<ListOut> {
-    const args = {
+    const numberOfSessions = await this.prisma.session.count({
       where: filter,
-    };
-    const numberOfSessions = await this.prisma.session.count(args);
-    const sessions = await this.prisma.session.findMany({
-      ...args,
-      skip: getTheNumberOfSkippedItems(pageOptions),
-      take: pageOptions.take,
     });
+    const sessions = await this.prisma.$queryRawTyped(
+      getUnexpiredUserSessions(
+        filter.userId,
+        pageOptions.take,
+        getTheNumberOfSkippedItems(pageOptions),
+      ),
+    );
     return {
-      data: sessions.map(mapModelToEntity),
+      data: sessions.map((session) =>
+        f.pipe(
+          session,
+          (session) =>
+            Object.fromEntries(
+              Object.entries(session).map(([key, value]) => [camelCase(key), value]),
+            ) as SessionModel,
+          mapModelToEntity,
+        ),
+      ),
       meta: createPageMeta(pageOptions, numberOfSessions),
     };
   }
