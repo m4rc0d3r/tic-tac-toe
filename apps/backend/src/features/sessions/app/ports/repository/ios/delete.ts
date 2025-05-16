@@ -8,7 +8,7 @@ const zDeleteIn = zSession
   })
   .merge(
     z.object({
-      exceptForSessionId: zSession.shape.id.optional(),
+      exceptForSessionId: zSession.shape.id,
     }),
   );
 type DeleteIn = z.infer<typeof zDeleteIn>;

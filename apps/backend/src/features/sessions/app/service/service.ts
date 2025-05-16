@@ -19,7 +19,7 @@ import type {
 import { isSessionExpired } from "../utils";
 
 import { SessionDeletionError } from "./errors";
-import type { CreateOneIn, DeleteOneIn, DeleteUserSessionsIn } from "./ios";
+import type { CreateOneIn, DeleteOneIn, DeleteOtherUserSessionsIn } from "./ios";
 
 import type { NotFoundError, UniqueKeyViolationError } from "~/app";
 import type { Session, SessionFieldsInUniqueConstraints } from "~/core";
@@ -89,10 +89,9 @@ class SessionsService {
     });
   }
 
-  async deleteUserSessions({
+  async deleteOtherUserSessions({
     initiatingSessionId,
-    deleteMode,
-  }: DeleteUserSessionsIn): Promise<e.Either<SessionDeletionError, DeleteOut>> {
+  }: DeleteOtherUserSessionsIn): Promise<e.Either<SessionDeletionError, DeleteOut>> {
     const eitherInitiatingSession =
       await this.getSessionOrReasonWhyItCannotDeleteOthers(initiatingSessionId);
     if (eitherInitiatingSession._tag === "Left") {
@@ -104,7 +103,7 @@ class SessionsService {
     return e.right(
       await this.sessionsRepository.delete({
         userId: initiatingSession.userId,
-        ...(deleteMode === "OTHER" && { exceptForSessionId: initiatingSession.id }),
+        exceptForSessionId: initiatingSession.id,
       }),
     );
   }

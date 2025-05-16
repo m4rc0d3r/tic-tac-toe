@@ -217,11 +217,9 @@ class PrismaSessionsRepository extends SessionsRepository {
       await this.prisma.session.deleteMany({
         where: {
           userId,
-          ...(typeof exceptForSessionId === "string" && {
-            NOT: {
-              id: exceptForSessionId,
-            },
-          }),
+          NOT: {
+            id: exceptForSessionId,
+          },
         },
       })
     ).count;

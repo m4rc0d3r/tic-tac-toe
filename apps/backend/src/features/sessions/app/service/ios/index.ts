@@ -1,3 +1,3 @@
 export * from "./create-one";
 export * from "./delete-one";
-export * from "./delete-user-sessions";
+export * from "./delete-other-user-sessions";

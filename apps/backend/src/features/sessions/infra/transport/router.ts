@@ -1,5 +1,5 @@
 import type { GetMySessionsOut } from "./ios";
-import { zDeleteMySessionsIn, zDeleteOneIn, zGetMySessionsIn, zGetMySessionsOut } from "./ios";
+import { zDeleteOneIn, zGetMySessionsIn, zGetMySessionsOut } from "./ios";
 
 import { procedureWithTracing, toTrpcError, trpcProcedureWithAuth, trpcRouter } from "~/infra";
 
@@ -50,21 +50,17 @@ const sessionsRouter = trpcRouter({
     }),
   ),
 
-  deleteMySessions: trpcProcedureWithAuth.input(zDeleteMySessionsIn).mutation(
+  deleteMySessions: trpcProcedureWithAuth.mutation(
     procedureWithTracing(async (opts) => {
       const {
         ctx: {
           sessionsService,
           session: { id: initiatingSessionId },
         },
-        input,
       } = opts;
 
-      const { deleteMode } = input;
-
-      const resultOfDeletion = await sessionsService.deleteUserSessions({
+      const resultOfDeletion = await sessionsService.deleteOtherUserSessions({
         initiatingSessionId,
-        deleteMode,
       });
 
       if (resultOfDeletion._tag === "Left") {
