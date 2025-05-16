@@ -61,12 +61,6 @@ import { Badge } from "~/shared/ui/badge";
 import { Button } from "~/shared/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/shared/ui/card";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "~/shared/ui/dropdown-menu";
-import {
   Form,
   FormControl,
   FormDescription,
@@ -303,27 +297,18 @@ function SettingsPage() {
     deleteSession({ id });
   };
 
-  const handleDeleteMySessions = (
-    deleteMode: Parameters<typeof deleteMySessions>[0]["deleteMode"],
-  ) => {
-    deleteMySessions(
-      { deleteMode },
-      {
-        onSuccess: () => {
-          toast.success(tc(TRANSLATION_KEYS.SESSIONS_SUCCESSFULLY_TERMINATED));
-          if (deleteMode === "ALL") {
-            logoutLocally();
-          } else {
-            void queryClient.invalidateQueries({
-              queryKey: getMySessionsQueryKey,
-            });
-          }
-        },
-        onError: (error) => {
-          handleTrpcError(error, TRANSLATION_KEYS.FAILED_TO_TERMINATE_SESSIONS);
-        },
+  const handleDeleteMySessions = () => {
+    deleteMySessions(void 0, {
+      onSuccess: () => {
+        toast.success(tc(TRANSLATION_KEYS.SESSIONS_SUCCESSFULLY_TERMINATED));
+        void queryClient.invalidateQueries({
+          queryKey: getMySessionsQueryKey,
+        });
       },
-    );
+      onError: (error) => {
+        handleTrpcError(error, TRANSLATION_KEYS.FAILED_TO_TERMINATE_SESSIONS);
+      },
+    });
   };
 
   const handleTrpcError = (
@@ -566,38 +551,14 @@ function SettingsPage() {
           <Separator />
         </div>
         <CardContent className="flex flex-col gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="destructive" disabled={isDeleteMySessionsPending}>
-                <Ban />
-                {tc(TRANSLATION_KEYS.TERMINATE_ALL_SESSIONS)}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <div>
-                {(
-                  [
-                    {
-                      labelKey: TRANSLATION_KEYS.EXCEPT_THE_CURRENT_ONE,
-                      onSelect: () => {
-                        handleDeleteMySessions("OTHER");
-                      },
-                    },
-                    {
-                      labelKey: TRANSLATION_KEYS.INCLUDING_THE_CURRENT_ONE,
-                      onSelect: () => {
-                        handleDeleteMySessions("ALL");
-                      },
-                    },
-                  ] as const
-                ).map(({ labelKey, onSelect }) => (
-                  <DropdownMenuItem key={labelKey} onSelect={onSelect}>
-                    {tc(labelKey)}
-                  </DropdownMenuItem>
-                ))}
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button
+            variant="destructive"
+            disabled={isDeleteMySessionsPending}
+            onClick={handleDeleteMySessions}
+          >
+            <Ban />
+            {tc(TRANSLATION_KEYS.TERMINATE_ALL_OTHER_SESSIONS)}
+          </Button>
           {isMySessionsPending ? (
             <div className="flex items-center justify-center">
               <Spinner className="size-16" />
