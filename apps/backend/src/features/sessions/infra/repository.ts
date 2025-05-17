@@ -198,14 +198,14 @@ class PrismaSessionsRepository extends SessionsRepository {
         Number(
           (
             await tx.$queryRaw<[{ count: bigint }]>`
-SELECT
-  count(*)
-FROM
-  sessions
-WHERE
-  user_id = ${userId}
-  AND created_at + cast(maximum_age || ' millisecond' AS INTERVAL) >= current_timestamp at TIME ZONE 'UTC'
-`
+              SELECT
+                count(*)
+              FROM
+                sessions
+              WHERE
+                user_id = ${userId}
+                AND created_at + cast(maximum_age || ' millisecond' AS INTERVAL) >= current_timestamp at TIME ZONE 'UTC'
+            `
           )[0].count,
         );
       const numberOfUserSessions = await (typeof userId === "number"
