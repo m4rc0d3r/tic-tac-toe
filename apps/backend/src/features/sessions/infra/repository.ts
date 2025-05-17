@@ -189,40 +189,98 @@ class PrismaSessionsRepository extends SessionsRepository {
     };
   }
 
-  override async deleteOne(params: DeleteOneIn): Promise<e.Either<NotFoundError, DeleteOneOut>> {
-    const { id, userId } = params;
-    return te.tryCatch(
-      async () =>
-        mapModelToEntity(
-          await this.prisma.session.delete({
-            where: {
-              id,
-              ...(userId && { userId }),
+  override async deleteOne({
+    id,
+    userId,
+  }: DeleteOneIn): Promise<e.Either<NotFoundError, DeleteOneOut>> {
+    return this.prisma.$transaction(async (tx) => {
+      const getNumberOfUnexpiredUserSessions = async (userId: number) =>
+        Number(
+          (
+            await tx.$queryRaw<[{ count: bigint }]>`
+SELECT
+  count(*)
+FROM
+  sessions
+WHERE
+  user_id = ${userId}
+  AND created_at + cast(maximum_age || ' millisecond' AS INTERVAL) >= current_timestamp at TIME ZONE 'UTC'
+`
+          )[0].count,
+        );
+      const numberOfUserSessions = await (typeof userId === "number"
+        ? getNumberOfUnexpiredUserSessions(userId)
+        : f.pipe(
+            await tx.session.findFirst({
+              where: {
+                id,
+              },
+            }),
+            te.fromNullable(0),
+            te.map(({ userId }) => getNumberOfUnexpiredUserSessions(userId)),
+            te.toUnion,
+          )());
+      console.log({ numberOfUserSessions });
+      const where = {
+        id,
+        ...(userId && { userId }),
+      };
+      if (numberOfUserSessions === 0) {
+        return e.left(new NotFoundError(where));
+      } else {
+        return f.pipe(
+          te.tryCatch(
+            () =>
+              numberOfUserSessions === 1
+                ? tx.session.update({
+                    where,
+                    data: {
+                      maximumAge: 0,
+                    },
+                  })
+                : this.prisma.session.delete({
+                    where,
+                  }),
+
+            (reason) => {
+              if (isNotFoundError(reason)) {
+                return new NotFoundError(where);
+              }
+              throw reason;
             },
-          }),
-        ),
-      (reason) => {
-        if (isNotFoundError(reason)) {
-          return new NotFoundError({
-            id,
-          });
-        }
-        throw reason;
-      },
-    )();
+          ),
+          te.map(mapModelToEntity),
+        )();
+      }
+    });
   }
 
   override async delete({ userId, exceptForSessionId }: DeleteIn): Promise<DeleteOut> {
-    return (
-      await this.prisma.session.deleteMany({
-        where: {
-          userId,
-          NOT: {
-            id: exceptForSessionId,
-          },
-        },
-      })
-    ).count;
+    return this.prisma.$transaction((tx) => {
+      return f.pipe(
+        te.fromNullable(0)(
+          tx.session.findFirst({
+            where: {
+              id: exceptForSessionId,
+            },
+          }),
+        ),
+        te.map(
+          async () =>
+            (
+              await tx.session.deleteMany({
+                where: {
+                  userId,
+                  NOT: {
+                    id: exceptForSessionId,
+                  },
+                },
+              })
+            ).count,
+        ),
+        te.toUnion,
+      )();
+    });
   }
 }
 
