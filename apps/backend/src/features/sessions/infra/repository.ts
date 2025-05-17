@@ -6,6 +6,7 @@ import {
   EMPTY_STRING,
   getTheNumberOfSkippedItems,
   mapParsedUserAgent,
+  MILLISECONDS_PER_SECOND,
 } from "@tic-tac-toe/core";
 import { camelCase } from "change-case-all";
 import { either as e, function as f, taskEither as te } from "fp-ts";
@@ -39,6 +40,7 @@ class PrismaSessionsRepository extends SessionsRepository {
   }
 
   override async createOne({
+    maximumAge,
     geolocation,
     device,
     os,
@@ -52,6 +54,7 @@ class PrismaSessionsRepository extends SessionsRepository {
         return mapModelToEntity(
           await this.prisma.session.create({
             data: {
+              maximumAge: maximumAge / MILLISECONDS_PER_SECOND,
               ...(geolocation && {
                 latitude: geolocation.coordinates.latitude,
                 longitude: geolocation.coordinates.longitude,
@@ -204,7 +207,7 @@ class PrismaSessionsRepository extends SessionsRepository {
                 sessions
               WHERE
                 user_id = ${userId}
-                AND created_at + cast(maximum_age || ' millisecond' AS INTERVAL) >= current_timestamp at TIME ZONE 'UTC'
+                AND created_at + cast(maximum_age || ' second' AS INTERVAL) >= current_timestamp at TIME ZONE 'UTC'
             `
           )[0].count,
         );
@@ -286,6 +289,7 @@ class PrismaSessionsRepository extends SessionsRepository {
 
 function mapModelToEntity(value: SessionModel): FindOneOut {
   const {
+    maximumAge,
     latitude,
     longitude,
     countryCode,
@@ -303,6 +307,7 @@ function mapModelToEntity(value: SessionModel): FindOneOut {
 
   return {
     ...sessionModel,
+    maximumAge: maximumAge * MILLISECONDS_PER_SECOND,
     geolocation:
       typeof latitude === "number" && typeof longitude === "number"
         ? {

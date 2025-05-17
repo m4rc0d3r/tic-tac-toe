@@ -7,7 +7,7 @@ FROM
   sessions
 WHERE
   user_id = $1
-  AND created_at + cast(maximum_age || ' millisecond' AS INTERVAL) >= current_timestamp at TIME ZONE 'UTC'
+  AND created_at + cast(maximum_age || ' second' AS INTERVAL) >= current_timestamp at TIME ZONE 'UTC'
 LIMIT
   $2
 OFFSET
