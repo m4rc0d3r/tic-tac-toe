@@ -1,3 +1,4 @@
+import { fastifyAwilixPlugin } from "@fastify/awilix";
 import fastifyCookie from "@fastify/cookie";
 import fastifyCors from "@fastify/cors";
 import fastifyMultipart from "@fastify/multipart";
@@ -12,13 +13,19 @@ import fastify from "fastify";
 import { authRouter } from "./features/auth";
 import { sessionsRouter } from "./features/sessions/infra/transport";
 import { usersRouter } from "./features/users/infra/transport";
-import { createConfig, createDependencies, createTrpcContext, trpcRouter } from "./infra";
+import type { Dependencies } from "./infra";
+import { createConfig, createDiContainer, createTrpcContext, trpcRouter } from "./infra";
 
 declare module "fastify" {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface FastifyRequest {
     body2: FastifyRequest["body"];
   }
+}
+
+declare module "@fastify/awilix" {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-empty-object-type
+  interface Cradle extends Dependencies {}
 }
 
 const appRouter = trpcRouter({
@@ -49,7 +56,9 @@ const app = fastify({
   },
 });
 
-const dependencies = createDependencies(config);
+app.register(fastifyAwilixPlugin, {
+  container: createDiContainer(config, app.log),
+});
 
 app.register(fastifyCors, config.cors);
 
@@ -89,11 +98,18 @@ app.register(fastifyTRPCPlugin, {
   prefix,
   trpcOptions: {
     router: appRouter,
-    createContext: (opts) =>
-      createTrpcContext({
+    createContext: (opts) => {
+      const { config, usersService, sessionsService, getGeolocationByIp, parseUserAgent } =
+        opts.req.diScope.cradle;
+      return createTrpcContext({
         ...opts,
-        ...dependencies,
-      }),
+        config,
+        usersService,
+        sessionsService,
+        getGeolocationByIp,
+        parseUserAgent,
+      });
+    },
   } satisfies FastifyTRPCPluginOptions<AppRouter>["trpcOptions"],
 });
 

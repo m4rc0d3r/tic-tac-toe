@@ -1,8 +1,18 @@
+import type { GetGeolocationByIp, UserAgentParserFunction } from "@tic-tac-toe/core";
 import type { CreateFastifyContextOptions } from "@trpc/server/adapters/fastify";
 
-import type { createDependencies } from "../dependencies";
+import type { Config } from "../config";
 
-type CreateTrpcInternalContextOptions = ReturnType<typeof createDependencies>;
+import type { SessionsService } from "~/features/sessions";
+import type { UsersService } from "~/features/users";
+
+type CreateTrpcInternalContextOptions = {
+  config: Config;
+  usersService: UsersService;
+  sessionsService: SessionsService;
+  getGeolocationByIp: GetGeolocationByIp;
+  parseUserAgent: UserAgentParserFunction;
+};
 
 function createTrpcInternalContext(opts: CreateTrpcInternalContextOptions) {
   return opts;
