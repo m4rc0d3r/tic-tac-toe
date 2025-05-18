@@ -10,6 +10,7 @@ import type {
 } from "awilix";
 import { asClass, asFunction, asValue, createContainer, Lifetime } from "awilix";
 import type { FastifyBaseLogger } from "fastify";
+import type { ToadScheduler } from "toad-scheduler";
 
 import type { Config } from "./config";
 
@@ -32,6 +33,8 @@ interface AsyncDispose {
 
 type Dependencies = {
   config: Config;
+  logger: FastifyBaseLogger;
+  scheduler: ToadScheduler;
   prisma: PrismaClient;
 
   usersRepository: PrismaUsersRepository;
@@ -54,6 +57,7 @@ function createDiContainer(config: Config, logger: FastifyBaseLogger) {
     strict: true,
   }).register({
     config: asValue(config),
+    logger: asValue(logger),
     prisma: asFunction(() => new PrismaClient(), {
       lifetime: Lifetime.SINGLETON,
       asyncInit: async (instance) => {

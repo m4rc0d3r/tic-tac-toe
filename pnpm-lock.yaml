@@ -59,6 +59,9 @@ importers:
       '@fastify/multipart':
         specifier: ^9.0.3
         version: 9.0.3
+      '@fastify/schedule':
+        specifier: ^6.0.0
+        version: 6.0.0(toad-scheduler@3.1.0)
       '@fastify/sensible':
         specifier: ^6.0.0
         version: 6.0.2
@@ -113,6 +116,9 @@ importers:
       request-ip:
         specifier: ^3.3.0
         version: 3.3.0
+      toad-scheduler:
+        specifier: ^3.1.0
+        version: 3.1.0
       type-fest:
         specifier: ^4.34.1
         version: 4.34.1
@@ -1044,6 +1050,11 @@ packages:
 
   '@fastify/proxy-addr@5.0.0':
     resolution: {integrity: sha512-37qVVA1qZ5sgH7KpHkkC4z9SK6StIsIcOmpjvMPXNb3vx2GQxhZocogVYbr2PbbeLCQxYIPDok307xEvRZOzGA==}
+
+  '@fastify/schedule@6.0.0':
+    resolution: {integrity: sha512-q4mPXUtqISb+dH2cB7HE7DxXqQmxPee9k0G29ydvGOoj5Aqb+uzUCLtkMVAzpnkPE6oOFGon6+JzWEmfJNS8ig==}
+    peerDependencies:
+      toad-scheduler: '>=2.0.0'
 
   '@fastify/sensible@6.0.2':
     resolution: {integrity: sha512-sva4j0CDeFKpYepjiELnaeUam3X2u3rCS2BgQettpph89XGJQlxgslWihiQN5HBE9cjc1Cl4iy6Hcu1HhhFhzA==}
@@ -3111,6 +3122,10 @@ packages:
 
   create-require@1.1.1:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
+
+  croner@8.1.2:
+    resolution: {integrity: sha512-ypfPFcAXHuAZRCzo3vJL6ltENzniTjwe/qsLleH1V2/7SRDjgvRQyrLmumFTLmjFax4IuSxfGXEn79fozXcJog==}
+    engines: {node: '>=18.0'}
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -5866,6 +5881,9 @@ packages:
     resolution: {integrity: sha512-/m8M+2BJUpoJdgAHoG+baCwBT+tf2VraSfkBgl0Y00qIWt41DJ8R5B8nsEw0I58YwF5IZH6z24/2TobDKnqSWw==}
     engines: {node: '>=12'}
 
+  toad-scheduler@3.1.0:
+    resolution: {integrity: sha512-ZTwsGMWyKTOokgTmIvjPIvkT3ZiPFgkAi8L0OLONOcSc/BUDPRzNMOfVWZzugIAxyntvY0Nzy1etNk+31Q4FXQ==}
+
   toidentifier@1.0.1:
     resolution: {integrity: sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA==}
     engines: {node: '>=0.6'}
@@ -6773,6 +6791,11 @@ snapshots:
     dependencies:
       '@fastify/forwarded': 3.0.0
       ipaddr.js: 2.2.0
+
+  '@fastify/schedule@6.0.0(toad-scheduler@3.1.0)':
+    dependencies:
+      fastify-plugin: 5.0.1
+      toad-scheduler: 3.1.0
 
   '@fastify/sensible@6.0.2':
     dependencies:
@@ -8736,6 +8759,8 @@ snapshots:
       typescript: 5.7.3
 
   create-require@1.1.1: {}
+
+  croner@8.1.2: {}
 
   cross-spawn@7.0.6:
     dependencies:
@@ -11711,6 +11736,10 @@ snapshots:
       is-number: 7.0.0
 
   toad-cache@3.7.0: {}
+
+  toad-scheduler@3.1.0:
+    dependencies:
+      croner: 8.1.2
 
   toidentifier@1.0.1: {}
 

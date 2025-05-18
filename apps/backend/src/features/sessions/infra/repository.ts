@@ -8,8 +8,12 @@ import {
   mapParsedUserAgent,
   MILLISECONDS_PER_SECOND,
 } from "@tic-tac-toe/core";
+import type { AwilixContainer } from "awilix";
 import { camelCase } from "change-case-all";
+import type { FastifyBaseLogger } from "fastify";
 import { either as e, function as f, taskEither as te } from "fp-ts";
+import type { ToadScheduler } from "toad-scheduler";
+import { AsyncTask, SimpleIntervalJob } from "toad-scheduler";
 
 import { SessionsRepository } from "../app/ports";
 import type {
@@ -32,11 +36,56 @@ import type {
 import { NotFoundError, UniqueKeyViolationError } from "~/app";
 import type { SessionFieldsInUniqueConstraints } from "~/core";
 import { isConstrainedFields, sessionFieldsInUniqueConstraints } from "~/core";
+import type { AsyncDispose, AsyncInit, Config } from "~/infra";
 import { isNotFoundError, isUniqueKeyViolation } from "~/infra";
 
-class PrismaSessionsRepository extends SessionsRepository {
-  constructor(private readonly prisma: PrismaClient) {
+class PrismaSessionsRepository extends SessionsRepository implements AsyncInit, AsyncDispose {
+  private jobToRemoveExpiredSessions: SimpleIntervalJob | null = null;
+
+  constructor(
+    private readonly config: Config,
+    private readonly logger: FastifyBaseLogger,
+    private readonly scheduler: ToadScheduler,
+    private readonly prisma: PrismaClient,
+  ) {
     super();
+  }
+
+  asyncInit(_diContainer: AwilixContainer): Promise<unknown> {
+    this.jobToRemoveExpiredSessions = new SimpleIntervalJob(
+      {
+        milliseconds: this.config.session.howOftenToDeleteExpired,
+      },
+      new AsyncTask(
+        "delete expired sessions",
+        async () => {
+          const numberOfDeleted = await this.prisma.$executeRaw`
+            DELETE FROM sessions
+            WHERE
+              created_at + cast(maximum_age || ' second' AS INTERVAL) < current_timestamp at TIME ZONE 'UTC'
+          `;
+          this.logger.info(
+            `${numberOfDeleted} expired sessions have been removed from the database`,
+          );
+        },
+        (err) => {
+          this.logger.error(
+            {
+              err,
+            },
+            "Something went wrong while trying to delete expired sessions",
+          );
+        },
+      ),
+    );
+
+    this.scheduler.addSimpleIntervalJob(this.jobToRemoveExpiredSessions);
+    return Promise.resolve();
+  }
+
+  asyncDispose() {
+    this.jobToRemoveExpiredSessions?.stop();
+    return Promise.resolve();
   }
 
   override async createOne({

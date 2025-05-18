@@ -2,9 +2,11 @@ import { fastifyAwilixPlugin } from "@fastify/awilix";
 import fastifyCookie from "@fastify/cookie";
 import fastifyCors from "@fastify/cors";
 import fastifyMultipart from "@fastify/multipart";
+import { fastifySchedule } from "@fastify/schedule";
 import { SLASH } from "@tic-tac-toe/core";
 import type { FastifyTRPCPluginOptions } from "@trpc/server/adapters/fastify";
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
+import { asFunction, Lifetime } from "awilix";
 import closeWithGrace from "close-with-grace";
 import { config as dotenvConfig } from "dotenv";
 import { expand } from "dotenv-expand";
@@ -56,9 +58,18 @@ const app = fastify({
   },
 });
 
-app.register(fastifyAwilixPlugin, {
-  container: createDiContainer(config, app.log),
+const container = createDiContainer(config, app.log);
+container.register({
+  scheduler: asFunction(() => app.scheduler, {
+    lifetime: Lifetime.SINGLETON,
+  }),
 });
+
+app.register(fastifyAwilixPlugin, {
+  container,
+});
+
+app.register(fastifySchedule);
 
 app.register(fastifyCors, config.cors);
 
