@@ -49,7 +49,7 @@ const app = fastify({
   },
 });
 
-const dependencies = createDependencies(config, app.log);
+const dependencies = createDependencies(config);
 
 app.register(fastifyCors, config.cors);
 

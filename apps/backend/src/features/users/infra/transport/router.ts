@@ -12,7 +12,6 @@ import {
 
 import type { FullyRegisteredUser } from "~/core";
 import {
-  procedureWithTracing,
   processFormData,
   toTrpcError,
   trpcProcedure,
@@ -21,8 +20,9 @@ import {
 } from "~/infra";
 
 const usersRouter = trpcRouter({
-  updatePersonalData: trpcProcedureWithAuth.use(processFormData(zUpdatePersonalDataIn)).mutation(
-    procedureWithTracing(async (opts): Promise<UpdatePersonalDataOut> => {
+  updatePersonalData: trpcProcedureWithAuth
+    .use(processFormData(zUpdatePersonalDataIn))
+    .mutation(async (opts): Promise<UpdatePersonalDataOut> => {
       const {
         ctx: {
           usersService,
@@ -42,10 +42,10 @@ const usersRouter = trpcRouter({
 
       return updateResult.right;
     }),
-  ),
 
-  updateCredentials: trpcProcedureWithAuth.input(zUpdateCredentialsIn).mutation(
-    procedureWithTracing(async (opts): Promise<UpdateCredentialsOut> => {
+  updateCredentials: trpcProcedureWithAuth
+    .input(zUpdateCredentialsIn)
+    .mutation(async (opts): Promise<UpdateCredentialsOut> => {
       const {
         ctx: {
           usersService,
@@ -84,58 +84,51 @@ const usersRouter = trpcRouter({
 
       return me;
     }),
-  ),
 
-  getMe: trpcProcedureWithAuth.query(
-    procedureWithTracing(async (opts) => {
-      const {
-        ctx: {
-          usersService,
-          session: { userId: id },
-        },
-      } = opts;
+  getMe: trpcProcedureWithAuth.query(async (opts) => {
+    const {
+      ctx: {
+        usersService,
+        session: { userId: id },
+      },
+    } = opts;
 
-      const searchResult = await usersService.findOneBy({
-        id,
-      });
+    const searchResult = await usersService.findOneBy({
+      id,
+    });
 
-      if (searchResult._tag === "Left") {
-        throw toTrpcError(searchResult.left);
-      }
+    if (searchResult._tag === "Left") {
+      throw toTrpcError(searchResult.left);
+    }
 
-      return searchResult.right;
-    }),
-  ),
+    return searchResult.right;
+  }),
 
-  getUser: trpcProcedure.input(zGetUserIn).query(
-    procedureWithTracing(async (opts) => {
-      const {
-        ctx: { usersService },
-        input: { id },
-      } = opts;
+  getUser: trpcProcedure.input(zGetUserIn).query(async (opts) => {
+    const {
+      ctx: { usersService },
+      input: { id },
+    } = opts;
 
-      const searchResult = await usersService.findOneWithLastOnlineDate({
-        id,
-      });
+    const searchResult = await usersService.findOneWithLastOnlineDate({
+      id,
+    });
 
-      if (searchResult._tag === "Left") {
-        throw toTrpcError(searchResult.left);
-      }
+    if (searchResult._tag === "Left") {
+      throw toTrpcError(searchResult.left);
+    }
 
-      return zGetUserOut.parse(searchResult.right);
-    }),
-  ),
+    return zGetUserOut.parse(searchResult.right);
+  }),
 
-  getUsersByNickname: trpcProcedure.input(zListByNicknameIn).query(
-    procedureWithTracing(async (opts) => {
-      const {
-        ctx: { usersService },
-        input,
-      } = opts;
+  getUsersByNickname: trpcProcedure.input(zListByNicknameIn).query(async (opts) => {
+    const {
+      ctx: { usersService },
+      input,
+    } = opts;
 
-      return zGetUsersByNicknameOut.parse(await usersService.listByNickname(input));
-    }),
-  ),
+    return zGetUsersByNicknameOut.parse(await usersService.listByNickname(input));
+  }),
 });
 
 export { usersRouter };

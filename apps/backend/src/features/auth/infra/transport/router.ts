@@ -9,122 +9,116 @@ import { zLoginIn, zRegisterIn } from "./ios";
 import type { Session, User } from "~/core";
 import type { SessionsService } from "~/features/sessions";
 import type { FindOneByOut } from "~/features/users/app/ports/repository";
-import { procedureWithTracing, toTrpcError, trpcProcedure, trpcRouter } from "~/infra";
+import { toTrpcError, trpcProcedure, trpcRouter } from "~/infra";
 
 const authRouter = trpcRouter({
-  register: trpcProcedure.input(zRegisterIn).mutation(
-    procedureWithTracing(async (opts): Promise<RegisterOut> => {
-      const {
-        ctx: {
-          req,
-          res,
-          config: {
-            session: { cookieName },
-          },
-          usersService,
-          sessionsService,
-          getGeolocationByIp,
-          parseUserAgent,
-        },
-        input: { registrationType, ...input },
-      } = opts;
-
-      const resultOfCreation = await usersService.create(input);
-
-      if (resultOfCreation._tag === "Left") {
-        throw toTrpcError(resultOfCreation.left);
-      }
-
-      const me = getUserWithoutPasswordHash(resultOfCreation.right);
-
-      await setUpSession(
+  register: trpcProcedure.input(zRegisterIn).mutation(async (opts): Promise<RegisterOut> => {
+    const {
+      ctx: {
         req,
         res,
+        config: {
+          session: { cookieName },
+        },
+        usersService,
         sessionsService,
         getGeolocationByIp,
         parseUserAgent,
-        cookieName,
-        me.id,
-      );
+      },
+      input: { registrationType, ...input },
+    } = opts;
 
-      return {
-        me,
-      };
-    }),
-  ),
+    const resultOfCreation = await usersService.create(input);
 
-  login: trpcProcedure.input(zLoginIn).mutation(
-    procedureWithTracing(async (opts): Promise<LoginOut> => {
-      const {
-        ctx: {
-          req,
-          res,
-          config: {
-            session: { cookieName },
-          },
-          usersService,
-          sessionsService,
-          getGeolocationByIp,
-          parseUserAgent,
-        },
-        input: { email, password },
-      } = opts;
+    if (resultOfCreation._tag === "Left") {
+      throw toTrpcError(resultOfCreation.left);
+    }
 
-      const searchResult = await usersService.findOneBy({
-        email,
-        password,
-      });
+    const me = getUserWithoutPasswordHash(resultOfCreation.right);
 
-      if (searchResult._tag === "Left") {
-        throw toTrpcError(searchResult.left);
-      }
+    await setUpSession(
+      req,
+      res,
+      sessionsService,
+      getGeolocationByIp,
+      parseUserAgent,
+      cookieName,
+      me.id,
+    );
 
-      const me = getUserWithoutPasswordHash(searchResult.right);
+    return {
+      me,
+    };
+  }),
 
-      await setUpSession(
+  login: trpcProcedure.input(zLoginIn).mutation(async (opts): Promise<LoginOut> => {
+    const {
+      ctx: {
         req,
         res,
+        config: {
+          session: { cookieName },
+        },
+        usersService,
         sessionsService,
         getGeolocationByIp,
         parseUserAgent,
-        cookieName,
-        me.id,
-      );
+      },
+      input: { email, password },
+    } = opts;
 
-      return {
-        me,
-      };
-    }),
-  ),
+    const searchResult = await usersService.findOneBy({
+      email,
+      password,
+    });
 
-  logout: trpcProcedure.mutation(
-    procedureWithTracing(async (opts) => {
-      const {
-        ctx: {
-          req,
-          res,
-          config: {
-            session: { cookieName },
-          },
-          sessionsService,
+    if (searchResult._tag === "Left") {
+      throw toTrpcError(searchResult.left);
+    }
+
+    const me = getUserWithoutPasswordHash(searchResult.right);
+
+    await setUpSession(
+      req,
+      res,
+      sessionsService,
+      getGeolocationByIp,
+      parseUserAgent,
+      cookieName,
+      me.id,
+    );
+
+    return {
+      me,
+    };
+  }),
+
+  logout: trpcProcedure.mutation(async (opts) => {
+    const {
+      ctx: {
+        req,
+        res,
+        config: {
+          session: { cookieName },
         },
-      } = opts;
+        sessionsService,
+      },
+    } = opts;
 
-      const sessionCookie = req.cookies[cookieName];
+    const sessionCookie = req.cookies[cookieName];
 
-      if (typeof sessionCookie !== "string") {
-        return;
-      }
+    if (typeof sessionCookie !== "string") {
+      return;
+    }
 
-      const result = req.unsignCookie(sessionCookie);
+    const result = req.unsignCookie(sessionCookie);
 
-      if (!result.valid) {
-        return;
-      }
+    if (!result.valid) {
+      return;
+    }
 
-      await destroySession(res, sessionsService, cookieName, result.value);
-    }),
-  ),
+    await destroySession(res, sessionsService, cookieName, result.value);
+  }),
 });
 
 function getUserWithoutPasswordHash(user: FindOneByOut) {
