@@ -1,4 +1,6 @@
-import { SPACE } from "@tic-tac-toe/core";
+import { keepPreviousData } from "@tanstack/react-query";
+import type { PageOptions } from "@tic-tac-toe/core";
+import { EMPTY_STRING, SPACE } from "@tic-tac-toe/core";
 import { GamepadIcon, MenuIcon, Moon, Sun } from "lucide-react";
 import type { ComponentProps } from "react";
 import { useState } from "react";
@@ -22,6 +24,15 @@ import { SUPPORTED_LANGUAGES, TRANSLATION_KEYS, useTranslation2 } from "~/shared
 import { ROUTES } from "~/shared/routing";
 import { Button } from "~/shared/ui/button";
 import {
+  Command,
+  CommandEmpty,
+  CommandError,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "~/shared/ui/command";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -29,6 +40,8 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "~/shared/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "~/shared/ui/popover";
+import { Spinner } from "~/shared/ui/spinner";
 import { cn } from "~/shared/ui/utils";
 
 function RootLayout() {
@@ -154,6 +167,9 @@ function RootLayout() {
                 <li className="flex items-center">
                   <ul className="flex gap-1">
                     <li className="flex items-center">
+                      <UserSearchButton />
+                    </li>
+                    <li className="flex items-center">
                       <ThemeSwitcher />
                     </li>
                     <li className="flex items-center">
@@ -192,6 +208,99 @@ function RootLayout() {
         <Outlet />
       </main>
     </div>
+  );
+}
+
+function UserSearchButton() {
+  const {
+    postproc: { tc },
+  } = useTranslation2();
+
+  const MINIMUM_NICKNAME_PREFIX_LENGTH = 2;
+  const [nicknamePrefix, setNicknamePrefix] = useState(EMPTY_STRING);
+  const [pageOptions] = useState<PageOptions>({
+    page: 1,
+    take: 10,
+  });
+  const isAcceptableNicknamePrefix = nicknamePrefix.length >= MINIMUM_NICKNAME_PREFIX_LENGTH;
+
+  const {
+    data: users,
+    error: usersError,
+    isError: isUsersError,
+    isPending: isUsersPending,
+    isFetching: isUsersFetching,
+  } = trpc.users.getUsersByNickname.useQuery(
+    {
+      nicknamePrefix,
+      pageOptions,
+    },
+    {
+      ...(isAcceptableNicknamePrefix && {
+        placeholderData: keepPreviousData,
+      }),
+      enabled: isAcceptableNicknamePrefix,
+    },
+  );
+
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline">{tc(TRANSLATION_KEYS.FIND_USER)}</Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-fit">
+        <Command shouldFilter={false}>
+          <CommandInput
+            value={nicknamePrefix}
+            onValueChange={setNicknamePrefix}
+            className="placeholder-shown:text-ellipsis"
+            placeholder={tc(TRANSLATION_KEYS.ENTER_NICKNAME)}
+            suffixElement={<Spinner className={cn(!isUsersFetching && "invisible")} />}
+          />
+          <CommandList>
+            {!isUsersPending &&
+              (isUsersError ? (
+                <CommandError>{usersError.message}</CommandError>
+              ) : (
+                <>
+                  <CommandGroup>
+                    {users.data.map(({ id, nickname, firstName, lastName, avatar }) => {
+                      const fullName = [firstName, lastName].join(SPACE).trim();
+                      const prefix = nickname.substring(0, nicknamePrefix.length);
+                      const suffix = nickname.substring(nicknamePrefix.length);
+
+                      return (
+                        <CommandItem
+                          key={id}
+                          value={nickname}
+                          onSelect={() => {
+                            setNicknamePrefix(EMPTY_STRING);
+                            setOpen(false);
+                          }}
+                        >
+                          <UserAvatar firstName={firstName} lastName={lastName} avatar={avatar} />
+                          <div className="flex flex-col">
+                            <span>{fullName || tc(TRANSLATION_KEYS.NAME_NOT_SPECIFIED)}</span>
+                            <span>
+                              <span className="font-bold">{prefix}</span>
+                              <span>{suffix}</span>
+                            </span>
+                          </div>
+                        </CommandItem>
+                      );
+                    })}
+                  </CommandGroup>
+                  <CommandEmpty>
+                    {tc(TRANSLATION_KEYS.NO_USER_WITH_THIS_NICKNAME_FOUND)}
+                  </CommandEmpty>
+                </>
+              ))}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
 

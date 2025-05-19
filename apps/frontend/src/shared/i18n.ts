@@ -160,6 +160,9 @@ const TRANSLATION_KEYS = z.enum([
   "BROWSER",
   "NOT_RECOGNIZED",
   "LAST_ACCESS",
+  "FIND_USER",
+  "ENTER_NICKNAME",
+  "NO_USER_WITH_THIS_NICKNAME_FOUND",
 ]).Values;
 
 const RESOURCES = {
@@ -303,6 +306,9 @@ const RESOURCES = {
       [TRANSLATION_KEYS.BROWSER]: "browser",
       [TRANSLATION_KEYS.NOT_RECOGNIZED]: "not recognized",
       [TRANSLATION_KEYS.LAST_ACCESS]: "last access",
+      [TRANSLATION_KEYS.FIND_USER]: "find user",
+      [TRANSLATION_KEYS.ENTER_NICKNAME]: "enter nickname",
+      [TRANSLATION_KEYS.NO_USER_WITH_THIS_NICKNAME_FOUND]: "no user with this nickname found",
     },
   },
   uk: {
@@ -450,6 +456,10 @@ const RESOURCES = {
       [TRANSLATION_KEYS.BROWSER]: "браузер",
       [TRANSLATION_KEYS.NOT_RECOGNIZED]: "не розпізнано",
       [TRANSLATION_KEYS.LAST_ACCESS]: "останній доступ",
+      [TRANSLATION_KEYS.FIND_USER]: "знайти користувача",
+      [TRANSLATION_KEYS.ENTER_NICKNAME]: "введіть псевдонім",
+      [TRANSLATION_KEYS.NO_USER_WITH_THIS_NICKNAME_FOUND]:
+        "користувача з цим псевдонімом не знайдено",
     },
   },
 };
