@@ -1,3 +1,4 @@
+import { Slot } from "@radix-ui/react-slot";
 import { Command as CommandPrimitive } from "cmdk";
 import { SearchIcon } from "lucide-react";
 import * as React from "react";
@@ -51,11 +52,26 @@ function CommandDialog({
 
 function CommandInput({
   className,
+  withSearchIcon = true,
+  prefixElement,
+  suffixElement,
   ...props
-}: React.ComponentProps<typeof CommandPrimitive.Input>) {
+}: React.ComponentProps<typeof CommandPrimitive.Input> &
+  (
+    | {
+        withSearchIcon: true;
+        prefixElement?: undefined;
+      }
+    | {
+        withSearchIcon?: false | undefined;
+        prefixElement?: React.ReactNode | undefined;
+      }
+  ) & {
+    suffixElement?: React.ReactNode | undefined;
+  }) {
   return (
     <div data-slot="command-input-wrapper" className="flex h-9 items-center gap-2 border-b px-3">
-      <SearchIcon className="size-4 shrink-0 opacity-50" />
+      {prefixElement ?? (withSearchIcon && <SearchIcon className="size-4 shrink-0 opacity-50" />)}
       <CommandPrimitive.Input
         data-slot="command-input"
         className={cn(
@@ -64,6 +80,7 @@ function CommandInput({
         )}
         {...props}
       />
+      {suffixElement}
     </div>
   );
 }
@@ -80,6 +97,24 @@ function CommandList({ className, ...props }: React.ComponentProps<typeof Comman
 
 function CommandLoading({ ...props }: React.ComponentProps<typeof CommandPrimitive.Loading>) {
   return <CommandPrimitive.Loading data-slot="command-loading" {...props} />;
+}
+
+function CommandError({
+  asChild = false,
+  className,
+  ...props
+}: React.ComponentProps<"div"> & {
+  asChild?: boolean;
+}) {
+  const Comp = asChild ? Slot : "div";
+
+  return (
+    <Comp
+      data-slot="command-error"
+      className={cn("py-6 text-center text-sm text-red-400", className)}
+      {...props}
+    />
+  );
 }
 
 function CommandEmpty({ ...props }: React.ComponentProps<typeof CommandPrimitive.Empty>) {
@@ -148,6 +183,7 @@ export {
   Command,
   CommandDialog,
   CommandEmpty,
+  CommandError,
   CommandGroup,
   CommandInput,
   CommandItem,
