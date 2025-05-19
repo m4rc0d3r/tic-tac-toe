@@ -78,6 +78,10 @@ function CommandList({ className, ...props }: React.ComponentProps<typeof Comman
   );
 }
 
+function CommandLoading({ ...props }: React.ComponentProps<typeof CommandPrimitive.Loading>) {
+  return <CommandPrimitive.Loading data-slot="command-loading" {...props} />;
+}
+
 function CommandEmpty({ ...props }: React.ComponentProps<typeof CommandPrimitive.Empty>) {
   return (
     <CommandPrimitive.Empty
@@ -148,6 +152,7 @@ export {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandLoading,
   CommandSeparator,
   CommandShortcut,
 };
