@@ -60,9 +60,31 @@ class PrismaSessionsRepository extends SessionsRepository implements AsyncInit, 
         "delete expired sessions",
         async () => {
           const numberOfDeleted = await this.prisma.$executeRaw`
-            DELETE FROM sessions
+            WITH
+              last_access_sessions AS (
+                SELECT
+                  user_id,
+                  max(last_accessed_at) AS last_accessed_at
+                FROM
+                  sessions
+                GROUP BY
+                  user_id
+              ),
+              expired_sessions AS (
+                SELECT
+                  id,
+                  user_id,
+                  last_accessed_at
+                FROM
+                  sessions
+                WHERE
+                  created_at + (maximum_age * INTERVAL '1 second') < now() at TIME ZONE 'UTC'
+              )
+            DELETE FROM sessions s USING expired_sessions es
+            INNER JOIN last_access_sessions las ON las.user_id = es.user_id
             WHERE
-              created_at + cast(maximum_age || ' second' AS INTERVAL) < current_timestamp at TIME ZONE 'UTC'
+              s.id = es.id
+              AND es.last_accessed_at < las.last_accessed_at;
           `;
           this.logger.info(
             `${numberOfDeleted} expired sessions have been removed from the database`,
