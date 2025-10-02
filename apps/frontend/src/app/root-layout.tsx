@@ -1,6 +1,5 @@
-import { keepPreviousData } from "@tanstack/react-query";
 import type { PageOptions } from "@tic-tac-toe/core";
-import { EMPTY_STRING, SPACE } from "@tic-tac-toe/core";
+import { EMPTY_STRING, isObject, SPACE } from "@tic-tac-toe/core";
 import { GamepadIcon, MenuIcon, Moon, Sun } from "lucide-react";
 import type { ComponentProps } from "react";
 import { useState } from "react";
@@ -236,9 +235,30 @@ function UserSearchButton() {
       pageOptions,
     },
     {
-      ...(isAcceptableNicknamePrefix && {
-        placeholderData: keepPreviousData,
-      }),
+      placeholderData: (previousData, previousQuery) => {
+        const previousPrefix = (() => {
+          if (!(isObject(previousQuery) && Array.isArray(previousQuery.queryKey))) return null;
+          const queryKey = previousQuery.queryKey;
+          if (!Array.isArray(queryKey)) return null;
+
+          const INPUT = "input";
+          const options = queryKey[1] as unknown;
+          if (!(isObject(options) && INPUT in options)) return null;
+
+          const { input } = options;
+          const NICKNAME_PREFIX = "nicknamePrefix";
+          if (!(isObject(input) && NICKNAME_PREFIX in input)) return null;
+
+          const { nicknamePrefix } = input;
+          if (typeof nicknamePrefix !== "string") return null;
+
+          return nicknamePrefix;
+        })();
+
+        return typeof previousPrefix === "string" && nicknamePrefix.includes(previousPrefix)
+          ? previousData
+          : undefined;
+      },
       enabled: isAcceptableNicknamePrefix,
     },
   );
@@ -268,8 +288,16 @@ function UserSearchButton() {
                   <CommandGroup>
                     {users.data.map(({ id, nickname, firstName, lastName, avatar }) => {
                       const fullName = [firstName, lastName].join(SPACE).trim();
-                      const prefix = nickname.substring(0, nicknamePrefix.length);
-                      const suffix = nickname.substring(nicknamePrefix.length);
+
+                      const { prefix, suffix } = nickname.startsWith(nicknamePrefix)
+                        ? {
+                            prefix: nickname.substring(0, nicknamePrefix.length),
+                            suffix: nickname.substring(nicknamePrefix.length),
+                          }
+                        : {
+                            prefix: EMPTY_STRING,
+                            suffix: nickname,
+                          };
 
                       return (
                         <CommandItem
