@@ -163,6 +163,8 @@ const TRANSLATION_KEYS = z.enum([
   "FIND_USER",
   "ENTER_NICKNAME",
   "NO_USER_WITH_THIS_NICKNAME_FOUND",
+  "USER_PROFILE",
+  "LAST_ONLINE",
 ]).Values;
 
 const RESOURCES = {
@@ -309,6 +311,8 @@ const RESOURCES = {
       [TRANSLATION_KEYS.FIND_USER]: "find user",
       [TRANSLATION_KEYS.ENTER_NICKNAME]: "enter nickname",
       [TRANSLATION_KEYS.NO_USER_WITH_THIS_NICKNAME_FOUND]: "no user with this nickname found",
+      [TRANSLATION_KEYS.USER_PROFILE]: "user profile",
+      [TRANSLATION_KEYS.LAST_ONLINE]: "last online",
     },
   },
   uk: {
@@ -460,6 +464,8 @@ const RESOURCES = {
       [TRANSLATION_KEYS.ENTER_NICKNAME]: "введіть псевдонім",
       [TRANSLATION_KEYS.NO_USER_WITH_THIS_NICKNAME_FOUND]:
         "користувача з цим псевдонімом не знайдено",
+      [TRANSLATION_KEYS.USER_PROFILE]: "профіль користувача",
+      [TRANSLATION_KEYS.LAST_ONLINE]: "востаннє онлайн",
     },
   },
 };

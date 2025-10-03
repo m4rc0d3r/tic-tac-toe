@@ -11,7 +11,7 @@ import { THEMES, useTheme } from "./theming";
 
 import type { Me } from "~/entities/auth";
 import { useAuthStore } from "~/entities/auth";
-import { UserAvatar } from "~/entities/user";
+import { UserAvatar, UserProfileDialog } from "~/entities/user";
 import { ClassicGameOptionsDialog } from "~/pages/classic-game";
 import { trpc } from "~/shared/api";
 import AboutIcon from "~/shared/assets/about.svg?react";
@@ -264,71 +264,78 @@ function UserSearchButton() {
   );
 
   const [open, setOpen] = useState(false);
+  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(0);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="outline">{tc(TRANSLATION_KEYS.FIND_USER)}</Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-fit">
-        <Command shouldFilter={false}>
-          <CommandInput
-            value={nicknamePrefix}
-            onValueChange={setNicknamePrefix}
-            className="placeholder-shown:text-ellipsis"
-            placeholder={tc(TRANSLATION_KEYS.ENTER_NICKNAME)}
-            suffixElement={<Spinner className={cn(!isUsersFetching && "invisible")} />}
-          />
-          <CommandList>
-            {!isUsersPending &&
-              (isUsersError ? (
-                <CommandError>{usersError.message}</CommandError>
-              ) : (
-                <>
-                  <CommandGroup>
-                    {users.data.map(({ id, nickname, firstName, lastName, avatar }) => {
-                      const fullName = [firstName, lastName].join(SPACE).trim();
+    <>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button variant="outline">{tc(TRANSLATION_KEYS.FIND_USER)}</Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-fit">
+          <Command shouldFilter={false}>
+            <CommandInput
+              value={nicknamePrefix}
+              onValueChange={setNicknamePrefix}
+              className="placeholder-shown:text-ellipsis"
+              placeholder={tc(TRANSLATION_KEYS.ENTER_NICKNAME)}
+              suffixElement={<Spinner className={cn(!isUsersFetching && "invisible")} />}
+            />
+            <CommandList>
+              {!isUsersPending &&
+                (isUsersError ? (
+                  <CommandError>{usersError.message}</CommandError>
+                ) : (
+                  <>
+                    <CommandGroup>
+                      {users.data.map(({ id, nickname, firstName, lastName, avatar }) => {
+                        const fullName = [firstName, lastName].join(SPACE).trim();
 
-                      const { prefix, suffix } = nickname.startsWith(nicknamePrefix)
-                        ? {
-                            prefix: nickname.substring(0, nicknamePrefix.length),
-                            suffix: nickname.substring(nicknamePrefix.length),
-                          }
-                        : {
-                            prefix: EMPTY_STRING,
-                            suffix: nickname,
-                          };
+                        const { prefix, suffix } = nickname.startsWith(nicknamePrefix)
+                          ? {
+                              prefix: nickname.substring(0, nicknamePrefix.length),
+                              suffix: nickname.substring(nicknamePrefix.length),
+                            }
+                          : {
+                              prefix: EMPTY_STRING,
+                              suffix: nickname,
+                            };
 
-                      return (
-                        <CommandItem
-                          key={id}
-                          value={nickname}
-                          onSelect={() => {
-                            setNicknamePrefix(EMPTY_STRING);
-                            setOpen(false);
-                          }}
-                        >
-                          <UserAvatar firstName={firstName} lastName={lastName} avatar={avatar} />
-                          <div className="flex flex-col">
-                            <span>{fullName || tc(TRANSLATION_KEYS.NAME_NOT_SPECIFIED)}</span>
-                            <span>
-                              <span className="font-bold">{prefix}</span>
-                              <span>{suffix}</span>
-                            </span>
-                          </div>
-                        </CommandItem>
-                      );
-                    })}
-                  </CommandGroup>
-                  <CommandEmpty>
-                    {tc(TRANSLATION_KEYS.NO_USER_WITH_THIS_NICKNAME_FOUND)}
-                  </CommandEmpty>
-                </>
-              ))}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+                        return (
+                          <CommandItem
+                            key={id}
+                            value={nickname}
+                            onSelect={() => {
+                              setNicknamePrefix(EMPTY_STRING);
+                              setOpen(false);
+                              setDialogOpen(true);
+                              setSelectedUserId(id);
+                            }}
+                          >
+                            <UserAvatar firstName={firstName} lastName={lastName} avatar={avatar} />
+                            <div className="flex flex-col">
+                              <span>{fullName || tc(TRANSLATION_KEYS.NAME_NOT_SPECIFIED)}</span>
+                              <span>
+                                <span className="font-bold">{prefix}</span>
+                                <span>{suffix}</span>
+                              </span>
+                            </div>
+                          </CommandItem>
+                        );
+                      })}
+                    </CommandGroup>
+                    <CommandEmpty>
+                      {tc(TRANSLATION_KEYS.NO_USER_WITH_THIS_NICKNAME_FOUND)}
+                    </CommandEmpty>
+                  </>
+                ))}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+      <UserProfileDialog userId={selectedUserId} open={isDialogOpen} onOpenChange={setDialogOpen} />
+    </>
   );
 }
 
