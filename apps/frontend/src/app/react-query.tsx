@@ -3,9 +3,10 @@ import {
   QueryClientProvider as ReactQueryClientProvider,
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { httpLink } from "@trpc/client";
+import { httpLink, isNonJsonSerializable, splitLink } from "@trpc/client";
 import type { ReactNode } from "react";
 import { useState } from "react";
+import superjson from "superjson";
 
 import { trpc } from "~/shared/api";
 import { useConfigStore } from "~/shared/config";
@@ -19,21 +20,36 @@ function QueryClientProvider({ children }: Props) {
   const { prefix } = useConfigStore.use.trpc();
 
   const [queryClient] = useState(() => new QueryClient());
-  const [trpcClient] = useState(() =>
-    trpc.createClient({
+  const [trpcClient] = useState(() => {
+    const httpLinkOptions: Parameters<typeof httpLink>[0] = {
+      url: [backendApp.url(), prefix].join("/"),
+      fetch: (input, init) =>
+        fetch(input, {
+          ...init,
+          credentials: "include",
+          signal: init?.signal ?? null,
+        } as RequestInit),
+    };
+
+    return trpc.createClient({
       links: [
-        httpLink({
-          url: [backendApp.url(), prefix].join("/"),
-          fetch: (input, options) =>
-            fetch(input, {
-              ...options,
-              credentials: "include",
-              signal: options?.signal ?? null,
-            }),
+        splitLink({
+          condition: ({ input }) => isNonJsonSerializable(input),
+          true: httpLink({
+            ...httpLinkOptions,
+            transformer: {
+              serialize: (object: unknown) => object,
+              deserialize: (object: unknown) => object,
+            },
+          }),
+          false: httpLink({
+            ...httpLinkOptions,
+            transformer: superjson,
+          }),
         }),
       ],
-    }),
-  );
+    });
+  });
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <ReactQueryClientProvider client={queryClient}>
