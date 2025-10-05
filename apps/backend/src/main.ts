@@ -110,11 +110,18 @@ app.register(fastifyTRPCPlugin, {
   trpcOptions: {
     router: appRouter,
     createContext: (opts) => {
-      const { config, usersService, sessionsService, getGeolocationByIp, parseUserAgent } =
-        opts.req.diScope.cradle;
+      const {
+        config,
+        eventBus,
+        usersService,
+        sessionsService,
+        getGeolocationByIp,
+        parseUserAgent,
+      } = opts.req.diScope.cradle;
       return createTrpcContext({
         ...opts,
         config,
+        eventBus,
         usersService,
         sessionsService,
         getGeolocationByIp,

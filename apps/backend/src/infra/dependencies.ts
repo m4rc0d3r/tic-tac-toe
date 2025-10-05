@@ -1,3 +1,5 @@
+import EventEmitter from "events";
+
 import { PrismaClient } from "@prisma/client";
 import type { AnyFunction, GetGeolocationByIp, UserAgentParserFunction } from "@tic-tac-toe/core";
 import { freeIpApi, hasMethod, ipWhoIs, uaParserJs } from "@tic-tac-toe/core";
@@ -14,6 +16,7 @@ import type { ToadScheduler } from "toad-scheduler";
 
 import type { Config } from "./config";
 
+import type { EventBus } from "~/core";
 import { PrismaSessionsRepository, SessionsService } from "~/features/sessions";
 import {
   BcryptHashingService,
@@ -36,6 +39,7 @@ type Dependencies = {
   logger: FastifyBaseLogger;
   scheduler: ToadScheduler;
   prisma: PrismaClient;
+  eventBus: EventBus;
 
   usersRepository: PrismaUsersRepository;
   hashingService: BcryptHashingService;
@@ -51,6 +55,8 @@ type Dependencies = {
 
 function createDiContainer(config: Config, logger: FastifyBaseLogger) {
   const PRISMA_CLIENT_CLASS_NAME = "PrismaClient";
+
+  const eventBus: EventBus = new EventEmitter();
 
   return createContainer<Dependencies>({
     injectionMode: "CLASSIC",
@@ -79,6 +85,7 @@ function createDiContainer(config: Config, logger: FastifyBaseLogger) {
         );
       },
     }),
+    eventBus: asValue(eventBus),
     ...Object.fromEntries(
       (
         [

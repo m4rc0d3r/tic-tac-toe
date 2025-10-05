@@ -1,7 +1,10 @@
+import { wait } from "@tic-tac-toe/core";
+
 import type { GetMySessionsOut } from "./ios";
 import { zDeleteOneIn, zGetMySessionsIn, zGetMySessionsOut } from "./ios";
 
-import { toTrpcError, trpcProcedureWithAuth, trpcRouter } from "~/infra";
+import { EventName } from "~/core";
+import { on2, toTrpcError, trpcProcedureWithAuth, trpcRouter } from "~/infra";
 
 const sessionsRouter = trpcRouter({
   updateLastAccessDate: trpcProcedureWithAuth.mutation(async (opts) => {
@@ -84,6 +87,26 @@ const sessionsRouter = trpcRouter({
         isCurrent: value.id === currentSessionId,
       })),
     } satisfies GetMySessionsOut);
+  }),
+
+  onCurrentSessionTerminated: trpcProcedureWithAuth.subscription(async function* ({
+    ctx: {
+      eventBus,
+      session: { id: currentSessionId },
+    },
+    signal,
+  }) {
+    for await (const [{ id }] of on2(eventBus, EventName.sessionTerminated, {
+      signal,
+    })) {
+      if (currentSessionId === id) {
+        yield {
+          id,
+        };
+        await wait(1000);
+        return;
+      }
+    }
   }),
 });
 

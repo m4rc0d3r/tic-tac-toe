@@ -33,5 +33,9 @@ function getTypeInfo(value: unknown): TypeInfo {
   };
 }
 
-export { getTypeInfo };
+async function wait(time: number) {
+  await new Promise((resolve) => setTimeout(resolve, time));
+}
+
+export { getTypeInfo, wait };
 export type { TypeInfo };

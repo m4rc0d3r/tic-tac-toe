@@ -22,13 +22,14 @@ import { SessionDeletionError } from "./errors";
 import type { CreateOneIn, DeleteOneIn, DeleteOtherUserSessionsIn } from "./ios";
 
 import type { NotFoundError, UniqueKeyViolationError } from "~/app";
-import type { Session, SessionFieldsInUniqueConstraints } from "~/core";
-import { SESSION_ID_LENGTH } from "~/core";
+import type { EventBus, Session, SessionFieldsInUniqueConstraints } from "~/core";
+import { EventName, SESSION_ID_LENGTH } from "~/core";
 import type { Config } from "~/infra";
 
 class SessionsService {
   constructor(
     private readonly config: Config,
+    private readonly eventBus: EventBus,
     private readonly sessionsRepository: SessionsRepository,
   ) {}
 
@@ -83,10 +84,19 @@ class SessionsService {
       return eitherInitiatingSession;
     }
 
-    return this.sessionsRepository.deleteOne({
-      id,
-      userId: eitherInitiatingSession.right.userId,
-    });
+    return f.pipe(
+      await this.sessionsRepository.deleteOne({
+        id,
+        userId: eitherInitiatingSession.right.userId,
+      }),
+      e.tap(({ id }) =>
+        e.right(
+          this.eventBus.emit(EventName.sessionTerminated, {
+            id,
+          }),
+        ),
+      ),
+    );
   }
 
   async deleteOtherUserSessions({
@@ -100,12 +110,18 @@ class SessionsService {
 
     const initiatingSession = eitherInitiatingSession.right;
 
-    return e.right(
-      await this.sessionsRepository.delete({
-        userId: initiatingSession.userId,
-        exceptForSessionId: initiatingSession.id,
-      }),
-    );
+    const sessions = await this.sessionsRepository.delete({
+      userId: initiatingSession.userId,
+      exceptForSessionId: initiatingSession.id,
+    });
+
+    for (const { id } of sessions) {
+      this.eventBus.emit(EventName.sessionTerminated, {
+        id,
+      });
+    }
+
+    return e.right(sessions);
   }
 
   private async getSessionOrReasonWhyItCannotDeleteOthers(id: Session["id"]) {

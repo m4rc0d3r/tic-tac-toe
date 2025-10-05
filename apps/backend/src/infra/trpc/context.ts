@@ -3,11 +3,13 @@ import type { CreateFastifyContextOptions } from "@trpc/server/adapters/fastify"
 
 import type { Config } from "../config";
 
+import type { EventBus } from "~/core";
 import type { SessionsService } from "~/features/sessions";
 import type { UsersService } from "~/features/users";
 
 type CreateTrpcInternalContextOptions = {
   config: Config;
+  eventBus: EventBus;
   usersService: UsersService;
   sessionsService: SessionsService;
   getGeolocationByIp: GetGeolocationByIp;

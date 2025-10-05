@@ -11,7 +11,7 @@ import {
 import type { AwilixContainer } from "awilix";
 import { camelCase } from "change-case-all";
 import type { FastifyBaseLogger } from "fastify";
-import { either as e, function as f, taskEither as te } from "fp-ts";
+import { either as e, function as f, task as t, taskEither as te } from "fp-ts";
 import type { ToadScheduler } from "toad-scheduler";
 import { AsyncTask, SimpleIntervalJob } from "toad-scheduler";
 
@@ -332,27 +332,31 @@ class PrismaSessionsRepository extends SessionsRepository implements AsyncInit, 
   override async delete({ userId, exceptForSessionId }: DeleteIn): Promise<DeleteOut> {
     return this.prisma.$transaction((tx) => {
       return f.pipe(
-        te.fromNullable(0)(
-          tx.session.findFirst({
+        () =>
+          tx.session.findMany({
             where: {
-              id: exceptForSessionId,
+              userId,
             },
           }),
-        ),
-        te.map(
-          async () =>
-            (
-              await tx.session.deleteMany({
+        t.map((sessions) => (sessions.some(({ id }) => id === exceptForSessionId) ? sessions : [])),
+        t.flatMap((sessions) =>
+          f.pipe(
+            () =>
+              tx.session.deleteMany({
                 where: {
                   userId,
                   NOT: {
                     id: exceptForSessionId,
                   },
                 },
-              })
-            ).count,
+              }),
+            t.map(({ count }) => {
+              if (count !== sessions.length - 1) throw new Error();
+
+              return sessions.filter(({ id }) => id !== exceptForSessionId).map(mapModelToEntity);
+            }),
+          ),
         ),
-        te.toUnion,
       )();
     });
   }

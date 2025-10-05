@@ -13,7 +13,8 @@ const zDeleteIn = zSession
   );
 type DeleteIn = z.infer<typeof zDeleteIn>;
 
-type DeleteOut = number;
+const zDeleteOut = z.array(zSession);
+type DeleteOut = z.infer<typeof zDeleteOut>;
 
-export { zDeleteIn };
+export { zDeleteIn, zDeleteOut };
 export type { DeleteIn, DeleteOut };
