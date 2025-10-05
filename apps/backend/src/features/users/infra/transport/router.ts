@@ -40,7 +40,17 @@ const usersRouter = trpcRouter({
         throw toTrpcError(updateResult.left);
       }
 
-      return updateResult.right;
+      {
+        const { id, nickname, firstName, lastName, avatar } = updateResult.right;
+
+        return {
+          id,
+          nickname,
+          firstName,
+          lastName,
+          avatar,
+        };
+      }
     }),
 
   updateCredentials: trpcProcedureWithAuth
@@ -80,9 +90,14 @@ const usersRouter = trpcRouter({
         throw toTrpcError(updateResult.left);
       }
 
-      const { passwordHash, ...me } = updateResult.right;
+      {
+        const { id, email } = updateResult.right;
 
-      return me;
+        return {
+          id,
+          email,
+        };
+      }
     }),
 
   getMe: trpcProcedureWithAuth.query(async (opts) => {

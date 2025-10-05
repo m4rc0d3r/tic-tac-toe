@@ -22,23 +22,10 @@ const zUpdateCredentialsIn = zFullyRegisteredUser
   );
 type UpdateCredentialsIn = z.infer<typeof zUpdateCredentialsIn>;
 
-const zUpdatePersonalDataOut = zBasicUser;
-type UpdatePersonalDataOut = z.infer<typeof zUpdatePersonalDataOut>;
-
 const zUpdateCredentialsOut = zFullyRegisteredUser.omit({
   password: true,
 });
 type UpdateCredentialsOut = z.infer<typeof zUpdateCredentialsOut>;
 
-export {
-  zUpdateCredentialsIn,
-  zUpdateCredentialsOut,
-  zUpdatePersonalDataIn,
-  zUpdatePersonalDataOut,
-};
-export type {
-  UpdateCredentialsIn,
-  UpdateCredentialsOut,
-  UpdatePersonalDataIn,
-  UpdatePersonalDataOut,
-};
+export { zUpdateCredentialsIn, zUpdateCredentialsOut, zUpdatePersonalDataIn };
+export type { UpdateCredentialsIn, UpdateCredentialsOut, UpdatePersonalDataIn };

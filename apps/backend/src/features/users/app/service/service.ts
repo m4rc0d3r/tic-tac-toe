@@ -9,6 +9,7 @@ import type {
   ListByNicknameIn,
   ListByNicknameOut,
   ListOut,
+  UpdateOut,
 } from "../ports/repository";
 
 import type {
@@ -17,7 +18,6 @@ import type {
   UpdateCredentialsIn,
   UpdateCredentialsOut,
   UpdatePersonalDataIn,
-  UpdatePersonalDataOut,
 } from "./ios";
 
 import type { UniqueKeyViolationError } from "~/app";
@@ -50,10 +50,7 @@ class UsersService {
   async updatePersonalData(
     params: UpdatePersonalDataIn,
   ): Promise<
-    e.Either<
-      UniqueKeyViolationError<UserFieldsInUniqueConstraints> | NotFoundError,
-      UpdatePersonalDataOut
-    >
+    e.Either<UniqueKeyViolationError<UserFieldsInUniqueConstraints> | NotFoundError, UpdateOut>
   > {
     const { avatar, ...rest } = params;
     type DataForUpdate = Parameters<typeof this.usersRepository.update>[0];

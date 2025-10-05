@@ -2,10 +2,6 @@ import { z } from "zod";
 import { zfd } from "zod-form-data";
 
 import { zBasicUser, zUserAvatarAsFile } from "~/core";
-import {
-  zUpdateFullyRegisteredIn,
-  zUpdateNotFullyRegisteredIn,
-} from "~/features/users/app/ports/repository";
 
 const zUpdatePersonalDataIn = zfd.formData(
   zBasicUser
@@ -21,12 +17,7 @@ const zUpdatePersonalDataIn = zfd.formData(
 );
 type UpdatePersonalDataIn = z.infer<typeof zUpdatePersonalDataIn>;
 
-const zUpdatePersonalDataOut = z.union([
-  zUpdateNotFullyRegisteredIn,
-  zUpdateFullyRegisteredIn.omit({
-    passwordHash: true,
-  }),
-]);
+const zUpdatePersonalDataOut = zBasicUser;
 type UpdatePersonalDataOut = z.infer<typeof zUpdatePersonalDataOut>;
 
 export { zUpdatePersonalDataIn, zUpdatePersonalDataOut };
