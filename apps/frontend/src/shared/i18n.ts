@@ -165,6 +165,8 @@ const TRANSLATION_KEYS = z.enum([
   "NO_USER_WITH_THIS_NICKNAME_FOUND",
   "USER_PROFILE",
   "LAST_ONLINE",
+  "CURRENT_SESSION_TERMINATED",
+  "YOUR_SESSION_WAS_TERMINATED_BY_ANOTHER_SESSION",
 ]).Values;
 
 const RESOURCES = {
@@ -313,6 +315,9 @@ const RESOURCES = {
       [TRANSLATION_KEYS.NO_USER_WITH_THIS_NICKNAME_FOUND]: "no user with this nickname found",
       [TRANSLATION_KEYS.USER_PROFILE]: "user profile",
       [TRANSLATION_KEYS.LAST_ONLINE]: "last online",
+      [TRANSLATION_KEYS.CURRENT_SESSION_TERMINATED]: "current session terminated",
+      [TRANSLATION_KEYS.YOUR_SESSION_WAS_TERMINATED_BY_ANOTHER_SESSION]:
+        "your session was terminated by another session",
     },
   },
   uk: {
@@ -466,6 +471,9 @@ const RESOURCES = {
         "користувача з цим псевдонімом не знайдено",
       [TRANSLATION_KEYS.USER_PROFILE]: "профіль користувача",
       [TRANSLATION_KEYS.LAST_ONLINE]: "востаннє онлайн",
+      [TRANSLATION_KEYS.CURRENT_SESSION_TERMINATED]: "поточний сеанс завершено",
+      [TRANSLATION_KEYS.YOUR_SESSION_WAS_TERMINATED_BY_ANOTHER_SESSION]:
+        "ваш сеанс було перервано іншим сеансом",
     },
   },
 };
