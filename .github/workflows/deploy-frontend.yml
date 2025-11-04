@@ -1,0 +1,59 @@
+name: Deploy frontend
+
+on:
+  push:
+    branches:
+      - "master"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: npm i -g -f corepack && corepack enable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/checkout@v4
+        with:
+          path: source
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: dest
+      - shell: bash
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_DATABASE_URL: ${{ secrets.DIRECT_DATABASE_URL }}
+          VITE_BACKEND_APP_PROTOCOL: ${{ vars.VITE_BACKEND_APP_PROTOCOL }}
+          VITE_BACKEND_APP_ADDRESS: ${{ vars.VITE_BACKEND_APP_ADDRESS }}
+          VITE_TRPC_PREFIX: ${{ vars.VITE_TRPC_PREFIX }}
+          VITE_SESSION_LAST_ACCESS_DATE_UPDATE_INTERVAL: ${{ vars.VITE_SESSION_LAST_ACCESS_DATE_UPDATE_INTERVAL }}
+        run: |
+          cd source
+          pnpm install --frozen-lockfile
+          cd packages/core
+          pnpm build
+          cd ../../apps/backend
+          pnpm prisma generate
+          pnpm prisma migrate deploy
+          pnpm prisma generate --sql
+          pnpm build
+          cd ../frontend
+          pnpm build
+          cd ../../../dest
+          find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+          cp -r ../source/apps/frontend/dist/. .
+          git config user.name "${{ github.event.head_commit.author.name }}"
+          git config user.email "${{ github.event.head_commit.author.email }}"
+          git add .
+          if git diff --cached --quiet; then
+            echo 'No changes have been detected since the last commit.'
+          else
+            COMMIT_MESSAGE_FILE=$(mktemp)
+            echo "${{ github.event.head_commit.message }}" > "$COMMIT_MESSAGE_FILE"
+            git commit -F "$COMMIT_MESSAGE_FILE"
+            git push
+          fi
