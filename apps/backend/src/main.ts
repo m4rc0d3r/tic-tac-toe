@@ -73,9 +73,8 @@ app.register(fastifySchedule);
 
 app.register(fastifyCors, config.cors);
 
-const {
-  cookie: { secret, domain, secure },
-} = config;
+const { cookie } = config;
+const { secret, domain, sameSite, secure } = cookie;
 app.register(fastifyCookie, {
   secret,
   hook: "onRequest",
@@ -83,7 +82,7 @@ app.register(fastifyCookie, {
     domain,
     httpOnly: true,
     path: SLASH,
-    sameSite: "strict",
+    sameSite,
     secure,
     signed: true,
   },
