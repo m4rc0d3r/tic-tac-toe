@@ -1,10 +1,17 @@
+import { COLON, EMPTY_STRING } from "@tic-tac-toe/core";
 import { z } from "zod";
 
 const zBackendAppConfig = z
   .object({
     VITE_BACKEND_APP_PROTOCOL: z.string().nonempty(),
     VITE_BACKEND_APP_ADDRESS: z.string().nonempty(),
-    VITE_BACKEND_APP_PORT: z.coerce.number().positive(),
+    VITE_BACKEND_APP_PORT: z.preprocess((value) => {
+      if (typeof value === "number") return value;
+
+      if (typeof value === "string") return value.length > 0 ? Number(value) : undefined;
+
+      return value;
+    }, z.number().positive().optional()),
   })
   .transform(({ VITE_BACKEND_APP_PROTOCOL, VITE_BACKEND_APP_ADDRESS, VITE_BACKEND_APP_PORT }) => {
     const protocol = VITE_BACKEND_APP_PROTOCOL;
@@ -15,7 +22,7 @@ const zBackendAppConfig = z
       address,
       port,
       url() {
-        return `${protocol}://${address}:${port}`;
+        return `${protocol}://${address}${typeof port === "number" ? [COLON, port].join(EMPTY_STRING) : EMPTY_STRING}`;
       },
     };
   });

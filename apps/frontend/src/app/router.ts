@@ -11,52 +11,57 @@ import { RegistrationPage } from "~/pages/registration";
 import { SettingsPage } from "~/pages/settings";
 import { ROUTES } from "~/shared/routing";
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      children: [
+        {
+          Component: RootLayout,
+          children: [
+            {
+              index: true,
+              Component: HomePage,
+            },
+            {
+              path: ROUTES.about,
+              Component: AboutPage,
+            },
+            {
+              path: ROUTES.settings,
+              Component: withConditionalAccess({
+                component: SettingsPage,
+                allowFor: "AUTHENTICATED",
+              }),
+            },
+            {
+              path: ROUTES.classicGame,
+              Component: ClassicGamePage,
+            },
+          ],
+        },
+        {
+          Component: withConditionalAccess({
+            component: Outlet,
+            allowFor: "UNAUTHENTICATED",
+          }),
+          children: [
+            {
+              path: ROUTES.registration,
+              Component: RegistrationPage,
+            },
+            {
+              path: ROUTES.login,
+              Component: LoginPage,
+            },
+          ],
+        },
+      ],
+    },
+  ],
   {
-    path: "/",
-    children: [
-      {
-        Component: RootLayout,
-        children: [
-          {
-            index: true,
-            Component: HomePage,
-          },
-          {
-            path: ROUTES.about,
-            Component: AboutPage,
-          },
-          {
-            path: ROUTES.settings,
-            Component: withConditionalAccess({
-              component: SettingsPage,
-              allowFor: "AUTHENTICATED",
-            }),
-          },
-          {
-            path: ROUTES.classicGame,
-            Component: ClassicGamePage,
-          },
-        ],
-      },
-      {
-        Component: withConditionalAccess({
-          component: Outlet,
-          allowFor: "UNAUTHENTICATED",
-        }),
-        children: [
-          {
-            path: ROUTES.registration,
-            Component: RegistrationPage,
-          },
-          {
-            path: ROUTES.login,
-            Component: LoginPage,
-          },
-        ],
-      },
-    ],
+    basename: "/tic-tac-toe",
   },
-]);
+);
 
 export { router };
