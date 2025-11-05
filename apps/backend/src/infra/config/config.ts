@@ -33,7 +33,7 @@ function createConfig(variables: Record<string, unknown>): e.Either<ConfigVarsEr
         bcrypt: zBcryptConfig.parse(variables),
         cookie: zCookieConfig.parse(variables),
         cors: zCorsConfig.parse({
-          origin: frontendApp.url(),
+          origin: new URL(frontendApp.url()).origin,
           credentials: true,
         } satisfies CorsConfig),
         frontendApp,
