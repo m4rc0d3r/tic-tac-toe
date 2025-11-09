@@ -11,15 +11,13 @@ import { THEMES, useTheme } from "./theming";
 
 import type { Me } from "~/entities/auth";
 import { useAuthStore } from "~/entities/auth";
+import { LanguageSwitcher } from "~/entities/i18n_";
 import { UserAvatar, UserProfileDialog } from "~/entities/user";
 import { ClassicGameOptionsDialog } from "~/pages/classic-game";
 import { trpc } from "~/shared/api";
 import AboutIcon from "~/shared/assets/about.svg?react";
-import EnglishFlagIcon from "~/shared/assets/english-flag.svg?react";
 import LogoIcon from "~/shared/assets/logo.svg?react";
-import UkrainianFlagIcon from "~/shared/assets/ukrainian-flag.svg?react";
-import type { LanguageCode } from "~/shared/i18n";
-import { SUPPORTED_LANGUAGES, TRANSLATION_KEYS, useTranslation2 } from "~/shared/i18n";
+import { TRANSLATION_KEYS, useTranslation2 } from "~/shared/i18n";
 import { ROUTES } from "~/shared/routing";
 import { Button } from "~/shared/ui/button";
 import {
@@ -369,46 +367,6 @@ function ThemeSwitcher(props: ComponentProps<typeof DropdownMenu>) {
   );
 }
 
-function LanguageSwitcher(props: ComponentProps<typeof DropdownMenu>) {
-  const {
-    translation: { i18n },
-    postproc: { tc },
-  } = useTranslation2();
-
-  const FLAGS_BY_CODE: Record<LanguageCode, typeof EnglishFlagIcon> = {
-    en: EnglishFlagIcon,
-    uk: UkrainianFlagIcon,
-  };
-
-  const getLanguageName = (code: string) =>
-    tc(SUPPORTED_LANGUAGES[code as LanguageCode].toLocaleUpperCase(), {
-      lng: code,
-    });
-
-  const FlagIcon = FLAGS_BY_CODE[i18n.language as LanguageCode];
-
-  return (
-    <DropdownMenu {...props}>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <FlagIcon />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuRadioGroup
-          value={i18n.language}
-          onValueChange={(value) => void i18n.changeLanguage(value)}
-        >
-          {Object.keys(SUPPORTED_LANGUAGES).map((value) => (
-            <DropdownMenuRadioItem key={value} value={value}>
-              {getLanguageName(value)}
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
 type MeSectionProps = ComponentProps<typeof DropdownMenu> & {
   data: Me;
 };

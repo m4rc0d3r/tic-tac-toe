@@ -81,6 +81,7 @@
     "format:fix": "prettier --write .",
     "lint:check": "eslint . && stylelint '**/*.css'",
     "lint:fix": "eslint --fix . && stylelint --fix '**/*.css'",
+    "postbuild": "cp dist/index.html dist/404.html",
     "preview": "vite preview",
     "type-check": "concurrently -p \"[{name}]\" -n \"App,Node\" -c \"blue.bold,yellow.bold\" \"pnpm type-check-app\" \"pnpm type-check-node\"",
     "type-check-app": "tsc --noEmit -p tsconfig.app.json",

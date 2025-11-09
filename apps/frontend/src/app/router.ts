@@ -7,6 +7,7 @@ import { AboutPage } from "~/pages/about";
 import { ClassicGamePage } from "~/pages/classic-game";
 import { HomePage } from "~/pages/home";
 import { LoginPage } from "~/pages/login";
+import { NotFoundPage } from "~/pages/not-found";
 import { RegistrationPage } from "~/pages/registration";
 import { SettingsPage } from "~/pages/settings";
 import { ROUTES } from "~/shared/routing";
@@ -57,6 +58,10 @@ const router = createBrowserRouter(
           ],
         },
       ],
+    },
+    {
+      path: "*",
+      Component: NotFoundPage,
     },
   ],
   {
