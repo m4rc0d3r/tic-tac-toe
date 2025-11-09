@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 24 24"><g
+    fill="#303C42"
+  ><path
+      d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0-3a1 1 0 0 1 0 1 1 1 0 0 1 0-1zM1 6a1 1 0 0 0 2 0l1-1v1a1 1 0 0 0 2 0V4H5l1-1a1 1 0 1 0-2-2v1L3 1a1 1 0 1 0-2 2l1 1H1v2zM23 18h-2v1l-1-1a1 1 0 1 0-2 2l1 1h-1a1 1 0 1 0 2 2l1-1v1a1 1 0 0 0 2 0v-2h-1l1-1v-2z"
+    /><path
+      d="M24 9V7h-7V0h-1l-1 1v6H9V0H8L7 1v6H1L0 8v1h7v6H1l-1 1v1h7v7h2v-7h6v7h2v-7h7v-2h-7V9h7zm-9 6H9V9h6v6z"
+    /></g></svg>

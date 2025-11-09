@@ -168,6 +168,7 @@ const TRANSLATION_KEYS = z.enum([
   "CURRENT_SESSION_TERMINATED",
   "YOUR_SESSION_WAS_TERMINATED_BY_ANOTHER_SESSION",
   "SUCH_PAGE_DOES_NOT_EXIST",
+  "TIC_TAC_TOE",
 ]).Values;
 
 const RESOURCES = {
@@ -320,6 +321,7 @@ const RESOURCES = {
       [TRANSLATION_KEYS.YOUR_SESSION_WAS_TERMINATED_BY_ANOTHER_SESSION]:
         "your session was terminated by another session",
       [TRANSLATION_KEYS.SUCH_PAGE_DOES_NOT_EXIST]: "such page does not exist",
+      [TRANSLATION_KEYS.TIC_TAC_TOE]: "tic-tac-toe",
     },
   },
   uk: {
@@ -477,6 +479,7 @@ const RESOURCES = {
       [TRANSLATION_KEYS.YOUR_SESSION_WAS_TERMINATED_BY_ANOTHER_SESSION]:
         "ваш сеанс було перервано іншим сеансом",
       [TRANSLATION_KEYS.SUCH_PAGE_DOES_NOT_EXIST]: "такої сторінки не існує",
+      [TRANSLATION_KEYS.TIC_TAC_TOE]: "хрестики-нулики",
     },
   },
 };
